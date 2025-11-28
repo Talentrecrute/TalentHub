@@ -1,0 +1,129 @@
+{
+  "name": "Job",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Job title"
+    },
+    "company_id": {
+      "type": "string",
+      "description": "Reference to Company entity"
+    },
+    "description": {
+      "type": "string",
+      "description": "Full job description"
+    },
+    "requirements": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Job requirements"
+    },
+    "responsibilities": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Job responsibilities"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "Technology",
+        "Marketing",
+        "Sales",
+        "Design",
+        "Finance",
+        "Human Resources",
+        "Operations",
+        "Customer Support",
+        "Engineering",
+        "Product",
+        "Legal",
+        "Other"
+      ],
+      "description": "Job category"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "Full-time",
+        "Part-time",
+        "Contract",
+        "Freelance",
+        "Internship"
+      ],
+      "description": "Employment type"
+    },
+    "experience_level": {
+      "type": "string",
+      "enum": [
+        "Entry Level",
+        "Mid Level",
+        "Senior Level",
+        "Lead",
+        "Executive"
+      ],
+      "description": "Required experience level"
+    },
+    "location": {
+      "type": "string",
+      "description": "Job location"
+    },
+    "remote": {
+      "type": "boolean",
+      "default": false,
+      "description": "Remote work option"
+    },
+    "salary_min": {
+      "type": "number",
+      "description": "Minimum salary"
+    },
+    "salary_max": {
+      "type": "number",
+      "description": "Maximum salary"
+    },
+    "salary_currency": {
+      "type": "string",
+      "default": "USD",
+      "description": "Salary currency"
+    },
+    "skills": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Required skills"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "open",
+        "closed",
+        "filled"
+      ],
+      "default": "open",
+      "description": "Job status"
+    },
+    "application_deadline": {
+      "type": "string",
+      "format": "date",
+      "description": "Application deadline"
+    },
+    "views": {
+      "type": "number",
+      "default": 0,
+      "description": "Number of views"
+    }
+  },
+  "required": [
+    "title",
+    "company_id",
+    "description",
+    "category",
+    "type",
+    "location"
+  ]
+}
