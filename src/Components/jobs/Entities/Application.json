@@ -1,0 +1,123 @@
+{
+  "name": "UserProfile",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string",
+      "description": "Reference to User email"
+    },
+    "title": {
+      "type": "string",
+      "description": "Professional title"
+    },
+    "bio": {
+      "type": "string",
+      "description": "Professional bio"
+    },
+    "location": {
+      "type": "string",
+      "description": "Current location"
+    },
+    "phone": {
+      "type": "string",
+      "description": "Phone number"
+    },
+    "linkedin_url": {
+      "type": "string",
+      "description": "LinkedIn profile URL"
+    },
+    "portfolio_url": {
+      "type": "string",
+      "description": "Portfolio website URL"
+    },
+    "cv_url": {
+      "type": "string",
+      "description": "CV/Resume file URL"
+    },
+    "skills": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Professional skills"
+    },
+    "experience": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "company": {
+            "type": "string"
+          },
+          "location": {
+            "type": "string"
+          },
+          "start_date": {
+            "type": "string"
+          },
+          "end_date": {
+            "type": "string"
+          },
+          "current": {
+            "type": "boolean"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Work experience"
+    },
+    "education": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "degree": {
+            "type": "string"
+          },
+          "institution": {
+            "type": "string"
+          },
+          "field": {
+            "type": "string"
+          },
+          "start_date": {
+            "type": "string"
+          },
+          "end_date": {
+            "type": "string"
+          },
+          "current": {
+            "type": "boolean"
+          }
+        }
+      },
+      "description": "Education history"
+    },
+    "preferred_categories": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Preferred job categories"
+    },
+    "preferred_job_types": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Preferred job types"
+    },
+    "expected_salary_min": {
+      "type": "number",
+      "description": "Minimum expected salary"
+    }
+  },
+  "required": [
+    "user_email"
+  ]
+}
