@@ -1,0 +1,187 @@
+// Job Portal Schema for TalentHub
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// NextAuth Models
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// Application Models
+enum UserRole {
+  CANDIDATE
+  EMPLOYER
+}
+
+enum JobStatus {
+  DRAFT
+  OPEN
+  CLOSED
+}
+
+enum ApplicationStatus {
+  PENDING
+  REVIEWED
+  ACCEPTED
+  REJECTED
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  emailVerified DateTime?
+  name          String?
+  password      String? // For credentials auth
+  image         String?
+  role          UserRole  @default(CANDIDATE)
+  
+  // Candidate fields
+  phone         String?
+  location      String?
+  bio           String?
+  skills        String? // JSON array stored as string
+  experience    String? // JSON array stored as string
+  education     String? // JSON array stored as string
+  resume        String? // URL to resume file
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  accounts      Account[]
+  sessions      Session[]
+  applications  Application[]
+  companies     Company[] // Companies owned by this employer
+  savedJobs     SavedJob[]
+}
+
+model Company {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  website     String?
+  logo        String?
+  industry    String?
+  size        String?
+  location    String?
+  
+  employerId  String
+  employer    User     @relation(fields: [employerId], references: [id], onDelete: Cascade)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  jobs        Job[]
+  
+  @@index([employerId])
+}
+
+model Job {
+  id            String    @id @default(cuid())
+  title         String
+  description   String
+  category      String
+  location      String
+  locationType  String    @default("onsite") // onsite, remote, hybrid
+  employmentType String   @default("full-time") // full-time, part-time, contract, internship
+  
+  salaryMin     Int?
+  salaryMax     Int?
+  salaryCurrency String   @default("USD")
+  
+  requirements  String? // JSON array stored as string
+  responsibilities String? // JSON array stored as string
+  benefits      String? // JSON array stored as string
+  
+  status        JobStatus @default(DRAFT)
+  
+  companyId     String
+  company       Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  expiresAt     DateTime?
+  
+  // Relations
+  applications  Application[]
+  savedBy       SavedJob[]
+  
+  @@index([companyId])
+  @@index([status])
+  @@index([category])
+}
+
+model Application {
+  id            String            @id @default(cuid())
+  
+  jobId         String
+  job           Job               @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  
+  candidateId   String
+  candidate     User              @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  
+  status        ApplicationStatus @default(PENDING)
+  coverLetter   String?
+  resume        String? // URL to resume file
+  
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+  
+  @@unique([jobId, candidateId]) // A user can only apply once per job
+  @@index([candidateId])
+  @@index([jobId])
+  @@index([status])
+}
+
+model SavedJob {
+  id          String   @id @default(cuid())
+  
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  jobId       String
+  job         Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  
+  createdAt   DateTime @default(now())
+  
+  @@unique([userId, jobId])
+  @@index([userId])
+}
