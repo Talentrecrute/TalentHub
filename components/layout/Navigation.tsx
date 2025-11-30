@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button"
 import { Briefcase, Building2, LogOut, Menu, User, X } from 'lucide-react'
 import { signIn, signOut, useSession } from 'next-auth/react'
+import NextImage from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
@@ -108,14 +109,26 @@ export default function Navigation() {
                       : 'bg-slate-100 hover:bg-slate-200'
                   }`}
                 >
-                  {isEmployer ? (
-                    <Building2 className={`w-4 h-4 ${
-                      isActive('/profile') ? 'text-white' : 'text-slate-700'
-                    }`} />
+                  {session.user?.image ? (
+                    <div className="w-6 h-6 rounded-full overflow-hidden ring-2 ring-white">
+                      <NextImage
+                        src={session.user.image}
+                        alt={session.user.name || 'Profile'}
+                        width={24}
+                        height={24}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
                   ) : (
-                    <User className={`w-4 h-4 ${
-                      isActive('/profile') ? 'text-white' : 'text-slate-700'
-                    }`} />
+                    isEmployer ? (
+                      <Building2 className={`w-4 h-4 ${
+                        isActive('/profile') ? 'text-white' : 'text-slate-700'
+                      }`} />
+                    ) : (
+                      <User className={`w-4 h-4 ${
+                        isActive('/profile') ? 'text-white' : 'text-slate-700'
+                      }`} />
+                    )
                   )}
                   <span className={`text-sm font-medium ${
                     isActive('/profile') ? 'text-white' : 'text-slate-700'
