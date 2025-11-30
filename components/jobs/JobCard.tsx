@@ -1,14 +1,17 @@
+import { Button } from '@/components/ui/button'
 import type { Company, Job } from '@prisma/client'
-import { Briefcase, Clock, DollarSign, MapPin } from 'lucide-react'
+import { Bookmark, Briefcase, Clock, DollarSign, MapPin } from 'lucide-react'
 import Link from 'next/link'
 
 interface JobCardProps {
   job: Job
   company?: Company | null
   showActions?: boolean
+  isSaved?: boolean
+  onSave?: () => void
 }
 
-export default function JobCard({ job, company, showActions = true }: JobCardProps) {
+export default function JobCard({ job, company, showActions = true, isSaved = false, onSave }: JobCardProps) {
   const formatSalary = (min?: number | null, max?: number | null, currency: string = 'USD') => {
     if (!min && !max) return 'Competitive'
     const formatter = new Intl.NumberFormat('en-US', {
@@ -35,8 +38,22 @@ export default function JobCard({ job, company, showActions = true }: JobCardPro
   }
 
   return (
-    <Link href={`/jobs/${job.id}`}>
-      <div className="bg-white border border-slate-200 rounded-xl p-6 hover:shadow-lg hover:border-teal-300 transition-all duration-300 cursor-pointer h-full">
+    <div className="bg-white border border-slate-200 rounded-xl p-6 hover:shadow-lg hover:border-teal-300 transition-all duration-300 h-full relative group">
+      {onSave && (
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={(e) => {
+            e.preventDefault()
+            onSave()
+          }}
+          className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity"
+        >
+          <Bookmark className={`w-5 h-5 ${isSaved ? 'fill-teal-600 text-teal-600' : 'text-slate-400'}`} />
+        </Button>
+      )}
+      
+      <Link href={`/jobs/${job.id}`} className="block">
         <div className="flex items-start gap-4 mb-4">
           {company?.logo ? (
             <img 
@@ -85,17 +102,17 @@ export default function JobCard({ job, company, showActions = true }: JobCardPro
           </span>
         </div>
 
-        <div className="flex items-center justify-between pt-4 border-t border-slate-200">
-          <span className="text-xs text-slate-500">
-            {getTimeAgo(job.createdAt)}
-          </span>
-          {showActions && (
+        {showActions && (
+          <div className="flex items-center justify-between pt-4 border-t border-slate-200">
+            <span className="text-xs text-slate-500">
+              {getTimeAgo(job.createdAt)}
+            </span>
             <span className="text-sm font-medium text-teal-600 hover:text-teal-700">
               View Details →
             </span>
-          )}
-        </div>
-      </div>
-    </Link>
+          </div>
+        )}
+      </Link>
+    </div>
   )
 }
