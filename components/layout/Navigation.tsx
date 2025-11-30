@@ -4,12 +4,16 @@ import { Button } from "@/components/ui/button"
 import { Briefcase, Building2, LogOut, Menu, User, X } from 'lucide-react'
 import { signIn, signOut, useSession } from 'next-auth/react'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 
 export default function Navigation() {
   const { data: session, status } = useSession()
+  const pathname = usePathname()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const isEmployer = session?.user?.role === 'EMPLOYER'
+
+  const isActive = (path: string) => pathname === path
 
   return (
     <nav className="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
@@ -27,13 +31,21 @@ export default function Navigation() {
           <div className="hidden md:flex items-center gap-6">
             <Link 
               href="/" 
-              className="text-sm font-medium text-slate-600 hover:text-blue-900 transition-colors"
+              className={`text-sm font-medium transition-colors ${
+                isActive('/') 
+                  ? 'text-blue-900 font-semibold' 
+                  : 'text-slate-600 hover:text-blue-900'
+              }`}
             >
               Home
             </Link>
             <Link 
               href="/jobs" 
-              className="text-sm font-medium text-slate-600 hover:text-blue-900 transition-colors"
+              className={`text-sm font-medium transition-colors ${
+                isActive('/jobs') 
+                  ? 'text-blue-900 font-semibold' 
+                  : 'text-slate-600 hover:text-blue-900'
+              }`}
             >
               Find Jobs
             </Link>
@@ -44,13 +56,21 @@ export default function Navigation() {
                   <>
                     <Link 
                       href="/employer/dashboard" 
-                      className="text-sm font-medium text-slate-600 hover:text-blue-900 transition-colors"
+                      className={`text-sm font-medium transition-colors ${
+                        isActive('/employer/dashboard') 
+                          ? 'text-blue-900 font-semibold' 
+                          : 'text-slate-600 hover:text-blue-900'
+                      }`}
                     >
                       Dashboard
                     </Link>
                     <Link 
                       href="/employer/post-job" 
-                      className="text-sm font-medium text-slate-600 hover:text-blue-900 transition-colors"
+                      className={`text-sm font-medium transition-colors ${
+                        isActive('/employer/post-job') 
+                          ? 'text-blue-900 font-semibold' 
+                          : 'text-slate-600 hover:text-blue-900'
+                      }`}
                     >
                       Post Job
                     </Link>
@@ -59,13 +79,21 @@ export default function Navigation() {
                   <>
                     <Link 
                       href="/dashboard" 
-                      className="text-sm font-medium text-slate-600 hover:text-blue-900 transition-colors"
+                      className={`text-sm font-medium transition-colors ${
+                        isActive('/dashboard') 
+                          ? 'text-blue-900 font-semibold' 
+                          : 'text-slate-600 hover:text-blue-900'
+                      }`}
                     >
                       Dashboard
                     </Link>
                     <Link 
                       href="/applications" 
-                      className="text-sm font-medium text-slate-600 hover:text-blue-900 transition-colors"
+                      className={`text-sm font-medium transition-colors ${
+                        isActive('/applications') 
+                          ? 'text-blue-900 font-semibold' 
+                          : 'text-slate-600 hover:text-blue-900'
+                      }`}
                     >
                       My Applications
                     </Link>
@@ -74,14 +102,24 @@ export default function Navigation() {
                 
                 <Link 
                   href="/profile" 
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 transition-colors"
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+                    isActive('/profile') 
+                      ? 'bg-blue-900 text-white' 
+                      : 'bg-slate-100 hover:bg-slate-200'
+                  }`}
                 >
                   {isEmployer ? (
-                    <Building2 className="w-4 h-4 text-slate-700" />
+                    <Building2 className={`w-4 h-4 ${
+                      isActive('/profile') ? 'text-white' : 'text-slate-700'
+                    }`} />
                   ) : (
-                    <User className="w-4 h-4 text-slate-700" />
+                    <User className={`w-4 h-4 ${
+                      isActive('/profile') ? 'text-white' : 'text-slate-700'
+                    }`} />
                   )}
-                  <span className="text-sm font-medium text-slate-700">{session.user?.name}</span>
+                  <span className={`text-sm font-medium ${
+                    isActive('/profile') ? 'text-white' : 'text-slate-700'
+                  }`}>{session.user?.name}</span>
                 </Link>
                 
                 <Button
@@ -122,14 +160,22 @@ export default function Navigation() {
             <div className="flex flex-col gap-3">
               <Link 
                 href="/" 
-                className="px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 rounded-lg"
+                className={`px-4 py-2 text-sm font-medium rounded-lg ${
+                  isActive('/') 
+                    ? 'bg-blue-900 text-white' 
+                    : 'text-slate-700 hover:bg-slate-100'
+                }`}
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Home
               </Link>
               <Link 
                 href="/jobs" 
-                className="px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 rounded-lg"
+                className={`px-4 py-2 text-sm font-medium rounded-lg ${
+                  isActive('/jobs') 
+                    ? 'bg-blue-900 text-white' 
+                    : 'text-slate-700 hover:bg-slate-100'
+                }`}
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Find Jobs
@@ -141,14 +187,22 @@ export default function Navigation() {
                     <>
                       <Link 
                         href="/employer/dashboard" 
-                        className="px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 rounded-lg"
+                        className={`px-4 py-2 text-sm font-medium rounded-lg ${
+                          isActive('/employer/dashboard') 
+                            ? 'bg-blue-900 text-white' 
+                            : 'text-slate-700 hover:bg-slate-100'
+                        }`}
                         onClick={() => setMobileMenuOpen(false)}
                       >
                         Dashboard
                       </Link>
                       <Link 
                         href="/employer/post-job" 
-                        className="px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 rounded-lg"
+                        className={`px-4 py-2 text-sm font-medium rounded-lg ${
+                          isActive('/employer/post-job') 
+                            ? 'bg-blue-900 text-white' 
+                            : 'text-slate-700 hover:bg-slate-100'
+                        }`}
                         onClick={() => setMobileMenuOpen(false)}
                       >
                         Post Job
@@ -158,14 +212,22 @@ export default function Navigation() {
                     <>
                       <Link 
                         href="/dashboard" 
-                        className="px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 rounded-lg"
+                        className={`px-4 py-2 text-sm font-medium rounded-lg ${
+                          isActive('/dashboard') 
+                            ? 'bg-blue-900 text-white' 
+                            : 'text-slate-700 hover:bg-slate-100'
+                        }`}
                         onClick={() => setMobileMenuOpen(false)}
                       >
                         Dashboard
                       </Link>
                       <Link 
                         href="/applications" 
-                        className="px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 rounded-lg"
+                        className={`px-4 py-2 text-sm font-medium rounded-lg ${
+                          isActive('/applications') 
+                            ? 'bg-blue-900 text-white' 
+                            : 'text-slate-700 hover:bg-slate-100'
+                        }`}
                         onClick={() => setMobileMenuOpen(false)}
                       >
                         My Applications
@@ -175,7 +237,11 @@ export default function Navigation() {
                   
                   <Link 
                     href="/profile" 
-                    className="px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 rounded-lg"
+                    className={`px-4 py-2 text-sm font-medium rounded-lg ${
+                      isActive('/profile') 
+                        ? 'bg-blue-900 text-white' 
+                        : 'text-slate-700 hover:bg-slate-100'
+                    }`}
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     Profile
