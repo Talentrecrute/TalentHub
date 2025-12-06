@@ -145,6 +145,36 @@ export async function updateJob(jobId: string, data: Partial<{
   return updatedJob
 }
 
+export async function toggleJobStatus(jobId: string) {
+  const session = await getServerSession(authOptions)
+
+  if (!session?.user?.id || session.user.role !== 'EMPLOYER') {
+    throw new Error('Only employers can update job status')
+  }
+
+  const job = await prisma.job.findUnique({
+    where: { id: jobId },
+    include: { company: true }
+  })
+
+  if (!job || job.company.employerId !== session.user.id) {
+    throw new Error('Job not found or unauthorized')
+  }
+
+  // Toggle status between OPEN and CLOSED
+  const newStatus = job.status === 'OPEN' ? 'CLOSED' : 'OPEN'
+
+  await prisma.job.update({
+    where: { id: jobId },
+    data: { status: newStatus }
+  })
+
+  revalidatePath('/employer/dashboard')
+  revalidatePath(`/jobs/${jobId}`)
+  
+  return { success: true, newStatus }
+}
+
 export async function deleteJob(jobId: string) {
   const session = await getServerSession(authOptions)
   

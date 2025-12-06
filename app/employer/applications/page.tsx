@@ -72,15 +72,15 @@ export default async function EmployerApplicationsPage() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Link href="/employer/dashboard" className="inline-flex items-center gap-2 text-slate-600 hover:text-slate-900 mb-6">
           <ArrowLeft className="w-4 h-4" />
-          Back to Dashboard
+          Retour au tableau de bord
         </Link>
 
         <div className="mb-8">
           <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-2">
-            Applications
+            Candidatures
           </h1>
           <p className="text-lg text-slate-600">
-            {applications.length} total applications for {company.name}
+            {applications.length} candidature{applications.length > 1 ? 's' : ''} pour {company.name}
           </p>
         </div>
 
@@ -88,13 +88,13 @@ export default async function EmployerApplicationsPage() {
           <Card>
             <CardContent className="p-12 text-center">
               <FileText className="w-16 h-16 text-slate-300 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-slate-900 mb-2">No applications yet</h3>
+              <h3 className="text-xl font-semibold text-slate-900 mb-2">Aucune candidature</h3>
               <p className="text-slate-600 mb-6">
-                Applications will appear here when candidates apply to your jobs
+                Les candidatures apparaîtront ici lorsque des candidats postuleront à vos offres
               </p>
               <Link href="/employer/post-job">
                 <Button className="bg-teal-600 hover:bg-teal-700">
-                  Post a Job
+                  Publier une offre
                 </Button>
               </Link>
             </CardContent>
@@ -114,7 +114,7 @@ export default async function EmployerApplicationsPage() {
                           {app.candidate.name || app.candidate.email}
                         </h3>
                         <p className="text-sm text-slate-600 mb-2">
-                          Applied for: <span className="font-medium">{app.job.title}</span>
+                          Postule pour : <span className="font-medium">{app.job.title}</span>
                         </p>
                         <p className="text-xs text-slate-500">
                           {new Date(app.createdAt).toLocaleDateString('en-US', {
@@ -132,7 +132,7 @@ export default async function EmployerApplicationsPage() {
 
                   {app.coverLetter && (
                     <div className="p-4 bg-slate-50 rounded-lg border border-slate-200 mb-4">
-                      <h4 className="text-sm font-semibold text-slate-700 mb-2">Cover Letter</h4>
+                      <h4 className="text-sm font-semibold text-slate-700 mb-2">Lettre de motivation</h4>
                       <p className="text-sm text-slate-600 whitespace-pre-wrap">
                         {app.coverLetter}
                       </p>
@@ -144,12 +144,14 @@ export default async function EmployerApplicationsPage() {
                       <span className="font-medium">Contact:</span> {app.candidate.email}
                     </div>
                     <div className="ml-auto flex gap-2">
-                      <Button variant="outline" size="sm">
-                        View Profile
-                      </Button>
+                      <Link href={`/employer/applications/${app.id}`}>
+                        <Button variant="default" size="sm" className="bg-teal-600 hover:bg-teal-700">
+                          Voir le profil complet
+                        </Button>
+                      </Link>
                       <Link href={`/jobs/${app.job.id}`}>
                         <Button variant="outline" size="sm">
-                          View Job
+                          Voir l'offre
                         </Button>
                       </Link>
                     </div>

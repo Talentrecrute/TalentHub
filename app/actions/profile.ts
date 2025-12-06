@@ -14,6 +14,12 @@ export async function updateProfile(data: {
   experience?: any[]
   education?: any[]
   resume?: string
+  // Company fields
+  companyName?: string
+  companyDescription?: string
+  companyWebsite?: string
+  companyIndustry?: string
+  companySize?: string
 }) {
   const session = await getServerSession(authOptions)
   
@@ -28,6 +34,13 @@ export async function updateProfile(data: {
   if (data.location !== undefined) updateData.location = data.location
   if (data.bio !== undefined) updateData.bio = data.bio
   if (data.resume !== undefined) updateData.resume = data.resume
+  
+  // Company fields
+  if (data.companyName !== undefined) updateData.companyName = data.companyName
+  if (data.companyDescription !== undefined) updateData.companyDescription = data.companyDescription
+  if (data.companyWebsite !== undefined) updateData.companyWebsite = data.companyWebsite
+  if (data.companyIndustry !== undefined) updateData.companyIndustry = data.companyIndustry
+  if (data.companySize !== undefined) updateData.companySize = data.companySize
   
   if (data.skills) {
     updateData.skills = JSON.stringify(data.skills)

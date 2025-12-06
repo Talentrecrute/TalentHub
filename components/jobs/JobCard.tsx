@@ -1,6 +1,7 @@
+import CompanyAvatar from '@/components/CompanyAvatar'
 import { Button } from '@/components/ui/button'
 import type { Company, Job } from '@prisma/client'
-import { Bookmark, Briefcase, Clock, DollarSign, MapPin } from 'lucide-react'
+import { Bookmark, Clock, DollarSign, MapPin } from 'lucide-react'
 import Link from 'next/link'
 
 interface JobCardProps {
@@ -14,9 +15,25 @@ interface JobCardProps {
 export default function JobCard({ job, company, showActions = true, isSaved = false, onSave }: JobCardProps) {
   const formatSalary = (min?: number | null, max?: number | null, currency: string = 'USD') => {
     if (!min && !max) return 'Competitive'
+    
+    // Map common invalid currency names to valid ISO codes
+    const currencyMap: Record<string, string> = {
+      'Euros': 'EUR',
+      'Dollars': 'USD',
+      'euros': 'EUR',
+      'dollars': 'USD'
+    }
+    
+    // Normalize currency code
+    const normalizedCurrency = currencyMap[currency] || currency || 'USD'
+    
+    // Validate currency code (should be 3 uppercase letters)
+    const isValidCurrency = /^[A-Z]{3}$/.test(normalizedCurrency)
+    const safeCurrency = isValidCurrency ? normalizedCurrency : 'USD'
+    
     const formatter = new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: currency,
+      currency: safeCurrency,
       maximumFractionDigits: 0
     })
     if (min && max) {
@@ -55,17 +72,11 @@ export default function JobCard({ job, company, showActions = true, isSaved = fa
       
       <Link href={`/jobs/${job.id}`} className="block">
         <div className="flex items-start gap-4 mb-4">
-          {company?.logo ? (
-            <img 
-              src={company.logo} 
-              alt={company.name} 
-              className="w-12 h-12 rounded-lg object-cover"
-            />
-          ) : (
-            <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-900 to-blue-700 flex items-center justify-center">
-              <Briefcase className="w-6 h-6 text-white" />
-            </div>
-          )}
+          <CompanyAvatar 
+            companyName={company?.name || 'Company'}
+            logoUrl={company?.logo}
+            size="md"
+          />
           <div className="flex-1 min-w-0">
             <h3 className="font-semibold text-lg text-slate-900 mb-1 truncate">
               {job.title}

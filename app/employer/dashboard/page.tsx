@@ -7,6 +7,8 @@ import { Briefcase, Building2, FileText, PlusCircle, TrendingUp, Users } from 'l
 import { getServerSession } from 'next-auth'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
+import { Toaster } from 'sonner'
+import JobActions from './JobActions'
 
 async function getEmployerData(userId: string) {
   // Get employer's company
@@ -193,11 +195,7 @@ export default async function EmployerDashboardPage() {
                             </span>
                           </div>
                         </div>
-                        <Link href={`/jobs/${job.id}`}>
-                          <Button variant="outline" size="sm">
-                            View
-                          </Button>
-                        </Link>
+                        <JobActions jobId={job.id} jobStatus={job.status} />
                       </div>
                     </CardContent>
                   </Card>
@@ -255,6 +253,7 @@ export default async function EmployerDashboardPage() {
           </div>
         </div>
       </div>
+      <Toaster position="top-right" />
     </div>
   )
 }

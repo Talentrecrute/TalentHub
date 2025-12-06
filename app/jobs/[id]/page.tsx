@@ -1,3 +1,4 @@
+import CompanyAvatar from '@/components/CompanyAvatar'
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
 import { authOptions } from '@/lib/auth'
@@ -15,6 +16,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { Toaster } from 'sonner'
 import ApplyButton from './ApplyButton'
+import EmployerJobActions from './EmployerJobActions'
 import SaveButton from './SaveButton'
 
 async function getJob(id: string) {
@@ -81,25 +83,42 @@ async function getSimilarJobs(category: string, excludeId: string) {
   })
 }
 
-export default async function JobDetailPage({ params }: { params: { id: string } }) {
+export default async function JobDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const session = await getServerSession(authOptions)
-  const job = await getJob(params.id)
+  const { id } = await params
+  const job = await getJob(id)
 
   if (!job) {
     notFound()
   }
 
   const [application, isSaved, similarJobs] = await Promise.all([
-    getApplication(params.id, session?.user?.id),
-    getSavedStatus(params.id, session?.user?.id),
-    getSimilarJobs(job.category, params.id)
+    getApplication(id, session?.user?.id),
+    getSavedStatus(id, session?.user?.id),
+    getSimilarJobs(job.category, id)
   ])
 
   const formatSalary = () => {
     if (!job.salaryMin && !job.salaryMax) return null
+    
+    // Map common invalid currency names to valid ISO codes
+    const currencyMap: Record<string, string> = {
+      'Euros': 'EUR',
+      'Dollars': 'USD',
+      'euros': 'EUR',
+      'dollars': 'USD'
+    }
+    
+    // Normalize currency code
+    const normalizedCurrency = currencyMap[job.salaryCurrency] || job.salaryCurrency || 'USD'
+    
+    // Validate currency code (should be 3 uppercase letters)
+    const isValidCurrency = /^[A-Z]{3}$/.test(normalizedCurrency)
+    const safeCurrency = isValidCurrency ? normalizedCurrency : 'USD'
+    
     const formatter = new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: job.salaryCurrency,
+      currency: safeCurrency,
       maximumFractionDigits: 0
     })
     if (job.salaryMin && job.salaryMax) {
@@ -126,11 +145,11 @@ export default async function JobDetailPage({ params }: { params: { id: string }
                 <CardContent className="p-8">
                   <div className="flex items-start justify-between mb-6">
                     <div className="flex gap-4 flex-1">
-                      {job.company?.logo && (
-                        <div className="w-16 h-16 rounded-lg bg-slate-100 flex items-center justify-center overflow-hidden flex-shrink-0">
-                          <img src={job.company.logo} alt={job.company.name} className="w-full h-full object-cover" />
-                        </div>
-                      )}
+                      <CompanyAvatar 
+                        companyName={job.company?.name || 'Company'}
+                        logoUrl={job.company?.logo}
+                        size="lg"
+                      />
                       <div className="flex-1 min-w-0">
                         <h1 className="text-3xl font-bold text-slate-900 mb-2">{job.title}</h1>
                         <div className="flex items-center gap-2 text-slate-600">
@@ -269,23 +288,43 @@ export default async function JobDetailPage({ params }: { params: { id: string }
 
             {/* Sidebar */}
             <div className="space-y-6">
-              {/* Apply Card */}
+              {/* Apply/Employer Actions Card */}
               <Card className="sticky top-20">
                 <CardContent className="p-6">
-                  <ApplyButton
-                    jobId={job.id}
-                    hasApplied={!!application}
-                    applicationStatus={application?.status}
-                    isAuthenticated={!!session}
-                  />
-                  {!application && (
-                    <div className="mt-4">
-                      <SaveButton
+                  {session?.user?.role === 'EMPLOYER' && session.user.id === job.company.employerId ? (
+                    // Show employer actions for job owner
+                    <EmployerJobActions
+                      jobId={job.id}
+                      jobStatus={job.status}
+                      employerId={job.company.employerId}
+                      currentUserId={session.user.id}
+                    />
+                  ) : session?.user?.role === 'EMPLOYER' ? (
+                    // Hide apply button for employers viewing other jobs
+                    <div className="text-center py-4">
+                      <p className="text-sm text-slate-600">
+                        Les employeurs ne peuvent pas postuler aux offres.
+                      </p>
+                    </div>
+                  ) : (
+                    // Show apply/save buttons for candidates
+                    <>
+                      <ApplyButton
                         jobId={job.id}
-                        isSaved={isSaved}
+                        hasApplied={!!application}
+                        applicationStatus={application?.status}
                         isAuthenticated={!!session}
                       />
-                    </div>
+                      {!application && (
+                        <div className="mt-4">
+                          <SaveButton
+                            jobId={job.id}
+                            isSaved={isSaved}
+                            isAuthenticated={!!session}
+                          />
+                        </div>
+                      )}
+                    </>
                   )}
                 </CardContent>
               </Card>
