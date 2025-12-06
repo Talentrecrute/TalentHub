@@ -8,6 +8,7 @@ import { ArrowLeft, Briefcase, Eye, FileText, Mail, MapPin, Phone, User } from '
 import { getServerSession } from 'next-auth'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
+import { Toaster } from 'sonner'
 import ApplicationActions from './ApplicationActions'
 
 async function getApplicationDetails(applicationId: string, userId: string) {
@@ -136,7 +137,12 @@ export default async function ApplicationDetailPage({
                   </Badge>
                 </div>
 
-                <ApplicationActions applicationId={application.id} currentStatus={application.status} />
+                <ApplicationActions 
+                  applicationId={application.id} 
+                  currentStatus={application.status}
+                  candidateEmail={application.candidate.email}
+                  jobTitle={application.job.title}
+                />
               </CardContent>
             </Card>
 
@@ -299,6 +305,7 @@ export default async function ApplicationDetailPage({
           </div>
         </div>
       </div>
+      <Toaster position="top-right" />
     </div>
   )
 }

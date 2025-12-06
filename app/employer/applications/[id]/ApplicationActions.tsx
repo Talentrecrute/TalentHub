@@ -2,7 +2,7 @@
 
 import { updateApplicationStatus } from '@/app/actions/applications'
 import { Button } from "@/components/ui/button"
-import { Check, Eye, X } from 'lucide-react'
+import { Check, Eye, Mail, X } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useTransition } from 'react'
 import { toast } from 'sonner'
@@ -10,9 +10,16 @@ import { toast } from 'sonner'
 interface ApplicationActionsProps {
   applicationId: string
   currentStatus: 'PENDING' | 'REVIEWED' | 'ACCEPTED' | 'REJECTED'
+  candidateEmail: string
+  jobTitle: string
 }
 
-export default function ApplicationActions({ applicationId, currentStatus }: ApplicationActionsProps) {
+export default function ApplicationActions({ 
+  applicationId, 
+  currentStatus,
+  candidateEmail,
+  jobTitle 
+}: ApplicationActionsProps) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
 
@@ -34,8 +41,21 @@ export default function ApplicationActions({ applicationId, currentStatus }: App
     })
   }
 
+  const emailSubject = encodeURIComponent(`Re: Votre candidature pour ${jobTitle}`)
+  const emailBody = encodeURIComponent(`Bonjour,\n\nSuite à votre candidature pour le poste de ${jobTitle}...\n\nCordialement`)
+
   return (
-    <div className="flex gap-2 pt-4 border-t border-slate-200">
+    <div className="flex flex-wrap gap-2 pt-4 border-t border-slate-200">
+      <a href={`mailto:${candidateEmail}?subject=${emailSubject}&body=${emailBody}`}>
+        <Button
+          variant="default"
+          size="sm"
+          className="bg-teal-600 hover:bg-teal-700"
+        >
+          <Mail className="w-4 h-4 mr-2" />
+          Envoyer un email
+        </Button>
+      </a>
       {currentStatus !== 'REVIEWED' && (
         <Button
           variant="outline"

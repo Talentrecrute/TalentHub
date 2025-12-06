@@ -39,6 +39,7 @@ export default function ProfileForm({ user, initialData }: ProfileFormProps) {
   }
 
   const [formData, setFormData] = useState({
+    name: initialData?.name || '',
     bio: initialData?.bio || '',
     location: initialData?.location || '',
     phone: initialData?.phone || '',
@@ -107,6 +108,7 @@ export default function ProfileForm({ user, initialData }: ProfileFormProps) {
 
   const handleCancel = () => {
     setFormData({
+      name: initialData?.name || '',
       bio: initialData?.bio || '',
       location: initialData?.location || '',
       phone: initialData?.phone || '',
@@ -123,15 +125,15 @@ export default function ProfileForm({ user, initialData }: ProfileFormProps) {
       <div className="flex items-center justify-between">
         {!editMode ? (
           <Button onClick={() => setEditMode(true)} className="bg-teal-600 hover:bg-teal-700">
-            Edit Profile
+            Modifier le profil
           </Button>
         ) : (
           <div className="flex gap-2">
             <Button variant="outline" onClick={handleCancel} disabled={isPending}>
-              Cancel
+              Annuler
             </Button>
             <Button onClick={handleSave} disabled={isPending} className="bg-teal-600 hover:bg-teal-700">
-              {isPending ? 'Saving...' : 'Save Changes'}
+              {isPending ? 'Enregistrement...' : 'Enregistrer'}
             </Button>
           </div>
         )}
@@ -140,8 +142,14 @@ export default function ProfileForm({ user, initialData }: ProfileFormProps) {
       {/* Basic Info */}
       <div className="space-y-4">
         <div>
-          <Label>Full Name</Label>
-          <Input value={user?.name || ''} disabled className="bg-slate-50" />
+          <Label>Nom complet</Label>
+          <Input 
+            placeholder="Votre nom complet"
+            value={formData.name}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            disabled={!editMode}
+            className={!editMode ? "bg-white" : ""}
+          />
         </div>
         
         <div>
