@@ -1,5 +1,6 @@
 import CompanyAvatar from '@/components/CompanyAvatar'
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
@@ -9,7 +10,8 @@ import {
     Building2,
     CheckCircle2,
     DollarSign,
-    MapPin
+    MapPin,
+    Users
 } from 'lucide-react'
 import { getServerSession } from 'next-auth'
 import Link from 'next/link'
@@ -83,6 +85,28 @@ async function getSimilarJobs(category: string, excludeId: string) {
   })
 }
 
+async function getJobApplications(jobId: string, employerId: string) {
+  // Verify the employer owns this job
+  const job = await prisma.job.findFirst({
+    where: { 
+      id: jobId,
+      company: { employerId }
+    }
+  })
+  
+  if (!job) return null
+  
+  return await prisma.application.findMany({
+    where: { jobId },
+    include: {
+      candidate: true
+    },
+    orderBy: {
+      createdAt: 'desc'
+    }
+  })
+}
+
 export default async function JobDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const session = await getServerSession(authOptions)
   const { id } = await params
@@ -97,6 +121,26 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
     getSavedStatus(id, session?.user?.id),
     getSimilarJobs(job.category, id)
   ])
+
+  // Get applications for this job if user is the job owner
+  const isJobOwner = session?.user?.role === 'EMPLOYER' && session?.user?.id === job.company?.employerId
+  const jobApplications = isJobOwner && session?.user?.id
+    ? await getJobApplications(id, session.user.id)
+    : null
+
+  const statusColors: Record<string, string> = {
+    PENDING: 'bg-yellow-100 text-yellow-700 border-yellow-200',
+    REVIEWED: 'bg-blue-100 text-blue-700 border-blue-200',
+    ACCEPTED: 'bg-green-100 text-green-700 border-green-200',
+    REJECTED: 'bg-red-100 text-red-700 border-red-200'
+  }
+
+  const statusLabels: Record<string, string> = {
+    PENDING: 'En attente',
+    REVIEWED: 'Examinée',
+    ACCEPTED: 'Acceptée',
+    REJECTED: 'Refusée'
+  }
 
   const formatSalary = () => {
     if (!job.salaryMin && !job.salaryMax) return null
@@ -280,6 +324,58 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
                           </a>
                         </div>
                       )}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Applications for this job (only for job owner) */}
+              {isJobOwner && jobApplications && jobApplications.length > 0 && (
+                <Card>
+                  <CardContent className="p-8">
+                    <div className="flex items-center justify-between mb-6">
+                      <h2 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
+                        <Users className="w-6 h-6" />
+                        Candidatures ({jobApplications.length})
+                      </h2>
+                      <Link href="/employer/applications">
+                        <Button variant="outline" size="sm">
+                          Voir toutes les candidatures
+                        </Button>
+                      </Link>
+                    </div>
+                    
+                    <div className="space-y-4">
+                      {jobApplications.map((app) => (
+                        <Link 
+                          key={app.id} 
+                          href={`/employer/applications/${app.id}`}
+                          className="block"
+                        >
+                          <div className="flex items-center justify-between p-4 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors border border-slate-200">
+                            <div className="flex items-center gap-4">
+                              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold">
+                                {app.candidate.name?.[0]?.toUpperCase() || app.candidate.email[0].toUpperCase()}
+                              </div>
+                              <div>
+                                <p className="font-medium text-slate-900">
+                                  {app.candidate.name || app.candidate.email}
+                                </p>
+                                <p className="text-sm text-slate-500">
+                                  {new Date(app.createdAt).toLocaleDateString('fr-FR', {
+                                    day: 'numeric',
+                                    month: 'short',
+                                    year: 'numeric'
+                                  })}
+                                </p>
+                              </div>
+                            </div>
+                            <Badge className={statusColors[app.status]} variant="outline">
+                              {statusLabels[app.status]}
+                            </Badge>
+                          </div>
+                        </Link>
+                      ))}
                     </div>
                   </CardContent>
                 </Card>

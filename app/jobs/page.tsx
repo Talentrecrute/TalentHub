@@ -9,6 +9,9 @@ async function getJobs() {
     where: { status: 'OPEN' },
     include: {
       company: true,
+      _count: {
+        select: { applications: true }
+      }
     },
     orderBy: {
       createdAt: 'desc'

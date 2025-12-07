@@ -10,9 +10,10 @@ interface JobCardProps {
   showActions?: boolean
   isSaved?: boolean
   onSave?: () => void
+  applicationCount?: number
 }
 
-export default function JobCard({ job, company, showActions = true, isSaved = false, onSave }: JobCardProps) {
+export default function JobCard({ job, company, showActions = true, isSaved = false, onSave, applicationCount }: JobCardProps) {
   const formatSalary = (min?: number | null, max?: number | null, currency: string = 'USD') => {
     if (!min && !max) return 'Competitive'
     
@@ -115,11 +116,19 @@ export default function JobCard({ job, company, showActions = true, isSaved = fa
 
         {showActions && (
           <div className="flex items-center justify-between pt-4 border-t border-slate-200">
-            <span className="text-xs text-slate-500">
-              {getTimeAgo(job.createdAt)}
-            </span>
+            <div className="flex items-center gap-3">
+              <span className="text-xs text-slate-500">
+                {getTimeAgo(job.createdAt)}
+              </span>
+              {applicationCount !== undefined && (
+                <span className="flex items-center gap-1 text-xs text-slate-500">
+                  <Users className="w-3 h-3" />
+                  {applicationCount} candidature{applicationCount !== 1 ? 's' : ''}
+                </span>
+              )}
+            </div>
             <span className="text-sm font-medium text-teal-600 hover:text-teal-700">
-              View Details →
+              Voir détails →
             </span>
           </div>
         )}

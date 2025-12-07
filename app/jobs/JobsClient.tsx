@@ -12,7 +12,7 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 
 interface JobsClientProps {
-  initialJobs: (Job & { company: Company })[]
+  initialJobs: (Job & { company: Company; _count?: { applications: number } })[]
   savedJobIds: string[]
   userId?: string
 }
@@ -169,6 +169,7 @@ export default function JobsClient({ initialJobs, savedJobIds, userId }: JobsCli
                     company={job.company}
                     isSaved={localSavedJobs.has(job.id)}
                     onSave={() => handleSaveJob(job.id)}
+                    applicationCount={job._count?.applications}
                   />
                 ))}
               </div>
