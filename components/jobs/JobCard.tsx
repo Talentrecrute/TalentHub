@@ -1,7 +1,7 @@
 import CompanyAvatar from '@/components/CompanyAvatar'
 import { Button } from '@/components/ui/button'
 import type { Company, Job } from '@prisma/client'
-import { Bookmark, Clock, DollarSign, MapPin } from 'lucide-react'
+import { Bookmark, Clock, DollarSign, MapPin, Users } from 'lucide-react'
 import Link from 'next/link'
 
 interface JobCardProps {

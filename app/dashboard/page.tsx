@@ -176,31 +176,51 @@ export default async function DashboardPage() {
               </Card>
             ) : (
               <div className="space-y-4">
-                {applications.map(app => (
-                  <Link key={app.id} href={`/jobs/${app.job.id}`}>
-                    <Card className="hover:shadow-md transition-shadow">
+                {applications.map(app => {
+                  const statusColors: Record<string, string> = {
+                    PENDING: 'bg-yellow-100 text-yellow-700',
+                    REVIEWED: 'bg-blue-100 text-blue-700',
+                    ACCEPTED: 'bg-green-100 text-green-700',
+                    REJECTED: 'bg-red-100 text-red-700'
+                  }
+                  const statusLabels: Record<string, string> = {
+                    PENDING: 'En attente',
+                    REVIEWED: 'Examinée',
+                    ACCEPTED: 'Acceptée',
+                    REJECTED: 'Refusée'
+                  }
+                  return (
+                    <Card key={app.id} className="hover:shadow-md transition-shadow cursor-pointer">
                       <CardContent className="p-4">
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
-                            <h3 className="font-semibold text-slate-900 mb-1">{app.job.title}</h3>
+                            <Link href={`/jobs/${app.job.id}`} className="hover:text-teal-600">
+                              <h3 className="font-semibold text-slate-900 mb-1">{app.job.title}</h3>
+                            </Link>
                             <p className="text-sm text-slate-600 mb-2">{app.job.company.name}</p>
-                            <Badge variant={
-                              app.status === 'ACCEPTED' ? 'success' :
-                              app.status === 'REJECTED' ? 'destructive' :
-                              app.status === 'REVIEWED' ? 'info' :
-                              'secondary'
-                            } className="capitalize">
-                              {app.status.toLowerCase()}
+                            <Badge className={statusColors[app.status]}>
+                              {statusLabels[app.status]}
                             </Badge>
                           </div>
-                          <span className="text-xs text-slate-500">
-                            {new Date(app.createdAt).toLocaleDateString()}
-                          </span>
+                          <div className="text-right">
+                            <span className="text-xs text-slate-500 block mb-2">
+                              {new Date(app.createdAt).toLocaleDateString('fr-FR', {
+                                day: 'numeric',
+                                month: 'short'
+                              })}
+                            </span>
+                            <Link 
+                              href="/applications" 
+                              className="text-xs text-teal-600 hover:text-teal-700"
+                            >
+                              Voir détails →
+                            </Link>
+                          </div>
                         </div>
                       </CardContent>
                     </Card>
-                  </Link>
-                ))}
+                  )
+                })}
               </div>
             )}
           </div>
