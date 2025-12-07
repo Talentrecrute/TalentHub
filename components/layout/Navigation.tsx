@@ -1,7 +1,8 @@
 'use client'
 
 import { Button } from "@/components/ui/button"
-import { Briefcase, Building2, LogOut, Menu, User, X } from 'lucide-react'
+import { useLanguage } from "@/contexts/LanguageContext"
+import { Briefcase, Building2, Globe, LogOut, Menu, User, X } from 'lucide-react'
 import { signIn, signOut, useSession } from 'next-auth/react'
 import NextImage from 'next/image'
 import Link from 'next/link'
@@ -13,8 +14,13 @@ export default function Navigation() {
   const pathname = usePathname()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const isEmployer = session?.user?.role === 'EMPLOYER'
+  const { language, setLanguage, t } = useLanguage()
 
   const isActive = (path: string) => pathname === path
+
+  const toggleLanguage = () => {
+    setLanguage(language === 'fr' ? 'en' : 'fr')
+  }
 
   return (
     <nav className="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
@@ -38,7 +44,7 @@ export default function Navigation() {
                   : 'text-slate-600 hover:text-blue-900'
               }`}
             >
-              Home
+              {t('nav.home')}
             </Link>
             <Link 
               href="/jobs" 
@@ -48,7 +54,7 @@ export default function Navigation() {
                   : 'text-slate-600 hover:text-blue-900'
               }`}
             >
-              Find Jobs
+              {t('nav.findJobs')}
             </Link>
             
             {status === 'authenticated' && session ? (
@@ -63,7 +69,7 @@ export default function Navigation() {
                           : 'text-slate-600 hover:text-blue-900'
                       }`}
                     >
-                      Dashboard
+                      {t('nav.dashboard')}
                     </Link>
                     <Link 
                       href="/employer/post-job" 
@@ -73,7 +79,7 @@ export default function Navigation() {
                           : 'text-slate-600 hover:text-blue-900'
                       }`}
                     >
-                      Post Job
+                      {t('nav.postJob')}
                     </Link>
                   </>
                 ) : (
@@ -86,7 +92,7 @@ export default function Navigation() {
                           : 'text-slate-600 hover:text-blue-900'
                       }`}
                     >
-                      Dashboard
+                      {t('nav.dashboard')}
                     </Link>
                     <Link 
                       href="/applications" 
@@ -96,7 +102,7 @@ export default function Navigation() {
                           : 'text-slate-600 hover:text-blue-900'
                       }`}
                     >
-                      My Applications
+                      {t('nav.myApplications')}
                     </Link>
                   </>
                 )}
@@ -149,9 +155,19 @@ export default function Navigation() {
                 onClick={() => signIn()}
                 className="bg-blue-900 hover:bg-blue-800 text-white"
               >
-                Sign In
+                {t('nav.signIn')}
               </Button>
             )}
+
+            {/* Language Toggle */}
+            <button
+              onClick={toggleLanguage}
+              className="flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+              title={language === 'fr' ? 'Switch to English' : 'Passer en français'}
+            >
+              <Globe className="w-4 h-4" />
+              <span className="uppercase">{language}</span>
+            </button>
           </div>
 
           {/* Mobile menu button */}
@@ -180,7 +196,7 @@ export default function Navigation() {
                 }`}
                 onClick={() => setMobileMenuOpen(false)}
               >
-                Home
+                {t('nav.home')}
               </Link>
               <Link 
                 href="/jobs" 
@@ -191,7 +207,7 @@ export default function Navigation() {
                 }`}
                 onClick={() => setMobileMenuOpen(false)}
               >
-                Find Jobs
+                {t('nav.findJobs')}
               </Link>
               
               {status === 'authenticated' && session ? (
@@ -207,7 +223,7 @@ export default function Navigation() {
                         }`}
                         onClick={() => setMobileMenuOpen(false)}
                       >
-                        Dashboard
+                        {t('nav.dashboard')}
                       </Link>
                       <Link 
                         href="/employer/post-job" 
@@ -218,7 +234,7 @@ export default function Navigation() {
                         }`}
                         onClick={() => setMobileMenuOpen(false)}
                       >
-                        Post Job
+                        {t('nav.postJob')}
                       </Link>
                     </>
                   ) : (
@@ -232,7 +248,7 @@ export default function Navigation() {
                         }`}
                         onClick={() => setMobileMenuOpen(false)}
                       >
-                        Dashboard
+                        {t('nav.dashboard')}
                       </Link>
                       <Link 
                         href="/applications" 
@@ -243,7 +259,7 @@ export default function Navigation() {
                         }`}
                         onClick={() => setMobileMenuOpen(false)}
                       >
-                        My Applications
+                        {t('nav.myApplications')}
                       </Link>
                     </>
                   )}
@@ -257,7 +273,7 @@ export default function Navigation() {
                     }`}
                     onClick={() => setMobileMenuOpen(false)}
                   >
-                    Profile
+                    {t('nav.profile')}
                   </Link>
                   
                   <button
@@ -267,7 +283,7 @@ export default function Navigation() {
                     }}
                     className="px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 rounded-lg text-left"
                   >
-                    Sign Out
+                    {t('nav.signOut')}
                   </button>
                 </>
               ) : (
@@ -278,9 +294,21 @@ export default function Navigation() {
                   }}
                   className="mx-4 px-4 py-2 bg-blue-900 hover:bg-blue-800 text-white rounded-lg text-sm font-medium"
                 >
-                  Sign In
+                  {t('nav.signIn')}
                 </button>
               )}
+
+              {/* Mobile Language Toggle */}
+              <button
+                onClick={() => {
+                  toggleLanguage()
+                  setMobileMenuOpen(false)
+                }}
+                className="mx-4 px-4 py-2 flex items-center gap-2 text-slate-700 hover:bg-slate-100 rounded-lg text-sm font-medium"
+              >
+                <Globe className="w-4 h-4" />
+                {language === 'fr' ? 'Switch to English' : 'Passer en français'}
+              </button>
             </div>
           </div>
         )}
