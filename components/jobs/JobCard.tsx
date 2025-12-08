@@ -121,6 +121,16 @@ export default function JobCard({ job, company, showActions = true, isSaved = fa
           <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">
             {job.category}
           </span>
+          {(job as any).experienceLevel && (
+            <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-medium">
+              {(job as any).experienceLevel === 'entry' ? (locale === 'fr' ? 'Débutant' : 'Entry') :
+               (job as any).experienceLevel === 'mid' ? (locale === 'fr' ? 'Intermédiaire' : 'Mid-Level') :
+               (job as any).experienceLevel === 'senior' ? 'Senior' :
+               (job as any).experienceLevel === 'lead' ? 'Lead' :
+               (job as any).experienceLevel === 'executive' ? (locale === 'fr' ? 'Directeur' : 'Executive') :
+               (job as any).experienceLevel}
+            </span>
+          )}
         </div>
 
         {showActions && (

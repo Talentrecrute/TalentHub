@@ -149,20 +149,38 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
       'dollars': 'USD'
     }
     
-    const normalizedCurrency = currencyMap[job.salaryCurrency] || job.salaryCurrency || 'USD'
+    const normalizedCurrency = currencyMap[job.salaryCurrency] || job.salaryCurrency || 'EUR'
     const isValidCurrency = /^[A-Z]{3}$/.test(normalizedCurrency)
-    const safeCurrency = isValidCurrency ? normalizedCurrency : 'USD'
+    const safeCurrency = isValidCurrency ? normalizedCurrency : 'EUR'
     
     const formatter = new Intl.NumberFormat(locale === 'fr' ? 'fr-FR' : 'en-US', {
       style: 'currency',
       currency: safeCurrency,
       maximumFractionDigits: 0
     })
+    
+    const periodSuffix = (job as any).salaryPeriod === 'yearly'
+      ? (locale === 'fr' ? '/an' : '/yr')
+      : (locale === 'fr' ? '/mois' : '/mo')
+    
     if (job.salaryMin && job.salaryMax) {
-      return `${formatter.format(job.salaryMin)} - ${formatter.format(job.salaryMax)}`
+      return `${formatter.format(job.salaryMin)} - ${formatter.format(job.salaryMax)}${periodSuffix}`
     }
-    if (job.salaryMin) return `${formatter.format(job.salaryMin)}+`
-    return `${t('upTo')} ${formatter.format(job.salaryMax!)}`
+    if (job.salaryMin) return `${formatter.format(job.salaryMin)}+${periodSuffix}`
+    return `${t('upTo')} ${formatter.format(job.salaryMax!)}${periodSuffix}`
+  }
+  
+  const getExperienceLabel = () => {
+    const level = (job as any).experienceLevel
+    if (!level) return null
+    const labels: Record<string, { fr: string; en: string }> = {
+      entry: { fr: 'Débutant', en: 'Entry Level' },
+      mid: { fr: 'Intermédiaire', en: 'Mid-Level' },
+      senior: { fr: 'Senior', en: 'Senior' },
+      lead: { fr: 'Lead', en: 'Lead' },
+      executive: { fr: 'Directeur', en: 'Executive' }
+    }
+    return labels[level] ? labels[level][locale as 'fr' | 'en'] : level
   }
 
   return (
@@ -221,8 +239,82 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
                   <div className="flex flex-wrap gap-2">
                     <Badge className="bg-blue-50 text-blue-700 border-blue-200">{job.category}</Badge>
                     <Badge className="bg-purple-50 text-purple-700 border-purple-200 capitalize">
-                      {job.employmentType}
+                      {job.employmentType.replace('-', ' ')}
                     </Badge>
+                    {getExperienceLabel() && (
+                      <Badge className="bg-amber-50 text-amber-700 border-amber-200">
+                        {getExperienceLabel()}
+                      </Badge>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Key Details Card */}
+              <Card>
+                <CardContent className="p-6">
+                  <h2 className="text-xl font-bold text-slate-900 mb-4">
+                    {locale === 'fr' ? 'Détails du poste' : 'Job Details'}
+                  </h2>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    <div className="p-3 bg-slate-50 rounded-lg">
+                      <p className="text-xs text-slate-500 uppercase tracking-wide mb-1">
+                        {locale === 'fr' ? 'Lieu' : 'Location'}
+                      </p>
+                      <p className="font-medium text-slate-900">{job.location}</p>
+                    </div>
+                    <div className="p-3 bg-slate-50 rounded-lg">
+                      <p className="text-xs text-slate-500 uppercase tracking-wide mb-1">
+                        {locale === 'fr' ? 'Type de travail' : 'Work Type'}
+                      </p>
+                      <p className="font-medium text-slate-900">
+                        {job.locationType === 'remote' ? (locale === 'fr' ? 'Télétravail' : 'Remote') :
+                         job.locationType === 'hybrid' ? (locale === 'fr' ? 'Hybride' : 'Hybrid') :
+                         (locale === 'fr' ? 'Sur site' : 'On-site')}
+                      </p>
+                    </div>
+                    <div className="p-3 bg-slate-50 rounded-lg">
+                      <p className="text-xs text-slate-500 uppercase tracking-wide mb-1">
+                        {locale === 'fr' ? 'Type de contrat' : 'Employment Type'}
+                      </p>
+                      <p className="font-medium text-slate-900 capitalize">
+                        {job.employmentType.replace('-', ' ')}
+                      </p>
+                    </div>
+                    {getExperienceLabel() && (
+                      <div className="p-3 bg-slate-50 rounded-lg">
+                        <p className="text-xs text-slate-500 uppercase tracking-wide mb-1">
+                          {locale === 'fr' ? 'Niveau d\'expérience' : 'Experience Level'}
+                        </p>
+                        <p className="font-medium text-slate-900">{getExperienceLabel()}</p>
+                      </div>
+                    )}
+                    {formatSalary() && (
+                      <div className="p-3 bg-teal-50 rounded-lg">
+                        <p className="text-xs text-teal-600 uppercase tracking-wide mb-1">
+                          {locale === 'fr' ? 'Salaire' : 'Salary'}
+                        </p>
+                        <p className="font-semibold text-teal-700">{formatSalary()}</p>
+                      </div>
+                    )}
+                    <div className="p-3 bg-slate-50 rounded-lg">
+                      <p className="text-xs text-slate-500 uppercase tracking-wide mb-1">
+                        {locale === 'fr' ? 'Catégorie' : 'Category'}
+                      </p>
+                      <p className="font-medium text-slate-900">{job.category}</p>
+                    </div>
+                    <div className="p-3 bg-slate-50 rounded-lg">
+                      <p className="text-xs text-slate-500 uppercase tracking-wide mb-1">
+                        {locale === 'fr' ? 'Publié le' : 'Posted'}
+                      </p>
+                      <p className="font-medium text-slate-900">
+                        {new Date(job.createdAt).toLocaleDateString(locale === 'fr' ? 'fr-FR' : 'en-US', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric'
+                        })}
+                      </p>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
