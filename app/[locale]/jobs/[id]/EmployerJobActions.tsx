@@ -3,6 +3,7 @@
 import { toggleJobStatus } from '@/app/actions/jobs'
 import { Button } from '@/components/ui/button'
 import { Edit, Lock, LockOpen } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
 import { useState, useTransition } from 'react'
 import { toast } from 'sonner'
@@ -20,6 +21,11 @@ export default function EmployerJobActions({
   employerId, 
   currentUserId 
 }: EmployerJobActionsProps) {
+  const t = useTranslations('employer')
+  const tMessages = useTranslations('messages')
+  const tErrors = useTranslations('errors')
+  const tStatus = useTranslations('status')
+  
   const [isPending, startTransition] = useTransition()
   const [currentStatus, setCurrentStatus] = useState(jobStatus)
   const router = useRouter()
@@ -34,10 +40,10 @@ export default function EmployerJobActions({
       try {
         const result = await toggleJobStatus(jobId)
         setCurrentStatus(result.newStatus as 'DRAFT' | 'OPEN' | 'CLOSED')
-        toast.success(`Job ${result.newStatus === 'OPEN' ? 'ouvert' : 'fermé'} avec succès`)
+        toast.success(result.newStatus === 'OPEN' ? tMessages('jobOpened') : tMessages('jobClosed'))
         router.refresh()
       } catch (error: any) {
-        toast.error(error.message || 'Échec de la mise à jour du statut')
+        toast.error(error.message || tErrors('somethingWrong'))
       }
     })
   }
@@ -50,10 +56,10 @@ export default function EmployerJobActions({
     <div className="space-y-3">
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
         <p className="text-sm text-blue-800 font-medium mb-2">
-          Gestion de l'offre
+          {t('jobManagement')}
         </p>
         <p className="text-xs text-blue-600">
-          En tant que propriétaire de cette offre, vous pouvez la modifier ou changer son statut.
+          {t('jobManagementDesc')}
         </p>
       </div>
 
@@ -62,7 +68,7 @@ export default function EmployerJobActions({
         className="w-full bg-teal-600 hover:bg-teal-700 text-white"
       >
         <Edit className="w-4 h-4 mr-2" />
-        Modifier l'offre
+        {t('editJob')}
       </Button>
 
       <Button 
@@ -74,18 +80,18 @@ export default function EmployerJobActions({
         {currentStatus === 'OPEN' ? (
           <>
             <Lock className="w-4 h-4 mr-2" />
-            Fermer l'offre
+            {t('closeJob')}
           </>
         ) : (
           <>
             <LockOpen className="w-4 h-4 mr-2" />
-            Ouvrir l'offre
+            {t('openJob')}
           </>
         )}
       </Button>
 
       <div className="text-xs text-slate-500 text-center pt-2">
-        Statut actuel: <span className="font-medium capitalize">{currentStatus}</span>
+        {t('currentStatus')}: <span className="font-medium capitalize">{tStatus(currentStatus.toLowerCase() as any)}</span>
       </div>
     </div>
   )

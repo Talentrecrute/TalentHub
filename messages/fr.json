@@ -90,7 +90,9 @@
     "iAmEmployer": "Je suis recruteur",
     "welcomeBack": "Content de vous revoir !",
     "loginSubtitle": "Connectez-vous pour accéder à votre compte",
-    "registerSubtitle": "Créez votre compte pour commencer"
+    "registerSubtitle": "Créez votre compte pour commencer",
+    "signInToApply": "Connectez-vous pour postuler",
+    "signInToSave": "Connectez-vous pour sauvegarder"
   },
   "candidateDashboard": {
     "welcome": "Bon retour",
@@ -154,7 +156,10 @@
     "experience": "Expérience professionnelle",
     "education": "Formation",
     "present": "Présent",
-    "inProgress": "En cours"
+    "inProgress": "En cours",
+    "status": "Statut",
+    "applicationSubmitted": "Candidature envoyée",
+    "viewMyApplications": "Voir mes candidatures"
   },
   "jobs": {
     "title": "Offres d'emploi",
@@ -199,7 +204,11 @@
     "visitWebsite": "Visiter le site",
     "showMore": "Voir plus",
     "showLess": "Voir moins",
-    "upTo": "Jusqu'à"
+    "upTo": "Jusqu'à",
+    "saved": "Sauvegardé",
+    "applyForPosition": "Postuler à cette offre",
+    "coverLetterPlaceholder": "Écrivez une lettre de motivation (optionnel)",
+    "submitApplication": "Envoyer ma candidature"
   },
   "postJob": {
     "title": "Publier une offre d'emploi",
@@ -285,7 +294,12 @@
     "companyCreated": "Entreprise créée avec succès",
     "jobCreated": "Offre publiée avec succès",
     "jobUpdated": "Offre mise à jour",
-    "statusChanged": "Statut modifié"
+    "statusChanged": "Statut modifié",
+    "jobManagement": "Gestion de l'offre",
+    "jobManagementDesc": "En tant que propriétaire, vous pouvez modifier ou changer le statut.",
+    "closeJob": "Fermer l'offre",
+    "openJob": "Ouvrir l'offre",
+    "currentStatus": "Statut actuel"
   },
   "errors": {
     "somethingWrong": "Une erreur est survenue",
@@ -302,7 +316,10 @@
     "jobSaved": "Offre sauvegardée",
     "jobUnsaved": "Offre retirée des favoris",
     "statusUpdated": "Statut mis à jour",
-    "emailSubject": "Re: Votre candidature pour"
+    "emailSubject": "Re: Votre candidature pour",
+    "applicationSubmitted": "Candidature envoyée avec succès",
+    "jobOpened": "Offre ouverte avec succès",
+    "jobClosed": "Offre fermée avec succès"
   },
   "language": {
     "switchTo": "Switch to English"

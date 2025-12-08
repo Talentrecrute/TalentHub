@@ -122,13 +122,14 @@ model Company {
 }
 
 model Job {
-  id             String @id @default(cuid())
-  title          String
-  description    String
-  category       String
-  location       String
-  locationType   String @default("onsite") // onsite, remote, hybrid
-  employmentType String @default("full-time") // full-time, part-time, contract, internship
+  id              String @id @default(cuid())
+  title           String
+  description     String
+  category        String
+  location        String
+  locationType    String @default("onsite") // onsite, remote, hybrid
+  employmentType  String @default("full-time") // full-time, part-time, contract, internship
+  experienceLevel String @default("mid") // entry, mid, senior, lead, executive
 
   salaryMin      Int?
   salaryMax      Int?

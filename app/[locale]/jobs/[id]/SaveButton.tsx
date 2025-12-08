@@ -3,6 +3,7 @@
 import { saveJob } from '@/app/actions/jobs'
 import { Button } from "@/components/ui/button"
 import { Bookmark } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
 import { useTransition } from 'react'
 import { toast } from 'sonner'
@@ -14,22 +15,27 @@ interface SaveButtonProps {
 }
 
 export default function SaveButton({ jobId, isSaved, isAuthenticated }: SaveButtonProps) {
+  const t = useTranslations('jobs')
+  const tAuth = useTranslations('auth')
+  const tMessages = useTranslations('messages')
+  const tErrors = useTranslations('errors')
+  
   const [isPending, startTransition] = useTransition()
   const router = useRouter()
 
   const handleSave = () => {
     if (!isAuthenticated) {
-      toast.error('Please sign in to save jobs')
+      toast.error(tAuth('signInToSave'))
       return
     }
 
     startTransition(async () => {
       try {
         const result = await saveJob(jobId)
-        toast.success(result.message)
+        toast.success(result.saved ? tMessages('jobSaved') : tMessages('jobUnsaved'))
         router.refresh()
       } catch (error: any) {
-        toast.error(error.message || 'Failed to save job')
+        toast.error(error.message || tErrors('somethingWrong'))
       }
     })
   }
@@ -42,7 +48,7 @@ export default function SaveButton({ jobId, isSaved, isAuthenticated }: SaveButt
       className="w-full"
     >
       <Bookmark className={`w-4 h-4 mr-2 ${isSaved ? 'fill-current text-teal-600' : ''}`} />
-      {isSaved ? 'Saved' : 'Save Job'}
+      {isSaved ? t('saved') : t('saveJob')}
     </Button>
   )
 }

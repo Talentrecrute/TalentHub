@@ -90,7 +90,9 @@
     "iAmEmployer": "I'm an employer",
     "welcomeBack": "Welcome back!",
     "loginSubtitle": "Sign in to access your account",
-    "registerSubtitle": "Create your account to get started"
+    "registerSubtitle": "Create your account to get started",
+    "signInToApply": "Sign in to apply",
+    "signInToSave": "Sign in to save"
   },
   "candidateDashboard": {
     "welcome": "Welcome back",
@@ -154,7 +156,10 @@
     "experience": "Work Experience",
     "education": "Education",
     "present": "Present",
-    "inProgress": "In Progress"
+    "inProgress": "In Progress",
+    "status": "Status",
+    "applicationSubmitted": "Application Submitted",
+    "viewMyApplications": "View My Applications"
   },
   "jobs": {
     "title": "Jobs",
@@ -199,7 +204,11 @@
     "visitWebsite": "Visit Website",
     "showMore": "Show more",
     "showLess": "Show less",
-    "upTo": "Up to"
+    "upTo": "Up to",
+    "saved": "Saved",
+    "applyForPosition": "Apply for this position",
+    "coverLetterPlaceholder": "Write a cover letter (optional)",
+    "submitApplication": "Submit Application"
   },
   "postJob": {
     "title": "Post a Job",
@@ -285,7 +294,12 @@
     "companyCreated": "Company created successfully",
     "jobCreated": "Job posted successfully",
     "jobUpdated": "Job updated",
-    "statusChanged": "Status changed"
+    "statusChanged": "Status changed",
+    "jobManagement": "Job Management",
+    "jobManagementDesc": "As the owner, you can edit or change the status.",
+    "closeJob": "Close Job",
+    "openJob": "Open Job",
+    "currentStatus": "Current status"
   },
   "errors": {
     "somethingWrong": "Something went wrong",
@@ -302,7 +316,10 @@
     "jobSaved": "Job saved",
     "jobUnsaved": "Job removed from saved",
     "statusUpdated": "Status updated",
-    "emailSubject": "Re: Your application for"
+    "emailSubject": "Re: Your application for",
+    "applicationSubmitted": "Application submitted successfully",
+    "jobOpened": "Job opened successfully",
+    "jobClosed": "Job closed successfully"
   },
   "language": {
     "switchTo": "Passer en français"

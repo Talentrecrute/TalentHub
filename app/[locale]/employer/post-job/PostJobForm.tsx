@@ -36,6 +36,14 @@ const employmentTypes = [
   { value: "internship", label: "Stage" }
 ]
 
+const experienceLevels = [
+  { value: "entry", label: "Débutant (0-2 ans)" },
+  { value: "mid", label: "Intermédiaire (2-5 ans)" },
+  { value: "senior", label: "Senior (5-10 ans)" },
+  { value: "lead", label: "Lead / Manager (10+ ans)" },
+  { value: "executive", label: "Directeur" }
+]
+
 export default function PostJobForm({ companyId, initialData, jobId }: PostJobFormProps) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
@@ -56,6 +64,7 @@ export default function PostJobForm({ companyId, initialData, jobId }: PostJobFo
     location: initialData?.location || '',
     locationType: initialData?.locationType || 'onsite',
     employmentType: initialData?.employmentType || 'full-time',
+    experienceLevel: initialData?.experienceLevel || 'mid',
     salaryMin: initialData?.salaryMin || '',
     salaryMax: initialData?.salaryMax || '',
     salaryCurrency: initialData?.salaryCurrency || 'USD',
@@ -210,6 +219,20 @@ export default function PostJobForm({ companyId, initialData, jobId }: PostJobFo
             >
               {employmentTypes.map((type) => (
                 <option key={type.value} value={type.value}>{type.label}</option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <Label htmlFor="experienceLevel">Niveau d'expérience</Label>
+            <select
+              id="experienceLevel"
+              className="flex h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2"
+              value={formData.experienceLevel}
+              onChange={(e) => setFormData({ ...formData, experienceLevel: e.target.value })}
+            >
+              {experienceLevels.map((level) => (
+                <option key={level.value} value={level.value}>{level.label}</option>
               ))}
             </select>
           </div>
