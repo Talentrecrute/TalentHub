@@ -2,6 +2,7 @@ import CompanyAvatar from '@/components/CompanyAvatar'
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { Link } from '@/i18n/routing'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import {
@@ -14,7 +15,7 @@ import {
     Users
 } from 'lucide-react'
 import { getServerSession } from 'next-auth'
-import Link from 'next/link'
+import { getTranslations } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 import { Toaster } from 'sonner'
 import ApplyButton from './ApplyButton'
@@ -31,7 +32,6 @@ async function getJob(id: string) {
 
   if (!job) return null
 
-  // Parse JSON fields
   return {
     ...job,
     requirements: job.requirements ? JSON.parse(job.requirements) : [],
@@ -86,7 +86,6 @@ async function getSimilarJobs(category: string, excludeId: string) {
 }
 
 async function getJobApplications(jobId: string, employerId: string) {
-  // Verify the employer owns this job
   const job = await prisma.job.findFirst({
     where: { 
       id: jobId,
@@ -107,10 +106,16 @@ async function getJobApplications(jobId: string, employerId: string) {
   })
 }
 
-export default async function JobDetailPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function JobDetailPage({ params }: { params: Promise<{ id: string; locale: string }> }) {
   const session = await getServerSession(authOptions)
-  const { id } = await params
+  const { id, locale } = await params
   const job = await getJob(id)
+  
+  const t = await getTranslations('jobs')
+  const tCommon = await getTranslations('common')
+  const tStatus = await getTranslations('status')
+  const tApps = await getTranslations('applications')
+  const tProfile = await getTranslations('profile')
 
   if (!job) {
     notFound()
@@ -122,7 +127,6 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
     getSimilarJobs(job.category, id)
   ])
 
-  // Get applications for this job if user is the job owner
   const isJobOwner = session?.user?.role === 'EMPLOYER' && session?.user?.id === job.company?.employerId
   const jobApplications = isJobOwner && session?.user?.id
     ? await getJobApplications(id, session.user.id)
@@ -135,17 +139,9 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
     REJECTED: 'bg-red-100 text-red-700 border-red-200'
   }
 
-  const statusLabels: Record<string, string> = {
-    PENDING: 'En attente',
-    REVIEWED: 'Examinée',
-    ACCEPTED: 'Acceptée',
-    REJECTED: 'Refusée'
-  }
-
   const formatSalary = () => {
     if (!job.salaryMin && !job.salaryMax) return null
     
-    // Map common invalid currency names to valid ISO codes
     const currencyMap: Record<string, string> = {
       'Euros': 'EUR',
       'Dollars': 'USD',
@@ -153,14 +149,11 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
       'dollars': 'USD'
     }
     
-    // Normalize currency code
     const normalizedCurrency = currencyMap[job.salaryCurrency] || job.salaryCurrency || 'USD'
-    
-    // Validate currency code (should be 3 uppercase letters)
     const isValidCurrency = /^[A-Z]{3}$/.test(normalizedCurrency)
     const safeCurrency = isValidCurrency ? normalizedCurrency : 'USD'
     
-    const formatter = new Intl.NumberFormat('en-US', {
+    const formatter = new Intl.NumberFormat(locale === 'fr' ? 'fr-FR' : 'en-US', {
       style: 'currency',
       currency: safeCurrency,
       maximumFractionDigits: 0
@@ -168,8 +161,8 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
     if (job.salaryMin && job.salaryMax) {
       return `${formatter.format(job.salaryMin)} - ${formatter.format(job.salaryMax)}`
     }
-    if (job.salaryMin) return `From ${formatter.format(job.salaryMin)}`
-    return `Up to ${formatter.format(job.salaryMax!)}`
+    if (job.salaryMin) return `${formatter.format(job.salaryMin)}+`
+    return `${t('upTo')} ${formatter.format(job.salaryMax!)}`
   }
 
   return (
@@ -178,7 +171,7 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <Link href="/jobs" className="inline-flex items-center gap-2 text-slate-600 hover:text-slate-900 mb-6">
             <ArrowLeft className="w-4 h-4" />
-            Back to Jobs
+            {t('backToJobs')}
           </Link>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -209,7 +202,8 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
                       <MapPin className="w-5 h-5 text-slate-400" />
                       <span>{job.location}</span>
                       <Badge className="bg-teal-50 text-teal-700 border-teal-200 capitalize">
-                        {job.locationType}
+                        {job.locationType === 'remote' ? t('remote') : 
+                         job.locationType === 'onsite' ? t('onsite') : t('hybrid')}
                       </Badge>
                     </div>
                     <div className="flex items-center gap-2 text-slate-600">
@@ -237,13 +231,13 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
               <Card>
                 <CardContent className="p-8 space-y-6">
                   <div>
-                    <h2 className="text-2xl font-bold text-slate-900 mb-4">About the Role</h2>
+                    <h2 className="text-2xl font-bold text-slate-900 mb-4">{t('description')}</h2>
                     <p className="text-slate-600 leading-relaxed whitespace-pre-wrap">{job.description}</p>
                   </div>
 
                   {job.responsibilities && job.responsibilities.length > 0 && (
                     <div>
-                      <h3 className="text-xl font-semibold text-slate-900 mb-3">Responsibilities</h3>
+                      <h3 className="text-xl font-semibold text-slate-900 mb-3">{t('responsibilities')}</h3>
                       <ul className="space-y-2">
                         {job.responsibilities.map((resp: string, idx: number) => (
                           <li key={idx} className="flex items-start gap-3">
@@ -257,7 +251,7 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
 
                   {job.requirements && job.requirements.length > 0 && (
                     <div>
-                      <h3 className="text-xl font-semibold text-slate-900 mb-3">Requirements</h3>
+                      <h3 className="text-xl font-semibold text-slate-900 mb-3">{t('requirements')}</h3>
                       <ul className="space-y-2">
                         {job.requirements.map((req: string, idx: number) => (
                           <li key={idx} className="flex items-start gap-3">
@@ -271,7 +265,7 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
 
                   {job.benefits && job.benefits.length > 0 && (
                     <div>
-                      <h3 className="text-xl font-semibold text-slate-900 mb-3">Benefits</h3>
+                      <h3 className="text-xl font-semibold text-slate-900 mb-3">{t('benefits')}</h3>
                       <ul className="space-y-2">
                         {job.benefits.map((benefit: string, idx: number) => (
                           <li key={idx} className="flex items-start gap-3">
@@ -289,38 +283,38 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
               {job.company && (
                 <Card>
                   <CardContent className="p-8">
-                    <h2 className="text-2xl font-bold text-slate-900 mb-4">About {job.company.name}</h2>
+                    <h2 className="text-2xl font-bold text-slate-900 mb-4">{t('about')} {job.company.name}</h2>
                     <p className="text-slate-600 mb-4">{job.company.description}</p>
                     
                     <div className="grid grid-cols-2 gap-4 text-sm">
                       {job.company.industry && (
                         <div>
-                          <span className="text-slate-500">Industry</span>
+                          <span className="text-slate-500">{t('industry')}</span>
                           <p className="font-medium text-slate-900">{job.company.industry}</p>
                         </div>
                       )}
                       {job.company.size && (
                         <div>
-                          <span className="text-slate-500">Company Size</span>
+                          <span className="text-slate-500">{t('companySize')}</span>
                           <p className="font-medium text-slate-900">{job.company.size}</p>
                         </div>
                       )}
                       {job.company.location && (
                         <div>
-                          <span className="text-slate-500">Location</span>
+                          <span className="text-slate-500">{t('location')}</span>
                           <p className="font-medium text-slate-900">{job.company.location}</p>
                         </div>
                       )}
                       {job.company.website && (
                         <div>
-                          <span className="text-slate-500">Website</span>
+                          <span className="text-slate-500">{tProfile('website')}</span>
                           <a 
                             href={job.company.website} 
                             target="_blank" 
                             rel="noopener noreferrer"
                             className="font-medium text-teal-600 hover:text-teal-700"
                           >
-                            Visit Website
+                            {t('visitWebsite')}
                           </a>
                         </div>
                       )}
@@ -336,11 +330,11 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
                     <div className="flex items-center justify-between mb-6">
                       <h2 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
                         <Users className="w-6 h-6" />
-                        Candidatures ({jobApplications.length})
+                        {tApps('title')} ({jobApplications.length})
                       </h2>
                       <Link href="/employer/applications">
                         <Button variant="outline" size="sm">
-                          Voir toutes les candidatures
+                          {tCommon('viewAll')}
                         </Button>
                       </Link>
                     </div>
@@ -362,7 +356,7 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
                                   {app.candidate.name || app.candidate.email}
                                 </p>
                                 <p className="text-sm text-slate-500">
-                                  {new Date(app.createdAt).toLocaleDateString('fr-FR', {
+                                  {new Date(app.createdAt).toLocaleDateString(locale === 'fr' ? 'fr-FR' : 'en-US', {
                                     day: 'numeric',
                                     month: 'short',
                                     year: 'numeric'
@@ -371,7 +365,7 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
                               </div>
                             </div>
                             <Badge className={statusColors[app.status]} variant="outline">
-                              {statusLabels[app.status]}
+                              {tStatus(app.status.toLowerCase() as any)}
                             </Badge>
                           </div>
                         </Link>
@@ -388,7 +382,6 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
               <Card className="sticky top-20">
                 <CardContent className="p-6">
                   {session?.user?.role === 'EMPLOYER' && session.user.id === job.company.employerId ? (
-                    // Show employer actions for job owner
                     <EmployerJobActions
                       jobId={job.id}
                       jobStatus={job.status}
@@ -396,14 +389,14 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
                       currentUserId={session.user.id}
                     />
                   ) : session?.user?.role === 'EMPLOYER' ? (
-                    // Hide apply button for employers viewing other jobs
                     <div className="text-center py-4">
                       <p className="text-sm text-slate-600">
-                        Les employeurs ne peuvent pas postuler aux offres.
+                        {locale === 'fr' 
+                          ? "Les employeurs ne peuvent pas postuler aux offres."
+                          : "Employers cannot apply to job listings."}
                       </p>
                     </div>
                   ) : (
-                    // Show apply/save buttons for candidates
                     <>
                       <ApplyButton
                         jobId={job.id}
@@ -429,7 +422,7 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
               {similarJobs.length > 0 && (
                 <Card>
                   <CardContent className="p-6">
-                    <h3 className="font-semibold text-slate-900 mb-4">Similar Jobs</h3>
+                    <h3 className="font-semibold text-slate-900 mb-4">{t('similarJobs')}</h3>
                     <div className="space-y-3">
                       {similarJobs.map(similarJob => (
                         <Link

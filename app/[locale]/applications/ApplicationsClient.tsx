@@ -3,9 +3,10 @@
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { Link } from '@/i18n/routing'
 import type { Application, Company, Job } from '@prisma/client'
 import { Calendar, FileText, Filter } from 'lucide-react'
-import Link from 'next/link'
+import { useLocale, useTranslations } from 'next-intl'
 import { useState } from 'react'
 
 type ApplicationWithJob = Application & {
@@ -16,14 +17,6 @@ interface ApplicationsClientProps {
   applications: ApplicationWithJob[]
 }
 
-const statusOptions = [
-  { value: 'ALL', label: 'Toutes', color: 'bg-slate-100 text-slate-700' },
-  { value: 'PENDING', label: 'En attente', color: 'bg-yellow-100 text-yellow-700' },
-  { value: 'REVIEWED', label: 'Examinée', color: 'bg-blue-100 text-blue-700' },
-  { value: 'ACCEPTED', label: 'Acceptée', color: 'bg-green-100 text-green-700' },
-  { value: 'REJECTED', label: 'Refusée', color: 'bg-red-100 text-red-700' },
-]
-
 const statusColors: Record<string, string> = {
   PENDING: 'bg-yellow-100 text-yellow-700 border-yellow-200',
   REVIEWED: 'bg-blue-100 text-blue-700 border-blue-200',
@@ -31,22 +24,34 @@ const statusColors: Record<string, string> = {
   REJECTED: 'bg-red-100 text-red-700 border-red-200'
 }
 
-const statusLabels: Record<string, string> = {
-  PENDING: 'En attente',
-  REVIEWED: 'Examinée',
-  ACCEPTED: 'Acceptée',
-  REJECTED: 'Refusée'
-}
-
 export default function ApplicationsClient({ applications }: ApplicationsClientProps) {
+  const t = useTranslations('applications')
+  const tStatus = useTranslations('status')
+  const tCommon = useTranslations('common')
+  const tDashboard = useTranslations('candidateDashboard')
+  const locale = useLocale()
   const [statusFilter, setStatusFilter] = useState<string>('ALL')
+
+  const statusOptions = [
+    { value: 'ALL', label: t('all'), color: 'bg-slate-100 text-slate-700' },
+    { value: 'PENDING', label: tStatus('pending'), color: 'bg-yellow-100 text-yellow-700' },
+    { value: 'REVIEWED', label: tStatus('reviewed'), color: 'bg-blue-100 text-blue-700' },
+    { value: 'ACCEPTED', label: tStatus('accepted'), color: 'bg-green-100 text-green-700' },
+    { value: 'REJECTED', label: tStatus('rejected'), color: 'bg-red-100 text-red-700' },
+  ]
+
+  const statusLabels: Record<string, string> = {
+    PENDING: tStatus('pending'),
+    REVIEWED: tStatus('reviewed'),
+    ACCEPTED: tStatus('accepted'),
+    REJECTED: tStatus('rejected')
+  }
 
   const filteredApplications = applications.filter(app => {
     if (statusFilter === 'ALL') return true
     return app.status === statusFilter
   })
 
-  // Count by status
   const statusCounts = {
     ALL: applications.length,
     PENDING: applications.filter(a => a.status === 'PENDING').length,
@@ -57,11 +62,10 @@ export default function ApplicationsClient({ applications }: ApplicationsClientP
 
   return (
     <div>
-      {/* Status Filter */}
       <div className="mb-6">
         <div className="flex items-center gap-2 mb-3">
           <Filter className="w-4 h-4 text-slate-500" />
-          <span className="text-sm font-medium text-slate-700">Filtrer par statut</span>
+          <span className="text-sm font-medium text-slate-700">{t('filterByStatus')}</span>
         </div>
         <div className="flex flex-wrap gap-2">
           {statusOptions.map((option) => (
@@ -80,37 +84,29 @@ export default function ApplicationsClient({ applications }: ApplicationsClientP
         </div>
       </div>
 
-      {/* Results count */}
       <p className="text-sm text-slate-600 mb-4">
-        {filteredApplications.length} candidature{filteredApplications.length !== 1 ? 's' : ''} 
-        {statusFilter !== 'ALL' && ` avec le statut "${statusLabels[statusFilter] || statusFilter}"`}
+        {t('total', { count: filteredApplications.length })}
       </p>
 
-      {/* Applications List */}
       {filteredApplications.length === 0 ? (
         <Card>
           <CardContent className="p-12 text-center">
             <FileText className="w-16 h-16 text-slate-300 mx-auto mb-4" />
             <h3 className="text-xl font-semibold text-slate-900 mb-2">
-              {statusFilter === 'ALL' ? 'Aucune candidature' : 'Aucune candidature avec ce statut'}
+              {statusFilter === 'ALL' ? t('noApplications') : t('noMatchingFilter')}
             </h3>
             <p className="text-slate-600 mb-6">
-              {statusFilter === 'ALL' 
-                ? "Vous n'avez pas encore postulé. Commencez à chercher des offres !"
-                : "Aucune candidature ne correspond à ce filtre."}
+              {statusFilter === 'ALL' ? tDashboard('startApplying') : t('noMatchingFilter')}
             </p>
             {statusFilter === 'ALL' ? (
               <Link href="/jobs">
                 <Button className="bg-teal-600 hover:bg-teal-700">
-                  Chercher des offres
+                  {tDashboard('browseJobs')}
                 </Button>
               </Link>
             ) : (
-              <Button 
-                variant="outline" 
-                onClick={() => setStatusFilter('ALL')}
-              >
-                Voir toutes les candidatures
+              <Button variant="outline" onClick={() => setStatusFilter('ALL')}>
+                {tCommon('viewAll')}
               </Button>
             )}
           </CardContent>
@@ -130,7 +126,7 @@ export default function ApplicationsClient({ applications }: ApplicationsClientP
                     <p className="text-lg text-slate-600 mb-2">{app.job.company.name}</p>
                     <div className="flex items-center gap-2 text-sm text-slate-500 mb-3">
                       <Calendar className="w-4 h-4" />
-                      <span>Postulé le {new Date(app.createdAt).toLocaleDateString('fr-FR', {
+                      <span>{t('appliedOn')} {new Date(app.createdAt).toLocaleDateString(locale === 'fr' ? 'fr-FR' : 'en-US', {
                         day: 'numeric',
                         month: 'long',
                         year: 'numeric'
@@ -144,7 +140,7 @@ export default function ApplicationsClient({ applications }: ApplicationsClientP
 
                 {app.coverLetter && (
                   <div className="p-4 bg-slate-50 rounded-lg border border-slate-200 mb-4">
-                    <h4 className="text-sm font-semibold text-slate-700 mb-2">Lettre de motivation</h4>
+                    <h4 className="text-sm font-semibold text-slate-700 mb-2">{t('coverLetter')}</h4>
                     <p className="text-sm text-slate-600 whitespace-pre-wrap line-clamp-3">
                       {app.coverLetter}
                     </p>
@@ -159,7 +155,7 @@ export default function ApplicationsClient({ applications }: ApplicationsClientP
                   </div>
                   <Link href={`/jobs/${app.job.id}`}>
                     <Button variant="outline" size="sm">
-                      Voir l'offre
+                      {t('viewJob')}
                     </Button>
                   </Link>
                 </div>

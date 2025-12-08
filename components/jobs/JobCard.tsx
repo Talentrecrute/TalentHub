@@ -1,8 +1,11 @@
+'use client'
+
 import CompanyAvatar from '@/components/CompanyAvatar'
 import { Button } from '@/components/ui/button'
+import { Link } from '@/i18n/routing'
 import type { Company, Job } from '@prisma/client'
 import { Bookmark, Clock, DollarSign, MapPin, Users } from 'lucide-react'
-import Link from 'next/link'
+import { useLocale, useTranslations } from 'next-intl'
 
 interface JobCardProps {
   job: Job
@@ -14,10 +17,13 @@ interface JobCardProps {
 }
 
 export default function JobCard({ job, company, showActions = true, isSaved = false, onSave, applicationCount }: JobCardProps) {
+  const t = useTranslations('jobs')
+  const tCommon = useTranslations('common')
+  const locale = useLocale()
+
   const formatSalary = (min?: number | null, max?: number | null, currency: string = 'USD') => {
-    if (!min && !max) return 'Competitive'
+    if (!min && !max) return t('competitive')
     
-    // Map common invalid currency names to valid ISO codes
     const currencyMap: Record<string, string> = {
       'Euros': 'EUR',
       'Dollars': 'USD',
@@ -25,14 +31,11 @@ export default function JobCard({ job, company, showActions = true, isSaved = fa
       'dollars': 'USD'
     }
     
-    // Normalize currency code
     const normalizedCurrency = currencyMap[currency] || currency || 'USD'
-    
-    // Validate currency code (should be 3 uppercase letters)
     const isValidCurrency = /^[A-Z]{3}$/.test(normalizedCurrency)
     const safeCurrency = isValidCurrency ? normalizedCurrency : 'USD'
     
-    const formatter = new Intl.NumberFormat('en-US', {
+    const formatter = new Intl.NumberFormat(locale === 'fr' ? 'fr-FR' : 'en-US', {
       style: 'currency',
       currency: safeCurrency,
       maximumFractionDigits: 0
@@ -40,7 +43,7 @@ export default function JobCard({ job, company, showActions = true, isSaved = fa
     if (min && max) {
       return `${formatter.format(min)} - ${formatter.format(max)}`
     }
-    return min ? `${formatter.format(min)}+` : `Up to ${formatter.format(max!)}`
+    return min ? `${formatter.format(min)}+` : `${t('upTo')} ${formatter.format(max!)}`
   }
 
   const getTimeAgo = (date: Date) => {
@@ -48,11 +51,11 @@ export default function JobCard({ job, company, showActions = true, isSaved = fa
     const diff = now.getTime() - new Date(date).getTime()
     const days = Math.floor(diff / (1000 * 60 * 60 * 24))
     
-    if (days === 0) return 'Today'
-    if (days === 1) return 'Yesterday'
-    if (days < 7) return `${days} days ago`
-    if (days < 30) return `${Math.floor(days / 7)} weeks ago`
-    return `${Math.floor(days / 30)} months ago`
+    if (days === 0) return tCommon('today')
+    if (days === 1) return tCommon('yesterday')
+    if (days < 7) return tCommon('daysAgo', { count: days })
+    if (days < 30) return tCommon('weeksAgo', { count: Math.floor(days / 7) })
+    return tCommon('monthsAgo', { count: Math.floor(days / 30) })
   }
 
   return (
@@ -92,8 +95,9 @@ export default function JobCard({ job, company, showActions = true, isSaved = fa
           <div className="flex items-center gap-2 text-sm text-slate-600">
             <MapPin className="w-4 h-4 flex-shrink-0" />
             <span className="truncate">{job.location}</span>
-            <span className="px-2 py-0.5 bg-slate-100 rounded text-xs capitalize flex-shrink-0">
-              {job.locationType}
+            <span className="px-2 py-0.5 bg-slate-100 rounded text-xs flex-shrink-0">
+              {job.locationType === 'remote' ? t('remote') : 
+               job.locationType === 'hybrid' ? t('hybrid') : t('onsite')}
             </span>
           </div>
           
@@ -123,12 +127,12 @@ export default function JobCard({ job, company, showActions = true, isSaved = fa
               {applicationCount !== undefined && (
                 <span className="flex items-center gap-1 text-xs text-slate-500">
                   <Users className="w-3 h-3" />
-                  {applicationCount} candidature{applicationCount !== 1 ? 's' : ''}
+                  {t('applications', { count: applicationCount })}
                 </span>
               )}
             </div>
             <span className="text-sm font-medium text-teal-600 hover:text-teal-700">
-              Voir détails →
+              {tCommon('viewDetails')} →
             </span>
           </div>
         )}

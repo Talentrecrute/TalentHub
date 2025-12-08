@@ -3,13 +3,18 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
+import { Link } from '@/i18n/routing'
 import { AlertCircle, Lock, Mail, User } from 'lucide-react'
-import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
 export default function SignUpPage() {
+  const t = useTranslations('auth')
+  const tErrors = useTranslations('errors')
+  const tCommon = useTranslations('common')
+  const tProfile = useTranslations('profile')
   const router = useRouter()
   
   const [formData, setFormData] = useState({
@@ -26,19 +31,19 @@ export default function SignUpPage() {
     const newErrors: string[] = []
 
     if (formData.name.length < 2) {
-      newErrors.push('Name must be at least 2 characters')
+      newErrors.push(tErrors('required'))
     }
 
     if (!formData.email.includes('@')) {
-      newErrors.push('Please enter a valid email')
+      newErrors.push(tErrors('invalidEmail'))
     }
 
     if (formData.password.length < 6) {
-      newErrors.push('Password must be at least 6 characters')
+      newErrors.push(tErrors('required'))
     }
 
     if (formData.password !== formData.confirmPassword) {
-      newErrors.push('Passwords do not match')
+      newErrors.push(tErrors('passwordMismatch'))
     }
 
     setErrors(newErrors)
@@ -72,16 +77,16 @@ export default function SignUpPage() {
       const data = await response.json()
 
       if (!response.ok) {
-        setErrors([data.error || 'Failed to create account'])
-        toast.error(data.error || 'Failed to create account')
+        setErrors([data.error || tErrors('somethingWrong')])
+        toast.error(data.error || tErrors('somethingWrong'))
         return
       }
 
-      toast.success('Account created successfully! Please sign in.')
+      toast.success(t('welcomeBack'))
       router.push('/auth/signin')
     } catch (error) {
-      setErrors(['Something went wrong. Please try again.'])
-      toast.error('Failed to create account')
+      setErrors([tErrors('somethingWrong')])
+      toast.error(tErrors('somethingWrong'))
     } finally {
       setIsLoading(false)
     }
@@ -94,14 +99,14 @@ export default function SignUpPage() {
           <Link href="/" className="inline-block">
             <h1 className="text-3xl font-bold text-slate-900 mb-2">TalentHub</h1>
           </Link>
-          <p className="text-slate-600">Create your account to get started</p>
+          <p className="text-slate-600">{t('registerSubtitle')}</p>
         </div>
 
         <Card className="shadow-xl">
           <CardHeader>
-            <CardTitle className="text-2xl">Sign Up</CardTitle>
+            <CardTitle className="text-2xl">{t('signUp')}</CardTitle>
             <CardDescription>
-              Join TalentHub today
+              {t('registerSubtitle')}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -120,7 +125,7 @@ export default function SignUpPage() {
               {/* Role Selection */}
               <div className="space-y-2">
                 <label className="text-sm font-medium text-slate-700">
-                  I am a
+                  {tProfile('role')}
                 </label>
                 <div className="grid grid-cols-2 gap-3">
                   <button
@@ -132,8 +137,7 @@ export default function SignUpPage() {
                         : 'border-slate-200 hover:border-slate-300'
                     }`}
                   >
-                    <div className="font-semibold text-slate-900">Job Seeker</div>
-                    <div className="text-xs text-slate-600 mt-1">Looking for jobs</div>
+                    <div className="font-semibold text-slate-900">{t('iAmCandidate')}</div>
                   </button>
                   <button
                     type="button"
@@ -144,15 +148,14 @@ export default function SignUpPage() {
                         : 'border-slate-200 hover:border-slate-300'
                     }`}
                   >
-                    <div className="font-semibold text-slate-900">Employer</div>
-                    <div className="text-xs text-slate-600 mt-1">Hiring talent</div>
+                    <div className="font-semibold text-slate-900">{t('iAmEmployer')}</div>
                   </button>
                 </div>
               </div>
 
               <div className="space-y-2">
                 <label htmlFor="name" className="text-sm font-medium text-slate-700">
-                  Full Name
+                  {tProfile('fullName')}
                 </label>
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
@@ -171,7 +174,7 @@ export default function SignUpPage() {
 
               <div className="space-y-2">
                 <label htmlFor="email" className="text-sm font-medium text-slate-700">
-                  Email Address
+                  {t('email')}
                 </label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
@@ -190,7 +193,7 @@ export default function SignUpPage() {
 
               <div className="space-y-2">
                 <label htmlFor="password" className="text-sm font-medium text-slate-700">
-                  Password
+                  {t('password')}
                 </label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
@@ -209,7 +212,7 @@ export default function SignUpPage() {
 
               <div className="space-y-2">
                 <label htmlFor="confirmPassword" className="text-sm font-medium text-slate-700">
-                  Confirm Password
+                  {t('confirmPassword')}
                 </label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
@@ -231,19 +234,15 @@ export default function SignUpPage() {
                 className="w-full bg-teal-600 hover:bg-teal-700 text-white py-6 text-base font-semibold"
                 disabled={isLoading}
               >
-                {isLoading ? 'Creating account...' : 'Create Account'}
+                {isLoading ? tCommon('loading') : t('createAccount')}
               </Button>
-
-              <p className="text-xs text-slate-600 text-center">
-                By signing up, you agree to our Terms of Service and Privacy Policy
-              </p>
             </form>
 
             <div className="mt-6 text-center">
               <p className="text-sm text-slate-600">
-                Already have an account?{' '}
+                {t('hasAccount')}{' '}
                 <Link href="/auth/signin" className="text-teal-600 hover:text-teal-700 font-semibold">
-                  Sign in
+                  {t('signIn')}
                 </Link>
               </p>
             </div>
@@ -252,7 +251,7 @@ export default function SignUpPage() {
 
         <div className="mt-6 text-center text-sm text-slate-600">
           <Link href="/" className="hover:text-slate-900">
-            ← Back to home
+            ← {tCommon('back')}
           </Link>
         </div>
       </div>

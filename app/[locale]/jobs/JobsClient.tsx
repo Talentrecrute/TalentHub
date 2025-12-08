@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import type { Company, Job } from '@prisma/client'
 import { Search, SlidersHorizontal } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { useSearchParams } from 'next/navigation'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -18,6 +19,9 @@ interface JobsClientProps {
 }
 
 export default function JobsClient({ initialJobs, savedJobIds, userId }: JobsClientProps) {
+  const t = useTranslations('jobs')
+  const tMessages = useTranslations('messages')
+  const tErrors = useTranslations('errors')
   const searchParams = useSearchParams()
   const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || '')
   const [filters, setFilters] = useState({
@@ -65,7 +69,7 @@ export default function JobsClient({ initialJobs, savedJobIds, userId }: JobsCli
 
   const handleSaveJob = async (jobId: string) => {
     if (!userId) {
-      toast.error('Please sign in to save jobs')
+      toast.error(tErrors('unauthorized'))
       return
     }
 
@@ -82,9 +86,9 @@ export default function JobsClient({ initialJobs, savedJobIds, userId }: JobsCli
         return newSet
       })
       
-      toast.success(result.message)
+      toast.success(result.saved ? tMessages('jobSaved') : tMessages('jobUnsaved'))
     } catch (error: any) {
-      toast.error(error.message || 'Failed to save job')
+      toast.error(error.message || tErrors('somethingWrong'))
     }
   }
 
@@ -104,14 +108,14 @@ export default function JobsClient({ initialJobs, savedJobIds, userId }: JobsCli
       <div className="bg-white border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-6">
-            Find Your Perfect Job
+            {t('findJob')}
           </h1>
           
           <div className="flex gap-3">
             <div className="flex-1 flex items-center gap-3 px-4 bg-slate-50 rounded-lg border border-slate-300">
               <Search className="w-5 h-5 text-slate-400" />
               <Input 
-                placeholder="Search by title, keyword, or company"
+                placeholder={t('searchPlaceholder')}
                 className="border-0 bg-transparent focus-visible:ring-0"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -143,7 +147,7 @@ export default function JobsClient({ initialJobs, savedJobIds, userId }: JobsCli
           <div className="flex-1 min-w-0">
             <div className="mb-6">
               <p className="text-slate-600">
-                {filteredJobs.length} jobs found
+                {t('jobsFound', { count: filteredJobs.length })}
               </p>
             </div>
 
@@ -152,12 +156,12 @@ export default function JobsClient({ initialJobs, savedJobIds, userId }: JobsCli
                 <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Search className="w-8 h-8 text-slate-400" />
                 </div>
-                <h3 className="text-xl font-semibold text-slate-900 mb-2">No jobs found</h3>
+                <h3 className="text-xl font-semibold text-slate-900 mb-2">{t('noJobsFound')}</h3>
                 <p className="text-slate-600 mb-6">
-                  Try adjusting your filters or search terms
+                  {t('adjustFilters')}
                 </p>
                 <Button onClick={clearFilters} variant="outline">
-                  Clear Filters
+                  {t('clearFilters')}
                 </Button>
               </div>
             ) : (

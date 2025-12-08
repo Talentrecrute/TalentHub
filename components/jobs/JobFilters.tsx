@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { X } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 interface JobFiltersProps {
   filters: {
@@ -27,6 +28,9 @@ const categories = [
 ]
 
 export default function JobFilters({ filters, onChange, onClear }: JobFiltersProps) {
+  const t = useTranslations('jobs')
+  const tCommon = useTranslations('common')
+
   const handleLocationChange = (location: string) => {
     onChange({ ...filters, location })
   }
@@ -59,7 +63,7 @@ export default function JobFilters({ filters, onChange, onClear }: JobFiltersPro
     <div className="space-y-6">
       {hasActiveFilters && (
         <div className="flex items-center justify-between">
-          <span className="text-sm font-medium text-slate-700">Active Filters</span>
+          <span className="text-sm font-medium text-slate-700">{tCommon('filter')}</span>
           <Button
             variant="ghost"
             size="sm"
@@ -67,7 +71,7 @@ export default function JobFilters({ filters, onChange, onClear }: JobFiltersPro
             className="text-sm text-slate-600 hover:text-slate-900"
           >
             <X className="w-4 h-4 mr-1" />
-            Clear All
+            {t('clearFilters')}
           </Button>
         </div>
       )}
@@ -75,11 +79,11 @@ export default function JobFilters({ filters, onChange, onClear }: JobFiltersPro
       {/* Location */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-sm font-semibold">Location</CardTitle>
+          <CardTitle className="text-sm font-semibold">{t('location')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <Input
-            placeholder="Enter location"
+            placeholder={t('location')}
             value={filters.location}
             onChange={(e) => handleLocationChange(e.target.value)}
           />
@@ -90,7 +94,7 @@ export default function JobFilters({ filters, onChange, onClear }: JobFiltersPro
               onChange={handleRemoteToggle}
               className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
             />
-            <span className="text-sm text-slate-700">Remote only</span>
+            <span className="text-sm text-slate-700">{t('remote')}</span>
           </label>
         </CardContent>
       </Card>
@@ -98,7 +102,7 @@ export default function JobFilters({ filters, onChange, onClear }: JobFiltersPro
       {/* Job Type */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-sm font-semibold">Job Type</CardTitle>
+          <CardTitle className="text-sm font-semibold">{t('jobType')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-2">
           {jobTypes.map(type => (
@@ -118,7 +122,7 @@ export default function JobFilters({ filters, onChange, onClear }: JobFiltersPro
       {/* Experience Level */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-sm font-semibold">Experience Level</CardTitle>
+          <CardTitle className="text-sm font-semibold">{t('experience')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-2">
           {experienceLevels.map(level => (
@@ -138,7 +142,7 @@ export default function JobFilters({ filters, onChange, onClear }: JobFiltersPro
       {/* Categories */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-sm font-semibold">Category</CardTitle>
+          <CardTitle className="text-sm font-semibold">{t('category')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-2 max-h-60 overflow-y-auto">
@@ -160,12 +164,12 @@ export default function JobFilters({ filters, onChange, onClear }: JobFiltersPro
       {/* Salary */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-sm font-semibold">Minimum Salary</CardTitle>
+          <CardTitle className="text-sm font-semibold">{t('minimumSalary')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <Input
             type="number"
-            placeholder="Enter minimum salary"
+            placeholder={t('minimumSalary')}
             value={filters.salaryMin || ''}
             onChange={(e) => handleSalaryChange(Number(e.target.value))}
             min="0"

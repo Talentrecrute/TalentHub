@@ -1,17 +1,17 @@
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Link } from '@/i18n/routing'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { Briefcase, Building2, FileText, PlusCircle, TrendingUp, Users } from 'lucide-react'
 import { getServerSession } from 'next-auth'
-import Link from 'next/link'
+import { getTranslations } from 'next-intl/server'
 import { redirect } from 'next/navigation'
 import { Toaster } from 'sonner'
 import JobActions from './JobActions'
 
 async function getEmployerData(userId: string) {
-  // Get employer's company
   const company = await prisma.company.findFirst({
     where: { employerId: userId }
   })
@@ -20,7 +20,6 @@ async function getEmployerData(userId: string) {
     return null
   }
 
-  // Get jobs for this company
   const jobs = await prisma.job.findMany({
     where: { companyId: company.id },
     include: {
@@ -36,7 +35,6 @@ async function getEmployerData(userId: string) {
     take: 5
   })
 
-  // Get recent applications
   const applications = await prisma.application.findMany({
     where: {
       job: {
@@ -53,7 +51,6 @@ async function getEmployerData(userId: string) {
     take: 5
   })
 
-  // Get stats
   const stats = {
     totalJobs: await prisma.job.count({ where: { companyId: company.id } }),
     openJobs: await prisma.job.count({ where: { companyId: company.id, status: 'OPEN' } }),
@@ -70,6 +67,12 @@ async function getEmployerData(userId: string) {
 
 export default async function EmployerDashboardPage() {
   const session = await getServerSession(authOptions)
+  const t = await getTranslations('employerDashboard')
+  const tStatus = await getTranslations('status')
+  const tCommon = await getTranslations('common')
+  const tEmployer = await getTranslations('employer')
+  const tNav = await getTranslations('nav')
+  const tApps = await getTranslations('applications')
   
   if (!session?.user?.id || session.user.role !== 'EMPLOYER') {
     redirect('/')
@@ -83,13 +86,15 @@ export default async function EmployerDashboardPage() {
         <Card className="max-w-md">
           <CardContent className="p-8 text-center">
             <Building2 className="w-16 h-16 text-slate-300 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-slate-900 mb-2">No Company Found</h2>
+            <h2 className="text-2xl font-bold text-slate-900 mb-2">{tEmployer('noCompany')}</h2>
             <p className="text-slate-600 mb-6">
-              You need to create a company before you can post jobs.
+              {tEmployer('createCompanyFirst')}
             </p>
-            <Button className="bg-teal-600 hover:bg-teal-700">
-              Create Company
-            </Button>
+            <Link href="/employer/create-company">
+              <Button className="bg-teal-600 hover:bg-teal-700">
+                {tEmployer('createCompany')}
+              </Button>
+            </Link>
           </CardContent>
         </Card>
       </div>
@@ -105,14 +110,14 @@ export default async function EmployerDashboardPage() {
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-2">
-              Employer Dashboard
+              {tNav('dashboard')}
             </h1>
             <p className="text-lg text-slate-600">{company.name}</p>
           </div>
           <Link href="/employer/post-job">
             <Button className="bg-teal-600 hover:bg-teal-700">
               <PlusCircle className="w-4 h-4 mr-2" />
-              Post New Job
+              {tNav('postJob')}
             </Button>
           </Link>
         </div>
@@ -121,7 +126,7 @@ export default async function EmployerDashboardPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-slate-600">Total Jobs</CardTitle>
+              <CardTitle className="text-sm font-medium text-slate-600">{t('activeJobs')}</CardTitle>
               <Briefcase className="w-4 h-4 text-slate-400" />
             </CardHeader>
             <CardContent>
@@ -131,7 +136,7 @@ export default async function EmployerDashboardPage() {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-slate-600">Open Jobs</CardTitle>
+              <CardTitle className="text-sm font-medium text-slate-600">{tStatus('open')}</CardTitle>
               <TrendingUp className="w-4 h-4 text-slate-400" />
             </CardHeader>
             <CardContent>
@@ -141,7 +146,7 @@ export default async function EmployerDashboardPage() {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-slate-600">Total Applications</CardTitle>
+              <CardTitle className="text-sm font-medium text-slate-600">{t('totalApplications')}</CardTitle>
               <FileText className="w-4 h-4 text-slate-400" />
             </CardHeader>
             <CardContent>
@@ -151,7 +156,7 @@ export default async function EmployerDashboardPage() {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-slate-600">Pending Review</CardTitle>
+              <CardTitle className="text-sm font-medium text-slate-600">{t('newApplications')}</CardTitle>
               <Users className="w-4 h-4 text-slate-400" />
             </CardHeader>
             <CardContent>
@@ -160,19 +165,19 @@ export default async function EmployerDashboardPage() {
           </Card>
         </div>
 
-        <div className="grid grid-cols-1 lg: grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Recent Jobs */}
           <div>
-            <h2 className="text-2xl font-bold text-slate-900 mb-4">Recent Jobs</h2>
+            <h2 className="text-2xl font-bold text-slate-900 mb-4">{t('recentJobs')}</h2>
             {jobs.length === 0 ? (
               <Card>
                 <CardContent className="p-12 text-center">
                   <Briefcase className="w-16 h-16 text-slate-300 mx-auto mb-4" />
-                  <h3 className="text-xl font-semibold text-slate-900 mb-2">No jobs posted</h3>
-                  <p className="text-slate-600 mb-4">Post your first job to start receiving applications</p>
+                  <h3 className="text-xl font-semibold text-slate-900 mb-2">{t('noJobs')}</h3>
+                  <p className="text-slate-600 mb-4">{t('createFirst')}</p>
                   <Link href="/employer/post-job">
                     <Button className="bg-teal-600 hover:bg-teal-700">
-                      Post a Job
+                      {t('postJob')}
                     </Button>
                   </Link>
                 </CardContent>
@@ -188,10 +193,10 @@ export default async function EmployerDashboardPage() {
                           <p className="text-sm text-slate-600 mb-2">{job.location}</p>
                           <div className="flex items-center gap-2">
                             <Badge variant={job.status === 'OPEN' ? 'success' : 'secondary'}>
-                              {job.status}
+                              {job.status === 'OPEN' ? tStatus('open') : tStatus('closed')}
                             </Badge>
                             <span className="text-sm text-slate-500">
-                              {job._count.applications} applications
+                              {job._count.applications} {tApps('title').toLowerCase()}
                             </span>
                           </div>
                         </div>
@@ -207,10 +212,10 @@ export default async function EmployerDashboardPage() {
           {/* Recent Applications */}
           <div>
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-2xl font-bold text-slate-900">Recent Applications</h2>
+              <h2 className="text-2xl font-bold text-slate-900">{t('recentApplications')}</h2>
               {applications.length > 0 && (
                 <Link href="/employer/applications" className="text-sm text-teal-600 hover:text-teal-700">
-                  View All
+                  {tCommon('viewAll')}
                 </Link>
               )}
             </div>
@@ -219,8 +224,10 @@ export default async function EmployerDashboardPage() {
               <Card>
                 <CardContent className="p-12 text-center">
                   <FileText className="w-16 h-16 text-slate-300 mx-auto mb-4" />
-                  <h3 className="text-xl font-semibold text-slate-900 mb-2">No applications yet</h3>
-                  <p className="text-slate-600">Applications will appear here when candidates apply to your jobs</p>
+                  <h3 className="text-xl font-semibold text-slate-900 mb-2">{tApps('noApplications')}</h3>
+                  <p className="text-slate-600">
+                    {t('overview')}
+                  </p>
                 </CardContent>
               </Card>
             ) : (
@@ -231,14 +238,14 @@ export default async function EmployerDashboardPage() {
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
                           <h3 className="font-semibold text-slate-900 mb-1">{app.candidate.name}</h3>
-                          <p className="text-sm text-slate-600 mb-2">Applied for: {app.job.title}</p>
+                          <p className="text-sm text-slate-600 mb-2">{tApps('appliesFor')}: {app.job.title}</p>
                           <Badge variant={
                             app.status === 'ACCEPTED' ? 'success' :
                             app.status === 'REJECTED' ? 'destructive' :
                             app.status === 'REVIEWED' ? 'info' :
                             'secondary'
-                          } className="capitalize">
-                            {app.status.toLowerCase()}
+                          }>
+                            {tStatus(app.status.toLowerCase() as any)}
                           </Badge>
                         </div>
                         <span className="text-xs text-slate-500">

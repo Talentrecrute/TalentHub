@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Plus, X } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
 import { useState, useTransition } from 'react'
 import { toast } from 'sonner'
@@ -16,15 +17,12 @@ interface ProfileFormProps {
   initialData: any
 }
 
-const categories = [
-  "Technology", "Marketing", "Sales", "Design", "Finance", 
-  "Human Resources", "Operations", "Customer Support", "Engineering", 
-  "Product", "Legal", "Other"
-]
-
-const jobTypes = ["Full-time", "Part-time", "Contract", "Freelance", "Internship"]
-
 export default function ProfileForm({ user, initialData }: ProfileFormProps) {
+  const t = useTranslations('profile')
+  const tCommon = useTranslations('common')
+  const tMessages = useTranslations('messages')
+  const tErrors = useTranslations('errors')
+  const tApps = useTranslations('applications')
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [editMode, setEditMode] = useState(false)
@@ -97,11 +95,11 @@ export default function ProfileForm({ user, initialData }: ProfileFormProps) {
     startTransition(async () => {
       try {
         await updateProfile(formData)
-        toast.success('Profile updated successfully!')
+        toast.success(tMessages('profileUpdated'))
         setEditMode(false)
         router.refresh()
       } catch (error: any) {
-        toast.error(error.message || 'Failed to update profile')
+        toast.error(error.message || tErrors('somethingWrong'))
       }
     })
   }
@@ -125,15 +123,15 @@ export default function ProfileForm({ user, initialData }: ProfileFormProps) {
       <div className="flex items-center justify-between">
         {!editMode ? (
           <Button onClick={() => setEditMode(true)} className="bg-teal-600 hover:bg-teal-700">
-            Modifier le profil
+            {t('editProfile')}
           </Button>
         ) : (
           <div className="flex gap-2">
             <Button variant="outline" onClick={handleCancel} disabled={isPending}>
-              Annuler
+              {tCommon('cancel')}
             </Button>
             <Button onClick={handleSave} disabled={isPending} className="bg-teal-600 hover:bg-teal-700">
-              {isPending ? 'Enregistrement...' : 'Enregistrer'}
+              {isPending ? tCommon('loading') : t('saveChanges')}
             </Button>
           </div>
         )}
@@ -142,9 +140,9 @@ export default function ProfileForm({ user, initialData }: ProfileFormProps) {
       {/* Basic Info */}
       <div className="space-y-4">
         <div>
-          <Label>Nom complet</Label>
+          <Label>{t('fullName')}</Label>
           <Input 
-            placeholder="Votre nom complet"
+            placeholder={t('fullName')}
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             disabled={!editMode}
@@ -153,14 +151,14 @@ export default function ProfileForm({ user, initialData }: ProfileFormProps) {
         </div>
         
         <div>
-          <Label>Email</Label>
+          <Label>{t('email')}</Label>
           <Input value={user?.email || ''} disabled className="bg-slate-50" />
         </div>
 
         <div>
-          <Label>Bio</Label>
+          <Label>{t('bio')}</Label>
           <Textarea
-            placeholder="Tell us about yourself..."
+            placeholder={t('bioPlaceholder')}
             value={formData.bio}
             onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
             disabled={!editMode}
@@ -170,9 +168,9 @@ export default function ProfileForm({ user, initialData }: ProfileFormProps) {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <Label>Location</Label>
+            <Label>{t('location')}</Label>
             <Input
-              placeholder="City, Country"
+              placeholder={t('location')}
               value={formData.location}
               onChange={(e) => setFormData({ ...formData, location: e.target.value })}
               disabled={!editMode}
@@ -180,7 +178,7 @@ export default function ProfileForm({ user, initialData }: ProfileFormProps) {
           </div>
           
           <div>
-            <Label>Phone</Label>
+            <Label>{t('phone')}</Label>
             <Input
               placeholder="+1 234 567 8900"
               value={formData.phone}
@@ -193,7 +191,7 @@ export default function ProfileForm({ user, initialData }: ProfileFormProps) {
 
       {/* Skills */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold">Skills</h3>
+        <h3 className="text-lg font-semibold">{t('skills')}</h3>
         <div className="flex flex-wrap gap-2">
           {formData.skills?.map((skill: string, idx: number) => (
             <Badge key={idx} variant="secondary" className="bg-blue-50 text-blue-700 border-blue-200">
@@ -210,7 +208,7 @@ export default function ProfileForm({ user, initialData }: ProfileFormProps) {
         {editMode && (
           <div className="flex gap-2">
             <Input
-              placeholder="Add a skill"
+              placeholder={t('skillsPlaceholder')}
               value={newSkill}
               onChange={(e) => setNewSkill(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && addSkill()}
@@ -224,7 +222,7 @@ export default function ProfileForm({ user, initialData }: ProfileFormProps) {
 
       {/* Experience */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold">Work Experience</h3>
+        <h3 className="text-lg font-semibold">{tApps('experience')}</h3>
         {formData.experience?.map((exp: any, idx: number) => (
           <div key={idx} className="p-4 border border-slate-200 rounded-lg">
             <div className="flex justify-between items-start mb-2">
@@ -239,7 +237,7 @@ export default function ProfileForm({ user, initialData }: ProfileFormProps) {
               )}
             </div>
             <p className="text-sm text-slate-500">
-              {exp.startDate} - {exp.current ? 'Present' : exp.endDate}
+              {exp.startDate} - {exp.current ? tApps('present') : exp.endDate}
               {exp.location && ` • ${exp.location}`}
             </p>
             {exp.description && <p className="text-sm text-slate-600 mt-2">{exp.description}</p>}
@@ -248,23 +246,23 @@ export default function ProfileForm({ user, initialData }: ProfileFormProps) {
 
         {editMode && (
           <div className="p-4 border-2 border-dashed border-slate-300 rounded-lg space-y-3">
-            <h4 className="font-medium">Add Experience</h4>
+            <h4 className="font-medium">{t('addExperience')}</h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <Input placeholder="Job Title" value={newExperience.title} onChange={(e) => setNewExperience({ ...newExperience, title: e.target.value })} />
-              <Input placeholder="Company" value={newExperience.company} onChange={(e) => setNewExperience({ ...newExperience, company: e.target.value })} />
-              <Input placeholder="Location" value={newExperience.location} onChange={(e) => setNewExperience({ ...newExperience, location: e.target.value })} />
+              <Input placeholder={t('jobTitle')} value={newExperience.title} onChange={(e) => setNewExperience({ ...newExperience, title: e.target.value })} />
+              <Input placeholder={t('company')} value={newExperience.company} onChange={(e) => setNewExperience({ ...newExperience, company: e.target.value })} />
+              <Input placeholder={t('location')} value={newExperience.location} onChange={(e) => setNewExperience({ ...newExperience, location: e.target.value })} />
               <Input type="month" value={newExperience.startDate} onChange={(e) => setNewExperience({ ...newExperience, startDate: e.target.value })} />
               {!newExperience.current && (
                 <Input type="month" value={newExperience.endDate} onChange={(e) => setNewExperience({ ...newExperience, endDate: e.target.value })} />
               )}
               <label className="flex items-center gap-2">
                 <input type="checkbox" checked={newExperience.current} onChange={(e) => setNewExperience({ ...newExperience, current: e.target.checked })} />
-                <span className="text-sm">Currently working here</span>
+                <span className="text-sm">{t('currentlyWorking')}</span>
               </label>
             </div>
             <Textarea placeholder="Description" value={newExperience.description} onChange={(e) => setNewExperience({ ...newExperience, description: e.target.value })} rows={3} />
             <Button onClick={addExperience}>
-              <Plus className="w-4 h-4 mr-2" /> Add Experience
+              <Plus className="w-4 h-4 mr-2" /> {t('addExperience')}
             </Button>
           </div>
         )}
@@ -272,7 +270,7 @@ export default function ProfileForm({ user, initialData }: ProfileFormProps) {
 
       {/* Education */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold">Education</h3>
+        <h3 className="text-lg font-semibold">{tApps('education')}</h3>
         {formData.education?.map((edu: any, idx: number) => (
           <div key={idx} className="p-4 border border-slate-200 rounded-lg">
             <div className="flex justify-between items-start mb-2">
@@ -288,29 +286,29 @@ export default function ProfileForm({ user, initialData }: ProfileFormProps) {
               )}
             </div>
             <p className="text-sm text-slate-500">
-              {edu.startDate} - {edu.current ? 'Present' : edu.endDate}
+              {edu.startDate} - {edu.current ? tApps('inProgress') : edu.endDate}
             </p>
           </div>
         ))}
 
         {editMode && (
           <div className="p-4 border-2 border-dashed border-slate-300 rounded-lg space-y-3">
-            <h4 className="font-medium">Add Education</h4>
+            <h4 className="font-medium">{t('addEducation')}</h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <Input placeholder="Degree" value={newEducation.degree} onChange={(e) => setNewEducation({ ...newEducation, degree: e.target.value })} />
-              <Input placeholder="Institution" value={newEducation.institution} onChange={(e) => setNewEducation({ ...newEducation, institution: e.target.value })} />
-              <Input placeholder="Field of Study" value={newEducation.field} onChange={(e) => setNewEducation({ ...newEducation, field: e.target.value })} />
+              <Input placeholder={t('degree')} value={newEducation.degree} onChange={(e) => setNewEducation({ ...newEducation, degree: e.target.value })} />
+              <Input placeholder={t('institution')} value={newEducation.institution} onChange={(e) => setNewEducation({ ...newEducation, institution: e.target.value })} />
+              <Input placeholder={t('fieldOfStudy')} value={newEducation.field} onChange={(e) => setNewEducation({ ...newEducation, field: e.target.value })} />
               <Input type="month" value={newEducation.startDate} onChange={(e) => setNewEducation({ ...newEducation, startDate: e.target.value })} />
               {!newEducation.current && (
                 <Input type="month" value={newEducation.endDate} onChange={(e) => setNewEducation({ ...newEducation, endDate: e.target.value })} />
               )}
               <label className="flex items-center gap-2">
                 <input type="checkbox" checked={newEducation.current} onChange={(e) => setNewEducation({ ...newEducation, current: e.target.checked })} />
-                <span className="text-sm">Currently studying</span>
+                <span className="text-sm">{t('currentlyStudying')}</span>
               </label>
             </div>
             <Button onClick={addEducation}>
-              <Plus className="w-4 h-4 mr-2" /> Add Education
+              <Plus className="w-4 h-4 mr-2" /> {t('addEducation')}
             </Button>
           </div>
         )}

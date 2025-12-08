@@ -3,14 +3,18 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
+import { Link } from '@/i18n/routing'
 import { AlertCircle, Lock, Mail } from 'lucide-react'
 import { signIn } from 'next-auth/react'
-import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Suspense, useState } from 'react'
 import { toast } from 'sonner'
 
 function SignInForm() {
+  const t = useTranslations('auth')
+  const tErrors = useTranslations('errors')
+  const tCommon = useTranslations('common')
   const router = useRouter()
   const searchParams = useSearchParams()
   const callbackUrl = searchParams.get('callbackUrl') || '/'
@@ -33,16 +37,16 @@ function SignInForm() {
       })
 
       if (result?.error) {
-        setError('Invalid email or password')
-        toast.error('Invalid email or password')
+        setError(tErrors('invalidEmail'))
+        toast.error(tErrors('invalidEmail'))
       } else {
-        toast.success('Welcome back!')
+        toast.success(t('welcomeBack'))
         router.push(callbackUrl)
         router.refresh()
       }
     } catch (error) {
-      setError('Something went wrong. Please try again.')
-      toast.error('Something went wrong')
+      setError(tErrors('somethingWrong'))
+      toast.error(tErrors('somethingWrong'))
     } finally {
       setIsLoading(false)
     }
@@ -54,14 +58,14 @@ function SignInForm() {
         <Link href="/" className="inline-block">
           <h1 className="text-3xl font-bold text-slate-900 mb-2">TalentHub</h1>
         </Link>
-        <p className="text-slate-600">Welcome back! Sign in to your account</p>
+        <p className="text-slate-600">{t('loginSubtitle')}</p>
       </div>
 
       <Card className="shadow-xl">
         <CardHeader>
-          <CardTitle className="text-2xl">Sign In</CardTitle>
+          <CardTitle className="text-2xl">{t('signIn')}</CardTitle>
           <CardDescription>
-            Enter your credentials to access your account
+            {t('loginSubtitle')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -75,7 +79,7 @@ function SignInForm() {
 
             <div className="space-y-2">
               <label htmlFor="email" className="text-sm font-medium text-slate-700">
-                Email Address
+                {t('email')}
               </label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
@@ -95,13 +99,13 @@ function SignInForm() {
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <label htmlFor="password" className="text-sm font-medium text-slate-700">
-                  Password
+                  {t('password')}
                 </label>
                 <Link 
                   href="/auth/forgot-password" 
                   className="text-sm text-teal-600 hover:text-teal-700"
                 >
-                  Forgot password?
+                  {t('forgotPassword')}
                 </Link>
               </div>
               <div className="relative">
@@ -124,15 +128,15 @@ function SignInForm() {
               className="w-full bg-teal-600 hover:bg-teal-700 text-white py-6 text-base font-semibold"
               disabled={isLoading}
             >
-              {isLoading ? 'Signing in...' : 'Sign In'}
+              {isLoading ? tCommon('loading') : t('signIn')}
             </Button>
           </form>
 
           <div className="mt-6 text-center">
             <p className="text-sm text-slate-600">
-              Don't have an account?{' '}
+              {t('noAccount')}{' '}
               <Link href="/auth/signup" className="text-teal-600 hover:text-teal-700 font-semibold">
-                Sign up
+                {t('signUp')}
               </Link>
             </p>
           </div>
@@ -141,8 +145,8 @@ function SignInForm() {
 
       <div className="mt-6 text-center text-sm text-slate-600">
         <Link href="/" className="hover:text-slate-900">
-          ← Back to home
- </Link>
+          ← {tCommon('back')}
+        </Link>
       </div>
     </div>
   )
