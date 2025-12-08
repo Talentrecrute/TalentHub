@@ -325,7 +325,7 @@ export default function JobFilters({ filters, onChange, onClear }: JobFiltersPro
         )}
       </Card>
 
-      {/* Salary */}
+      {/* Salary with Slider */}
       <Card>
         <CardHeader 
           className="cursor-pointer py-3"
@@ -342,29 +342,132 @@ export default function JobFilters({ filters, onChange, onClear }: JobFiltersPro
           </div>
         </CardHeader>
         {expandedSections.salary && (
-          <CardContent className="space-y-2 pt-0">
-            {salaryRanges.map(range => (
-              <label 
-                key={range.min} 
-                className={`flex items-center gap-3 cursor-pointer p-2 rounded-lg transition-colors ${
-                  filters.salaryMin === range.min ? 'bg-teal-50' : 'hover:bg-slate-50'
+          <CardContent className="space-y-4 pt-0">
+            {/* Salary Period Toggle */}
+            <div className="flex gap-2 p-1 bg-slate-100 rounded-lg">
+              <button
+                onClick={() => onChange({ ...filters, salaryPeriod: 'monthly' })}
+                className={`flex-1 px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+                  (filters as any).salaryPeriod === 'monthly' || !(filters as any).salaryPeriod
+                    ? 'bg-white text-teal-700 shadow-sm'
+                    : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
-                <input
-                  type="radio"
-                  name="salary"
-                  checked={filters.salaryMin === range.min}
-                  onChange={() => handleSalaryChange(range.min)}
-                  className="w-4 h-4 border-slate-300 text-teal-600 focus:ring-teal-500"
-                />
-                <span className={`text-sm ${filters.salaryMin === range.min ? 'text-teal-700 font-medium' : 'text-slate-700'}`}>
-                  {getLabel(range)}
+                {locale === 'fr' ? 'Par mois' : 'Monthly'}
+              </button>
+              <button
+                onClick={() => onChange({ ...filters, salaryPeriod: 'yearly' })}
+                className={`flex-1 px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+                  (filters as any).salaryPeriod === 'yearly'
+                    ? 'bg-white text-teal-700 shadow-sm'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                {locale === 'fr' ? 'Par an' : 'Yearly'}
+              </button>
+            </div>
+
+            {/* Currency selector */}
+            <div className="flex flex-wrap gap-2">
+              {['EUR', 'USD', 'GBP', 'XAF'].map(currency => (
+                <button
+                  key={currency}
+                  onClick={() => onChange({ ...filters, salaryCurrency: currency })}
+                  className={`px-3 py-1.5 text-xs font-medium rounded-full transition-colors ${
+                    (filters as any).salaryCurrency === currency || (!((filters as any).salaryCurrency) && currency === 'EUR')
+                      ? 'bg-teal-600 text-white' 
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  }`}
+                >
+                  {currency === 'EUR' ? '€ EUR' : currency === 'USD' ? '$ USD' : currency === 'GBP' ? '£ GBP' : 'XAF'}
+                </button>
+              ))}
+            </div>
+
+            {/* Salary Slider */}
+            <div className="space-y-3">
+              <input
+                type="range"
+                min="0"
+                max={(filters as any).salaryPeriod === 'yearly' ? 200000 : 15000}
+                step={(filters as any).salaryPeriod === 'yearly' ? 5000 : 500}
+                value={filters.salaryMin}
+                onChange={(e) => handleSalaryChange(Number(e.target.value))}
+                className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-teal-600"
+              />
+              
+              {/* Slider labels - adapt to period */}
+              <div className="flex justify-between text-xs text-slate-500">
+                <span>{locale === 'fr' ? 'Tous' : 'All'}</span>
+                {(filters as any).salaryPeriod === 'yearly' ? (
+                  <>
+                    <span>50k</span>
+                    <span>100k</span>
+                    <span>150k</span>
+                    <span>200k+</span>
+                  </>
+                ) : (
+                  <>
+                    <span>3k</span>
+                    <span>6k</span>
+                    <span>10k</span>
+                    <span>15k+</span>
+                  </>
+                )}
+              </div>
+            </div>
+
+            {/* Current value display */}
+            <div className="bg-slate-50 rounded-lg p-3 text-center">
+              {filters.salaryMin === 0 ? (
+                <span className="text-sm text-slate-500">
+                  {locale === 'fr' ? 'Tous les salaires' : 'All salaries'}
                 </span>
-              </label>
-            ))}
+              ) : (
+                <div>
+                  <span className="text-lg font-semibold text-teal-700">
+                    {new Intl.NumberFormat(locale === 'fr' ? 'fr-FR' : 'en-US', {
+                      style: 'currency',
+                      currency: (filters as any).salaryCurrency || 'EUR',
+                      maximumFractionDigits: 0
+                    }).format(filters.salaryMin)}
+                  </span>
+                  <span className="text-sm text-slate-500 ml-1">
+                    {(filters as any).salaryPeriod === 'yearly' 
+                      ? (locale === 'fr' ? 'et plus / an' : '+ / year')
+                      : (locale === 'fr' ? 'et plus / mois' : '+ / month')
+                    }
+                  </span>
+                </div>
+              )}
+            </div>
+
+            {/* Quick select buttons - adapt to period */}
+            <div className="flex flex-wrap gap-2">
+              {((filters as any).salaryPeriod === 'yearly' 
+                ? [0, 30000, 50000, 75000, 100000]
+                : [0, 2000, 3500, 5000, 8000]
+              ).map(value => (
+                <button
+                  key={value}
+                  onClick={() => handleSalaryChange(value)}
+                  className={`px-3 py-1.5 text-xs rounded-full transition-colors ${
+                    filters.salaryMin === value 
+                      ? 'bg-teal-100 text-teal-700 font-medium' 
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  }`}
+                >
+                  {value === 0 
+                    ? (locale === 'fr' ? 'Tous' : 'All')
+                    : `${value >= 1000 ? (value / 1000) + 'k' : value}+`
+                  }
+                </button>
+              ))}
+            </div>
           </CardContent>
         )}
       </Card>
     </div>
   )
 }
+

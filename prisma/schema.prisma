@@ -133,7 +133,8 @@ model Job {
 
   salaryMin      Int?
   salaryMax      Int?
-  salaryCurrency String @default("USD")
+  salaryCurrency String @default("EUR")
+  salaryPeriod   String @default("monthly") // monthly, yearly
 
   requirements     String? // JSON array stored as string
   responsibilities String? // JSON array stored as string

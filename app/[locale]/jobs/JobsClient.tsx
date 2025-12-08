@@ -135,8 +135,37 @@ export default function JobsClient({ initialJobs, savedJobIds, userId }: JobsCli
     // Experience level filter
     if (filters.experienceLevels.length > 0 && !filters.experienceLevels.includes((job as any).experienceLevel)) return false
     
-    // Salary filter
-    if (filters.salaryMin > 0 && (job.salaryMax || 0) < filters.salaryMin) return false
+    // Salary filter - smart comparison considering currency and period
+    if (filters.salaryMin > 0) {
+      const jobSalary = job.salaryMax || job.salaryMin || 0
+      const filterCurrency = (filters as any).salaryCurrency || 'EUR'
+      const filterPeriod = (filters as any).salaryPeriod || 'monthly'
+      const jobCurrency = (job.salaryCurrency || 'EUR').toUpperCase()
+      const jobPeriod = (job as any).salaryPeriod || 'monthly'
+      
+      // Normalize currency names (Euros -> EUR, Dollars -> USD, etc.)
+      const normalizedJobCurrency = 
+        jobCurrency.includes('EUR') ? 'EUR' :
+        jobCurrency.includes('USD') || jobCurrency.includes('DOLLAR') ? 'USD' :
+        jobCurrency.includes('GBP') || jobCurrency.includes('POUND') ? 'GBP' :
+        jobCurrency.includes('XAF') || jobCurrency.includes('CFA') ? 'XAF' :
+        jobCurrency
+      
+      // Convert salaries to same period for comparison
+      let normalizedJobSalary = jobSalary
+      if (filterPeriod === 'monthly' && jobPeriod === 'yearly') {
+        normalizedJobSalary = jobSalary / 12
+      } else if (filterPeriod === 'yearly' && jobPeriod === 'monthly') {
+        normalizedJobSalary = jobSalary * 12
+      }
+      
+      // If currencies match, compare directly
+      // If different currencies, still show the job (user can see the currency in the card)
+      if (normalizedJobCurrency === filterCurrency || filterCurrency === 'ALL') {
+        if (normalizedJobSalary < filters.salaryMin) return false
+      }
+      // For different currencies, we don't filter (show all to let user decide)
+    }
     
     return true
   })
@@ -216,7 +245,7 @@ export default function JobsClient({ initialJobs, savedJobIds, userId }: JobsCli
           
           {/* Professional Search Bar */}
           <div className="bg-white rounded-xl shadow-lg p-2">
-            <div className="flex flex-col md:flex-row gap-2">
+            <div className="flex flex-col md:flex-row gap-2 items-center">
               {/* Job Title / Keyword Search */}
               <div className="flex-1 relative">
                 <div className="flex items-center gap-2 px-4 py-3">

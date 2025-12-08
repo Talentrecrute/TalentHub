@@ -67,7 +67,8 @@ export default function PostJobForm({ companyId, initialData, jobId }: PostJobFo
     experienceLevel: initialData?.experienceLevel || 'mid',
     salaryMin: initialData?.salaryMin || '',
     salaryMax: initialData?.salaryMax || '',
-    salaryCurrency: initialData?.salaryCurrency || 'USD',
+    salaryCurrency: initialData?.salaryCurrency || 'EUR',
+    salaryPeriod: initialData?.salaryPeriod || 'monthly',
     requirements: parseJSON(initialData?.requirements),
     responsibilities: parseJSON(initialData?.responsibilities),
     benefits: parseJSON(initialData?.benefits),
@@ -242,23 +243,50 @@ export default function PostJobForm({ companyId, initialData, jobId }: PostJobFo
       {/* Salary */}
       <div className="space-y-4">
         <h3 className="text-lg font-semibold text-slate-900">Salaire (optionnel)</h3>
+        
+        {/* Salary Period Toggle */}
+        <div className="flex gap-2 p-1 bg-slate-100 rounded-lg w-fit">
+          <button
+            type="button"
+            onClick={() => setFormData({ ...formData, salaryPeriod: 'monthly' })}
+            className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+              formData.salaryPeriod === 'monthly'
+                ? 'bg-white text-teal-700 shadow-sm'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            Par mois
+          </button>
+          <button
+            type="button"
+            onClick={() => setFormData({ ...formData, salaryPeriod: 'yearly' })}
+            className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+              formData.salaryPeriod === 'yearly'
+                ? 'bg-white text-teal-700 shadow-sm'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            Par an
+          </button>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <Label htmlFor="salaryMin">Salaire minimum</Label>
+            <Label htmlFor="salaryMin">Salaire minimum ({formData.salaryPeriod === 'monthly' ? '/mois' : '/an'})</Label>
             <Input
               id="salaryMin"
               type="number"
-              placeholder="50000"
+              placeholder={formData.salaryPeriod === 'monthly' ? '3000' : '40000'}
               value={formData.salaryMin}
               onChange={(e) => setFormData({ ...formData, salaryMin: e.target.value })}
             />
           </div>
           <div>
-            <Label htmlFor="salaryMax">Salaire maximum</Label>
+            <Label htmlFor="salaryMax">Salaire maximum ({formData.salaryPeriod === 'monthly' ? '/mois' : '/an'})</Label>
             <Input
               id="salaryMax"
               type="number"
-              placeholder="80000"
+              placeholder={formData.salaryPeriod === 'monthly' ? '5000' : '60000'}
               value={formData.salaryMax}
               onChange={(e) => setFormData({ ...formData, salaryMax: e.target.value })}
             />
@@ -268,6 +296,31 @@ export default function PostJobForm({ companyId, initialData, jobId }: PostJobFo
             onChange={(value) => setFormData({ ...formData, salaryCurrency: value })}
           />
         </div>
+        
+        {/* Salary Preview */}
+        {(formData.salaryMin || formData.salaryMax) && (
+          <div className="bg-teal-50 border border-teal-200 rounded-lg p-3">
+            <p className="text-sm text-teal-800">
+              <span className="font-medium">Aperçu : </span>
+              {formData.salaryMin && formData.salaryMax ? (
+                <span>
+                  {Number(formData.salaryMin).toLocaleString('fr-FR')} - {Number(formData.salaryMax).toLocaleString('fr-FR')} {formData.salaryCurrency}
+                  {formData.salaryPeriod === 'monthly' ? ' / mois' : ' / an'}
+                </span>
+              ) : formData.salaryMin ? (
+                <span>
+                  À partir de {Number(formData.salaryMin).toLocaleString('fr-FR')} {formData.salaryCurrency}
+                  {formData.salaryPeriod === 'monthly' ? ' / mois' : ' / an'}
+                </span>
+              ) : (
+                <span>
+                  Jusqu'à {Number(formData.salaryMax).toLocaleString('fr-FR')} {formData.salaryCurrency}
+                  {formData.salaryPeriod === 'monthly' ? ' / mois' : ' / an'}
+                </span>
+              )}
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Requirements */}

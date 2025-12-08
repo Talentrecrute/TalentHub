@@ -21,7 +21,7 @@ export default function JobCard({ job, company, showActions = true, isSaved = fa
   const tCommon = useTranslations('common')
   const locale = useLocale()
 
-  const formatSalary = (min?: number | null, max?: number | null, currency: string = 'USD') => {
+  const formatSalary = (min?: number | null, max?: number | null, currency: string = 'EUR', period: string = 'monthly') => {
     if (!min && !max) return t('competitive')
     
     const currencyMap: Record<string, string> = {
@@ -31,19 +31,24 @@ export default function JobCard({ job, company, showActions = true, isSaved = fa
       'dollars': 'USD'
     }
     
-    const normalizedCurrency = currencyMap[currency] || currency || 'USD'
+    const normalizedCurrency = currencyMap[currency] || currency || 'EUR'
     const isValidCurrency = /^[A-Z]{3}$/.test(normalizedCurrency)
-    const safeCurrency = isValidCurrency ? normalizedCurrency : 'USD'
+    const safeCurrency = isValidCurrency ? normalizedCurrency : 'EUR'
     
     const formatter = new Intl.NumberFormat(locale === 'fr' ? 'fr-FR' : 'en-US', {
       style: 'currency',
       currency: safeCurrency,
       maximumFractionDigits: 0
     })
+    
+    const periodSuffix = period === 'yearly' 
+      ? (locale === 'fr' ? '/an' : '/yr')
+      : (locale === 'fr' ? '/mois' : '/mo')
+    
     if (min && max) {
-      return `${formatter.format(min)} - ${formatter.format(max)}`
+      return `${formatter.format(min)} - ${formatter.format(max)}${periodSuffix}`
     }
-    return min ? `${formatter.format(min)}+` : `${t('upTo')} ${formatter.format(max!)}`
+    return min ? `${formatter.format(min)}+${periodSuffix}` : `${t('upTo')} ${formatter.format(max!)}${periodSuffix}`
   }
 
   const getTimeAgo = (date: Date) => {
@@ -103,7 +108,7 @@ export default function JobCard({ job, company, showActions = true, isSaved = fa
           
           <div className="flex items-center gap-2 text-sm text-slate-600">
             <DollarSign className="w-4 h-4 flex-shrink-0" />
-            <span className="truncate">{formatSalary(job.salaryMin, job.salaryMax, job.salaryCurrency)}</span>
+            <span className="truncate">{formatSalary(job.salaryMin, job.salaryMax, job.salaryCurrency, (job as any).salaryPeriod)}</span>
           </div>
 
           <div className="flex items-center gap-2 text-sm text-slate-600">
