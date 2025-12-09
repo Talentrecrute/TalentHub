@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button"
 import { Link, usePathname, useRouter } from "@/i18n/routing"
-import { Briefcase, Building2, Globe, LogOut, Menu, User, X } from 'lucide-react'
+import { Building2, Globe, LogOut, Menu, User, X } from 'lucide-react'
 import { signIn, signOut, useSession } from 'next-auth/react'
 import { useLocale, useTranslations } from 'next-intl'
 import NextImage from 'next/image'
@@ -30,10 +30,14 @@ export default function Navigation() {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 group">
-            <div className="bg-gradient-to-br from-blue-900 to-blue-700 p-2 rounded-lg group-hover:shadow-lg transition-shadow">
-              <Briefcase className="w-6 h-6 text-white" />
-            </div>
-            <span className="text-xl font-bold text-slate-900">TalentHub</span>
+            <img 
+              src="/icon.svg" 
+              alt="OceanicJob" 
+              className="w-10 h-10 group-hover:scale-105 transition-transform"
+            />
+            <span className="text-xl font-bold bg-gradient-to-r from-blue-900 to-blue-600 bg-clip-text text-transparent">
+              OceanicJob
+            </span>
           </Link>
 
           {/* Desktop Navigation */}

@@ -7,8 +7,8 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 
   const title = locale === 'fr' ? 'Offres d\'emploi' : 'Job Offers'
   const description = locale === 'fr'
-    ? 'Parcourez des milliers d\'offres d\'emploi. Filtrez par lieu, type de contrat, salaire et plus. Trouvez votre prochain emploi sur TalentHub.'
-    : 'Browse thousands of job offers. Filter by location, contract type, salary and more. Find your next job on TalentHub.'
+    ? 'Parcourez des milliers d\'offres d\'emploi. Filtrez par lieu, type de contrat, salaire et plus. Trouvez votre prochain emploi sur OceanicJob.'
+    : 'Browse thousands of job offers. Filter by location, contract type, salary and more. Find your next job on OceanicJob.'
 
   return {
     title,
@@ -17,7 +17,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       ? ['offres emploi', 'recherche emploi', 'jobs', 'carrière', 'recrutement', 'embauche']
       : ['job offers', 'job search', 'jobs', 'career', 'recruitment', 'hiring'],
     openGraph: {
-      title: `${title} | TalentHub`,
+      title: `${title} | OceanicJob`,
       description,
       url: `${siteUrl}/${locale}/jobs`,
       type: 'website',

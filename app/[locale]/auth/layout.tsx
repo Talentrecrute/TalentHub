@@ -7,14 +7,14 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 
   const title = locale === 'fr' ? 'Connexion & Inscription' : 'Login & Register'
   const description = locale === 'fr'
-    ? 'Connectez-vous ou créez un compte TalentHub pour accéder à des milliers d\'offres d\'emploi ou poster vos annonces.'
-    : 'Log in or create a TalentHub account to access thousands of job offers or post your listings.'
+    ? 'Connectez-vous ou créez un compte OceanicJob pour accéder à des milliers d\'offres d\'emploi ou poster vos annonces.'
+    : 'Log in or create a OceanicJob account to access thousands of job offers or post your listings.'
 
   return {
     title,
     description,
     openGraph: {
-      title: `${title} | TalentHub`,
+      title: `${title} | OceanicJob`,
       description,
       url: `${siteUrl}/${locale}/auth`,
       type: 'website',

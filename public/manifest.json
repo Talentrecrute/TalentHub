@@ -1,6 +1,6 @@
 {
-  "name": "TalentHub",
-  "short_name": "TalentHub",
+  "name": "OceanicJob",
+  "short_name": "OceanicJob",
   "description": "Find your dream job - Leading recruitment platform",
   "start_url": "/",
   "display": "standalone",

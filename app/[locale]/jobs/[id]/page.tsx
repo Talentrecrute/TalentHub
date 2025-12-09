@@ -58,7 +58,7 @@ export async function generateMetadata({
       title: fullTitle,
       description,
       url: `${siteUrl}/${locale}/jobs/${id}`,
-      siteName: 'TalentHub',
+      siteName: 'OceanicJob',
       locale: locale === 'fr' ? 'fr_FR' : 'en_US',
       images: job.company?.logo ? [
         {

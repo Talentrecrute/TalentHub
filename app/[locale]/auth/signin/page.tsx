@@ -56,7 +56,7 @@ function SignInForm() {
     <div className="w-full max-w-md">
       <div className="text-center mb-8">
         <Link href="/" className="inline-block">
-          <h1 className="text-3xl font-bold text-slate-900 mb-2">TalentHub</h1>
+          <h1 className="text-3xl font-bold text-slate-900 mb-2">OceanicJob</h1>
         </Link>
         <p className="text-slate-600">{t('loginSubtitle')}</p>
       </div>

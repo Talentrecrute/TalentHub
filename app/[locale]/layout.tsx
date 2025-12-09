@@ -19,15 +19,15 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://talenthub.com';
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://oceanicjob.com';
 
 export async function generateMetadata({ params }: { params: Promise<{locale: string}> }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'seo' });
   
   const title = locale === 'fr' 
-    ? 'TalentHub - Trouvez Votre Emploi Idéal' 
-    : 'TalentHub - Find Your Dream Job';
+    ? 'OceanicJob - Trouvez Votre Emploi Idéal' 
+    : 'OceanicJob - Find Your Dream Job';
   const description = locale === 'fr'
     ? 'Plateforme de recrutement leader. Trouvez des milliers d\'offres d\'emploi, postulez en ligne et connectez-vous avec les meilleurs employeurs.'
     : 'Leading recruitment platform. Find thousands of job opportunities, apply online and connect with top employers.';
@@ -36,15 +36,15 @@ export async function generateMetadata({ params }: { params: Promise<{locale: st
     metadataBase: new URL(siteUrl),
     title: {
       default: title,
-      template: `%s | TalentHub`
+      template: `%s | OceanicJob`
     },
     description,
     keywords: locale === 'fr' 
       ? ['emploi', 'recrutement', 'offres emploi', 'carrière', 'job', 'travail', 'CV', 'candidature', 'Madagascar', 'Afrique']
       : ['job', 'recruitment', 'job offers', 'career', 'employment', 'work', 'resume', 'application', 'Madagascar', 'Africa'],
-    authors: [{ name: 'TalentHub Team' }],
-    creator: 'TalentHub',
-    publisher: 'TalentHub',
+    authors: [{ name: 'OceanicJob Team' }],
+    creator: 'OceanicJob',
+    publisher: 'OceanicJob',
     formatDetection: {
       email: false,
       address: false,
@@ -62,7 +62,7 @@ export async function generateMetadata({ params }: { params: Promise<{locale: st
       locale: locale === 'fr' ? 'fr_FR' : 'en_US',
       alternateLocale: locale === 'fr' ? 'en_US' : 'fr_FR',
       url: `${siteUrl}/${locale}`,
-      siteName: 'TalentHub',
+      siteName: 'OceanicJob',
       title,
       description,
       images: [
@@ -70,7 +70,7 @@ export async function generateMetadata({ params }: { params: Promise<{locale: st
           url: `${siteUrl}/og-image.png`,
           width: 1200,
           height: 630,
-          alt: 'TalentHub - Job Portal',
+          alt: 'OceanicJob - Job Portal',
         }
       ],
     },
@@ -121,7 +121,7 @@ export default async function LocaleLayout({
   const organizationSchema = {
     '@context': 'https://schema.org',
     '@type': 'Organization',
-    name: 'TalentHub',
+    name: 'OceanicJob',
     url: siteUrl,
     logo: `${siteUrl}/logo.png`,
     description: locale === 'fr' 
@@ -137,7 +137,7 @@ export default async function LocaleLayout({
   const websiteSchema = {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
-    name: 'TalentHub',
+    name: 'OceanicJob',
     url: siteUrl,
     potentialAction: {
       '@type': 'SearchAction',

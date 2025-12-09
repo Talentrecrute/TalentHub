@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "TalentHub - Find Your Dream Job",
+  title: "OceanicJob - Find Your Dream Job",
   description: "Connect with top employers and find your perfect job opportunity",
 };
 

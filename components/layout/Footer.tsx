@@ -1,7 +1,6 @@
 'use client'
 
 import { Link } from '@/i18n/routing'
-import { Briefcase } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import { useTranslations } from 'next-intl'
 
@@ -26,10 +25,12 @@ export default function Footer() {
           {/* Logo & Tagline */}
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <div className="bg-teal-600 p-2 rounded-lg">
-                <Briefcase className="w-5 h-5 text-white" />
-              </div>
-              <span className="text-lg font-bold text-white">TalentHub</span>
+              <img 
+                src="/icon.svg" 
+                alt="OceanicJob" 
+                className="w-10 h-10"
+              />
+              <span className="text-lg font-bold text-white">OceanicJob</span>
             </div>
             <p className="text-sm text-slate-400">
               {t('tagline')}

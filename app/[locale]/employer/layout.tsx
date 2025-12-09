@@ -7,8 +7,8 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 
   const title = locale === 'fr' ? 'Espace Employeur' : 'Employer Dashboard'
   const description = locale === 'fr'
-    ? 'Gérez vos offres d\'emploi, suivez les candidatures et trouvez les meilleurs talents. Espace employeur TalentHub.'
-    : 'Manage your job postings, track applications and find the best talent. TalentHub employer dashboard.'
+    ? 'Gérez vos offres d\'emploi, suivez les candidatures et trouvez les meilleurs talents. Espace employeur OceanicJob.'
+    : 'Manage your job postings, track applications and find the best talent. OceanicJob employer dashboard.'
 
   return {
     title,
@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       follow: false,
     },
     openGraph: {
-      title: `${title} | TalentHub`,
+      title: `${title} | OceanicJob`,
       description,
       url: `${siteUrl}/${locale}/employer`,
       type: 'website',
