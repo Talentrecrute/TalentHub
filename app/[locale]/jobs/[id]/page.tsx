@@ -14,6 +14,7 @@ import {
     MapPin,
     Users
 } from 'lucide-react'
+import type { Metadata } from 'next'
 import { getServerSession } from 'next-auth'
 import { getTranslations } from 'next-intl/server'
 import { notFound } from 'next/navigation'
@@ -21,6 +22,68 @@ import { Toaster } from 'sonner'
 import ApplyButton from './ApplyButton'
 import EmployerJobActions from './EmployerJobActions'
 import SaveButton from './SaveButton'
+
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://talenthub.com'
+
+// Generate dynamic SEO metadata for each job
+export async function generateMetadata({ 
+  params 
+}: { 
+  params: Promise<{ id: string; locale: string }> 
+}): Promise<Metadata> {
+  const { id, locale } = await params
+  
+  const job = await prisma.job.findUnique({
+    where: { id },
+    include: { company: true }
+  })
+
+  if (!job) {
+    return {
+      title: locale === 'fr' ? 'Offre non trouvée' : 'Job Not Found',
+    }
+  }
+
+  const title = job.title
+  const company = job.company?.name || 'Company'
+  const description = job.description.substring(0, 160) + '...'
+  const fullTitle = `${title} - ${company}`
+
+  return {
+    title: fullTitle,
+    description,
+    keywords: [job.category, job.location, job.employmentType, company, 'emploi', 'job'],
+    openGraph: {
+      type: 'article',
+      title: fullTitle,
+      description,
+      url: `${siteUrl}/${locale}/jobs/${id}`,
+      siteName: 'TalentHub',
+      locale: locale === 'fr' ? 'fr_FR' : 'en_US',
+      images: job.company?.logo ? [
+        {
+          url: job.company.logo,
+          width: 200,
+          height: 200,
+          alt: company,
+        }
+      ] : undefined,
+    },
+    twitter: {
+      card: 'summary',
+      title: fullTitle,
+      description,
+    },
+    alternates: {
+      canonical: `${siteUrl}/${locale}/jobs/${id}`,
+      languages: {
+        fr: `${siteUrl}/fr/jobs/${id}`,
+        en: `${siteUrl}/en/jobs/${id}`,
+      },
+    },
+  }
+}
+
 
 async function getJob(id: string) {
   const job = await prisma.job.findUnique({
@@ -183,8 +246,52 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
     return labels[level] ? labels[level][locale as 'fr' | 'en'] : level
   }
 
+  // JSON-LD structured data for job posting
+  const jobPostingSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'JobPosting',
+    title: job.title,
+    description: job.description,
+    datePosted: job.createdAt.toISOString(),
+    validThrough: job.expiresAt?.toISOString() || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+    employmentType: job.employmentType.toUpperCase().replace('-', '_'),
+    hiringOrganization: {
+      '@type': 'Organization',
+      name: job.company?.name || 'Company',
+      logo: job.company?.logo || undefined,
+    },
+    jobLocation: {
+      '@type': 'Place',
+      address: {
+        '@type': 'PostalAddress',
+        addressLocality: job.location,
+      }
+    },
+    ...(job.salaryMin || job.salaryMax ? {
+      baseSalary: {
+        '@type': 'MonetaryAmount',
+        currency: job.salaryCurrency || 'EUR',
+        value: {
+          '@type': 'QuantitativeValue',
+          minValue: job.salaryMin,
+          maxValue: job.salaryMax,
+          unitText: (job as any).salaryPeriod === 'yearly' ? 'YEAR' : 'MONTH',
+        }
+      }
+    } : {}),
+    jobLocationType: job.locationType === 'remote' ? 'TELECOMMUTE' : undefined,
+    applicantLocationRequirements: job.locationType === 'remote' ? {
+      '@type': 'Country',
+      name: 'Worldwide'
+    } : undefined,
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jobPostingSchema) }}
+      />
       <div className="min-h-screen bg-slate-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <Link href="/jobs" className="inline-flex items-center gap-2 text-slate-600 hover:text-slate-900 mb-6">
