@@ -75,7 +75,7 @@ export default async function HomePage() {
                 {!isCandidate && (
                   <AnimatedButton>
                     <Link href="/employer/post-job">
-                      <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10 px-8">
+                      <Button size="lg" variant="outline" className="bg-white text-blue-900 hover:bg-blue-50 px-8 shadow-lg shadow-blue-900/30">
                         {t('startHiring')}
                       </Button>
                     </Link>
