@@ -1,3 +1,4 @@
+import AnimatedBackground from "@/components/animations/AnimatedBackground";
 import Footer from "@/components/layout/Footer";
 import Navigation from "@/components/layout/Navigation";
 import AuthProvider from "@/components/providers/AuthProvider";
@@ -166,9 +167,11 @@ export default async function LocaleLayout({
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <AuthProvider>
           <NextIntlClientProvider messages={messages}>
-            <div className="min-h-screen bg-slate-50 flex flex-col">
+            <div className="min-h-screen bg-slate-50 flex flex-col relative">
+              {/* Animated background */}
+              <AnimatedBackground variant="gradient" />
               <Navigation />
-              <main className="flex-1">{children}</main>
+              <main className="flex-1 relative z-10">{children}</main>
               <Footer />
             </div>
             <Toaster position="top-right" />
@@ -178,4 +181,3 @@ export default async function LocaleLayout({
     </html>
   );
 }
-

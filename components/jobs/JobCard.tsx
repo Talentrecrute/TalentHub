@@ -64,7 +64,7 @@ export default function JobCard({ job, company, showActions = true, isSaved = fa
   }
 
   return (
-    <div className="bg-white border border-slate-200 rounded-xl p-6 hover:shadow-lg hover:border-teal-300 transition-all duration-300 h-full relative group">
+    <div className="bg-white border border-slate-200 rounded-xl p-6 hover:shadow-lg hover:border-teal-300 transition-all duration-300 h-full relative group hover-lift card-hover">
       {onSave && (
         <Button
           variant="ghost"
