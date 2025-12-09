@@ -166,7 +166,7 @@ export function FloatingShapes() {
           x: [0, 20, 0],
           rotate: [0, 180, 360]
         }}
-        transition={{ duration: 20, repeat: Infinity, ease: 'easeInOut' }}
+        transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
       />
       <motion.div
         className="absolute top-40 right-20 w-32 h-32 rounded-full bg-teal-400/10"
@@ -175,7 +175,7 @@ export function FloatingShapes() {
           x: [0, -30, 0],
           scale: [1, 1.2, 1]
         }}
-        transition={{ duration: 15, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
+        transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
       />
       <motion.div
         className="absolute bottom-20 left-1/4 w-16 h-16 rounded-lg bg-white/5 rotate-45"
@@ -183,7 +183,7 @@ export function FloatingShapes() {
           y: [0, -20, 0],
           rotate: [45, 90, 45]
         }}
-        transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
+        transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
       />
       <motion.div
         className="absolute top-1/3 right-1/4 w-24 h-24 rounded-full border-2 border-white/10"
@@ -191,7 +191,64 @@ export function FloatingShapes() {
           scale: [1, 1.3, 1],
           opacity: [0.3, 0.6, 0.3]
         }}
+        transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
+      />
+      <motion.div
+        className="absolute bottom-10 right-10 w-12 h-12 rounded-full bg-white/8"
+        animate={{ 
+          y: [0, -25, 0],
+          x: [0, 15, 0],
+        }}
+        transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut', delay: 0.3 }}
+      />
+    </div>
+  )
+}
+
+// Floating shapes for CTA section - similar style but adapted colors
+export function CTAFloatingShapes() {
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      <motion.div
+        className="absolute top-10 left-20 w-24 h-24 rounded-full bg-white/10"
+        animate={{ 
+          y: [0, -20, 0],
+          x: [0, 15, 0],
+          scale: [1, 1.1, 1]
+        }}
         transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
+      />
+      <motion.div
+        className="absolute top-20 right-1/4 w-16 h-16 rounded-lg bg-white/5 rotate-12"
+        animate={{ 
+          y: [0, 25, 0],
+          rotate: [12, 45, 12]
+        }}
+        transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
+      />
+      <motion.div
+        className="absolute bottom-10 left-1/3 w-20 h-20 rounded-full border-2 border-white/15"
+        animate={{ 
+          scale: [1, 1.25, 1],
+          opacity: [0.4, 0.7, 0.4]
+        }}
+        transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
+      />
+      <motion.div
+        className="absolute bottom-20 right-20 w-28 h-28 rounded-full bg-blue-400/10"
+        animate={{ 
+          y: [0, -30, 0],
+          x: [0, -20, 0],
+        }}
+        transition={{ duration: 9, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
+      />
+      <motion.div
+        className="absolute top-1/2 left-10 w-10 h-10 rounded-full bg-white/8"
+        animate={{ 
+          y: [0, 15, 0],
+          opacity: [0.3, 0.5, 0.3]
+        }}
+        transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
       />
     </div>
   )
