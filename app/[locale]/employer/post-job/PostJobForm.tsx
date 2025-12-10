@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Plus, X } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
 import { useState, useTransition } from 'react'
 import { toast } from 'sonner'
@@ -17,36 +18,50 @@ interface PostJobFormProps {
   jobId?: string
 }
 
-const categories = [
-  "Technologie", "Marketing", "Ventes", "Design", "Finance",
-  "Ressources Humaines", "Opérations", "Support Client", "Ingénierie",
-  "Produit", "Juridique", "Autre"
-]
-
-const locationTypes = [
-  { value: "onsite", label: "Sur site" },
-  { value: "remote", label: "Télétravail" },
-  { value: "hybrid", label: "Hybride" }
-]
-
-const employmentTypes = [
-  { value: "full-time", label: "Temps plein" },
-  { value: "part-time", label: "Temps partiel" },
-  { value: "contract", label: "Contrat" },
-  { value: "internship", label: "Stage" }
-]
-
-const experienceLevels = [
-  { value: "entry", label: "Débutant (0-2 ans)" },
-  { value: "mid", label: "Intermédiaire (2-5 ans)" },
-  { value: "senior", label: "Senior (5-10 ans)" },
-  { value: "lead", label: "Lead / Manager (10+ ans)" },
-  { value: "executive", label: "Directeur" }
-]
-
 export default function PostJobForm({ companyId, initialData, jobId }: PostJobFormProps) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
+  const t = useTranslations('postJob')
+  const tJobs = useTranslations('jobs')
+  const tCommon = useTranslations('common')
+  const tErrors = useTranslations('errors')
+
+  // Dynamic arrays with translations
+  const categories = [
+    { value: "technology", label: t('categories.technology') },
+    { value: "marketing", label: t('categories.marketing') },
+    { value: "sales", label: t('categories.sales') },
+    { value: "design", label: t('categories.design') },
+    { value: "finance", label: t('categories.finance') },
+    { value: "hr", label: t('categories.hr') },
+    { value: "operations", label: t('categories.operations') },
+    { value: "support", label: t('categories.support') },
+    { value: "engineering", label: t('categories.engineering') },
+    { value: "product", label: t('categories.product') },
+    { value: "legal", label: t('categories.legal') },
+    { value: "other", label: t('categories.other') }
+  ]
+
+  const locationTypes = [
+    { value: "onsite", label: tJobs('locationType.onsite') },
+    { value: "remote", label: tJobs('locationType.remote') },
+    { value: "hybrid", label: tJobs('locationType.hybrid') }
+  ]
+
+  const employmentTypes = [
+    { value: "full-time", label: tJobs('employmentType.fullTime') },
+    { value: "part-time", label: tJobs('employmentType.partTime') },
+    { value: "contract", label: tJobs('employmentType.contract') },
+    { value: "internship", label: tJobs('employmentType.internship') }
+  ]
+
+  const experienceLevels = [
+    { value: "entry", label: tJobs('experienceLevel.entry') },
+    { value: "mid", label: tJobs('experienceLevel.mid') },
+    { value: "senior", label: tJobs('experienceLevel.senior') },
+    { value: "lead", label: tJobs('experienceLevel.lead') },
+    { value: "executive", label: tJobs('experienceLevel.executive') }
+  ]
 
   const parseJSON = (data: string | null) => {
     if (!data) return []
@@ -113,7 +128,7 @@ export default function PostJobForm({ companyId, initialData, jobId }: PostJobFo
 
   const handleSubmit = async (status: 'DRAFT' | 'OPEN') => {
     if (!formData.title || !formData.description || !formData.category || !formData.location) {
-      toast.error('Veuillez remplir tous les champs requis')
+      toast.error(tErrors('requiredFields'))
       return
     }
 
@@ -128,19 +143,19 @@ export default function PostJobForm({ companyId, initialData, jobId }: PostJobFo
 
         if (jobId) {
           await updateJob(jobId, { ...jobData, status })
-          toast.success(status === 'OPEN' ? 'Offre publiée avec succès!' : 'Offre mise à jour!')
+          toast.success(status === 'OPEN' ? t('jobPublished') : t('jobUpdated'))
         } else {
           const job = await createJob(jobData)
           if (status === 'OPEN') {
             await updateJob(job.id, { status: 'OPEN' })
           }
-          toast.success(status === 'OPEN' ? 'Offre publiée avec succès!' : 'Brouillon sauvegardé!')
+          toast.success(status === 'OPEN' ? t('jobPublished') : t('draftSaved'))
         }
         
         router.push('/employer/dashboard')
         router.refresh()
       } catch (error: any) {
-        toast.error(error.message || 'Échec de la création de l\'offre')
+        toast.error(error.message || tErrors('createJobFailed'))
       }
     })
   }
@@ -150,20 +165,20 @@ export default function PostJobForm({ companyId, initialData, jobId }: PostJobFo
       {/* Basic Info */}
       <div className="space-y-4">
         <div>
-          <Label htmlFor="title">Titre du poste <span className="text-red-500">*</span></Label>
+          <Label htmlFor="title">{t('jobTitle')} <span className="text-red-500">*</span></Label>
           <Input
             id="title"
-            placeholder="Ex: Développeur Full Stack Senior"
+            placeholder={t('jobTitlePlaceholder')}
             value={formData.title}
             onChange={(e) => setFormData({ ...formData, title: e.target.value })}
           />
         </div>
 
         <div>
-          <Label htmlFor="description">Description <span className="text-red-500">*</span></Label>
+          <Label htmlFor="description">{t('jobDescription')} <span className="text-red-500">*</span></Label>
           <Textarea
             id="description"
-            placeholder="Décrivez le poste en détail..."
+            placeholder={t('jobDescriptionPlaceholder')}
             value={formData.description}
             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
             rows={8}
@@ -172,32 +187,32 @@ export default function PostJobForm({ companyId, initialData, jobId }: PostJobFo
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <Label htmlFor="category">Catégorie <span className="text-red-500">*</span></Label>
+            <Label htmlFor="category">{t('category')} <span className="text-red-500">*</span></Label>
             <select
               id="category"
               className="flex h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2"
               value={formData.category}
               onChange={(e) => setFormData({ ...formData, category: e.target.value })}
             >
-              <option value="">Sélectionner une catégorie</option>
+              <option value="">{t('selectCategory')}</option>
               {categories.map((cat) => (
-                <option key={cat} value={cat}>{cat}</option>
+                <option key={cat.value} value={cat.value}>{cat.label}</option>
               ))}
             </select>
           </div>
 
           <div>
-            <Label htmlFor="location">Localisation <span className="text-red-500">*</span></Label>
+            <Label htmlFor="location">{t('location')} <span className="text-red-500">*</span></Label>
             <Input
               id="location"
-              placeholder="Ex: Paris, France"
+              placeholder={t('locationPlaceholder')}
               value={formData.location}
               onChange={(e) => setFormData({ ...formData, location: e.target.value })}
             />
           </div>
 
           <div>
-            <Label htmlFor="locationType">Type de localisation</Label>
+            <Label htmlFor="locationType">{t('locationType')}</Label>
             <select
               id="locationType"
               className="flex h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2"
@@ -211,7 +226,7 @@ export default function PostJobForm({ companyId, initialData, jobId }: PostJobFo
           </div>
 
           <div>
-            <Label htmlFor="employmentType">Type d'emploi</Label>
+            <Label htmlFor="employmentType">{t('employmentType')}</Label>
             <select
               id="employmentType"
               className="flex h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2"
@@ -225,7 +240,7 @@ export default function PostJobForm({ companyId, initialData, jobId }: PostJobFo
           </div>
 
           <div>
-            <Label htmlFor="experienceLevel">Niveau d'expérience</Label>
+            <Label htmlFor="experienceLevel">{t('experienceLevel')}</Label>
             <select
               id="experienceLevel"
               className="flex h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2"
@@ -242,7 +257,7 @@ export default function PostJobForm({ companyId, initialData, jobId }: PostJobFo
 
       {/* Salary */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold text-slate-900">Salaire (optionnel)</h3>
+        <h3 className="text-lg font-semibold text-slate-900">{t('salary')}</h3>
         
         {/* Salary Period Toggle */}
         <div className="flex gap-2 p-1 bg-slate-100 rounded-lg w-fit">
@@ -325,7 +340,7 @@ export default function PostJobForm({ companyId, initialData, jobId }: PostJobFo
 
       {/* Requirements */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold text-slate-900">Exigences</h3>
+        <h3 className="text-lg font-semibold text-slate-900">{t('requirements')}</h3>
         <div className="space-y-2">
           {formData.requirements.map((req: string, idx: number) => (
             <div key={idx} className="flex items-center gap-2 p-3 bg-slate-50 rounded border border-slate-200">
@@ -342,7 +357,7 @@ export default function PostJobForm({ companyId, initialData, jobId }: PostJobFo
         </div>
         <div className="flex gap-2">
           <Input
-            placeholder="Ajouter une exigence"
+            placeholder={t('addRequirementPlaceholder')}
             value={newRequirement}
             onChange={(e) => setNewRequirement(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addRequirement())}
@@ -355,7 +370,7 @@ export default function PostJobForm({ companyId, initialData, jobId }: PostJobFo
 
       {/* Responsibilities */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold text-slate-900">Responsabilités</h3>
+        <h3 className="text-lg font-semibold text-slate-900">{t('responsibilities')}</h3>
         <div className="space-y-2">
           {formData.responsibilities.map((resp: string, idx: number) => (
             <div key={idx} className="flex items-center gap-2 p-3 bg-slate-50 rounded border border-slate-200">
@@ -372,7 +387,7 @@ export default function PostJobForm({ companyId, initialData, jobId }: PostJobFo
         </div>
         <div className="flex gap-2">
           <Input
-            placeholder="Ajouter une responsabilité"
+            placeholder={t('addResponsibilityPlaceholder')}
             value={newResponsibility}
             onChange={(e) => setNewResponsibility(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addResponsibility())}
@@ -385,7 +400,7 @@ export default function PostJobForm({ companyId, initialData, jobId }: PostJobFo
 
       {/* Benefits */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold text-slate-900">Avantages</h3>
+        <h3 className="text-lg font-semibold text-slate-900">{t('benefits')}</h3>
         <div className="space-y-2">
           {formData.benefits.map((benefit: string, idx: number) => (
             <div key={idx} className="flex items-center gap-2 p-3 bg-slate-50 rounded border border-slate-200">
@@ -402,7 +417,7 @@ export default function PostJobForm({ companyId, initialData, jobId }: PostJobFo
         </div>
         <div className="flex gap-2">
           <Input
-            placeholder="Ajouter un avantage"
+            placeholder={t('addBenefitPlaceholder')}
             value={newBenefit}
             onChange={(e) => setNewBenefit(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addBenefit())}
@@ -421,7 +436,7 @@ export default function PostJobForm({ companyId, initialData, jobId }: PostJobFo
           onClick={() => router.back()}
           disabled={isPending}
         >
-          Annuler
+          {tCommon('cancel')}
         </Button>
         <Button
           type="button"
@@ -429,7 +444,7 @@ export default function PostJobForm({ companyId, initialData, jobId }: PostJobFo
           onClick={() => handleSubmit('DRAFT')}
           disabled={isPending}
         >
-          Sauvegarder comme brouillon
+          {t('saveDraft')}
         </Button>
         <Button
           type="button"
@@ -437,7 +452,7 @@ export default function PostJobForm({ companyId, initialData, jobId }: PostJobFo
           onClick={() => handleSubmit('OPEN')}
           disabled={isPending}
         >
-          {isPending ? 'Publication...' : 'Publier l\'offre'}
+          {isPending ? t('publishing') : t('publishJob')}
         </Button>
       </div>
     </div>
