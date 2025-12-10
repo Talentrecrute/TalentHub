@@ -46,6 +46,10 @@ export default function JobsClient({ initialJobs, savedJobIds, userId }: JobsCli
   const [localSavedJobs, setLocalSavedJobs] = useState<Set<string>>(new Set(savedJobIds))
   const [showSuggestions, setShowSuggestions] = useState(false)
   const [recentSearches, setRecentSearches] = useState<string[]>([])
+  
+  // Pagination
+  const JOBS_PER_PAGE = 10
+  const [currentPage, setCurrentPage] = useState(1)
 
   // Load recent searches from localStorage
   useEffect(() => {
@@ -232,7 +236,18 @@ export default function JobsClient({ initialJobs, savedJobIds, userId }: JobsCli
     setLocationSearch('')
   }
 
+  // Reset pagination when filters change
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [searchTerm, locationSearch, filters])
+
   const hasActiveSearch = searchTerm || locationSearch
+  
+  // Pagination calculations
+  const totalPages = Math.ceil(filteredJobs.length / JOBS_PER_PAGE)
+  const startIndex = (currentPage - 1) * JOBS_PER_PAGE
+  const endIndex = startIndex + JOBS_PER_PAGE
+  const paginatedJobs = filteredJobs.slice(startIndex, endIndex)
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -386,13 +401,15 @@ export default function JobsClient({ initialJobs, savedJobIds, userId }: JobsCli
         </div>
 
         <div className="flex gap-8">
-          {/* Filters Sidebar */}
+          {/* Filters Sidebar - Sticky */}
           <aside className={`${showFilters ? 'block' : 'hidden'} lg:block w-full lg:w-80 flex-shrink-0`}>
-            <JobFilters 
-              filters={filters}
-              onChange={setFilters}
-              onClear={clearFilters}
-            />
+            <div className="lg:sticky lg:top-4">
+              <JobFilters 
+                filters={filters}
+                onChange={setFilters}
+                onClear={clearFilters}
+              />
+            </div>
           </aside>
 
           {/* Job Listings */}
@@ -422,18 +439,78 @@ export default function JobsClient({ initialJobs, savedJobIds, userId }: JobsCli
                 </Button>
               </div>
             ) : (
-              <div className="space-y-4">
-                {filteredJobs.map(job => (
-                  <JobCard 
-                    key={job.id}
-                    job={job}
-                    company={job.company}
-                    isSaved={localSavedJobs.has(job.id)}
-                    onSave={() => handleSaveJob(job.id)}
-                    applicationCount={job._count?.applications}
-                  />
-                ))}
-              </div>
+              <>
+                <div className="space-y-4">
+                  {paginatedJobs.map(job => (
+                    <JobCard 
+                      key={job.id}
+                      job={job}
+                      company={job.company}
+                      isSaved={localSavedJobs.has(job.id)}
+                      onSave={() => handleSaveJob(job.id)}
+                      applicationCount={job._count?.applications}
+                    />
+                  ))}
+                </div>
+                
+                {/* Pagination */}
+                {totalPages > 1 && (
+                  <div className="flex items-center justify-center gap-2 mt-8 pt-8 border-t border-slate-200">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                      disabled={currentPage === 1}
+                    >
+                      {tCommon('previous')}
+                    </Button>
+                    
+                    <div className="flex items-center gap-1">
+                      {Array.from({ length: totalPages }, (_, i) => i + 1)
+                        .filter(page => {
+                          // Show first, last, current, and neighbors
+                          if (page === 1 || page === totalPages) return true
+                          if (Math.abs(page - currentPage) <= 1) return true
+                          return false
+                        })
+                        .map((page, idx, arr) => {
+                          const showEllipsis = idx > 0 && arr[idx - 1] !== page - 1
+                          return (
+                            <span key={page} className="contents">
+                              {showEllipsis && (
+                                <span className="px-2 text-slate-400">...</span>
+                              )}
+                              <button
+                                onClick={() => setCurrentPage(page)}
+                                className={`w-10 h-10 rounded-lg text-sm font-medium transition-colors ${
+                                  currentPage === page
+                                    ? 'bg-teal-600 text-white'
+                                    : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+                                }`}
+                              >
+                                {page}
+                              </button>
+                            </span>
+                          )
+                        })}
+                    </div>
+                    
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                      disabled={currentPage === totalPages}
+                    >
+                      {tCommon('next')}
+                    </Button>
+                  </div>
+                )}
+                
+                {/* Page info */}
+                <p className="text-center text-sm text-slate-500 mt-4">
+                  {t('jobsFound', { count: filteredJobs.length })} — Page {currentPage} / {totalPages}
+                </p>
+              </>
             )}
           </div>
         </div>
