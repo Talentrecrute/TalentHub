@@ -6,7 +6,7 @@ import JobFilters from '@/components/jobs/JobFilters'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import type { Company, Job } from '@prisma/client'
-import { MapPin, Search, SlidersHorizontal, X } from 'lucide-react'
+import { ChevronLeft, ChevronRight, MapPin, Search, SlidersHorizontal, X } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
@@ -50,6 +50,9 @@ export default function JobsClient({ initialJobs, savedJobIds, userId }: JobsCli
   // Pagination
   const JOBS_PER_PAGE = 10
   const [currentPage, setCurrentPage] = useState(1)
+  
+  // Sidebar collapsed state (for desktop)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
 
   // Load recent searches from localStorage
   useEffect(() => {
@@ -400,10 +403,28 @@ export default function JobsClient({ initialJobs, savedJobIds, userId }: JobsCli
           </Button>
         </div>
 
-        <div className="flex gap-8">
-          {/* Filters Sidebar - Sticky */}
-          <aside className={`${showFilters ? 'block' : 'hidden'} lg:block w-full lg:w-80 flex-shrink-0`}>
-            <div className="lg:sticky lg:top-4">
+        <div className="flex gap-0 relative">
+          {/* Toggle Button for Desktop - Always visible */}
+          <button
+            onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+            className="hidden lg:flex absolute left-0 top-0 z-20 items-center justify-center w-8 h-8 bg-teal-600 text-white rounded-r-lg shadow-lg hover:bg-teal-700 transition-all duration-300"
+            style={{ transform: sidebarCollapsed ? 'translateX(0)' : `translateX(${320 - 8}px)` }}
+            title={sidebarCollapsed ? 'Afficher les filtres' : 'Masquer les filtres'}
+          >
+            {sidebarCollapsed ? <ChevronRight className="w-5 h-5" /> : <ChevronLeft className="w-5 h-5" />}
+          </button>
+
+          {/* Filters Sidebar - Collapsible with animation */}
+          <aside 
+            className={`
+              ${showFilters ? 'block' : 'hidden'} 
+              lg:block flex-shrink-0
+              transition-all duration-300 ease-in-out
+              ${sidebarCollapsed ? 'lg:w-0 lg:opacity-0 lg:overflow-hidden' : 'lg:w-80 lg:opacity-100'}
+              w-full mr-4
+            `}
+          >
+            <div className={`lg:sticky lg:top-4 w-80 transition-transform duration-300 ${sidebarCollapsed ? 'lg:-translate-x-full' : 'lg:translate-x-0'}`}>
               <JobFilters 
                 filters={filters}
                 onChange={setFilters}
@@ -412,12 +433,40 @@ export default function JobsClient({ initialJobs, savedJobIds, userId }: JobsCli
             </div>
           </aside>
 
-          {/* Job Listings */}
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center justify-between mb-6">
+          {/* Job Listings - Expands when sidebar is collapsed */}
+          <div className={`flex-1 min-w-0 transition-all duration-300 ${sidebarCollapsed ? 'lg:ml-4' : 'lg:ml-8'}`}>
+            <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
               <p className="text-slate-600">
                 {t('jobsFound', { count: filteredJobs.length })}
               </p>
+              
+              {/* Top Pagination - Compact */}
+              {totalPages > 1 && (
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                    disabled={currentPage === 1}
+                    className="h-8 px-2"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </Button>
+                  <span className="text-sm text-slate-600 min-w-[80px] text-center">
+                    Page {currentPage} / {totalPages}
+                  </span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                    disabled={currentPage === totalPages}
+                    className="h-8 px-2"
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </Button>
+                </div>
+              )}
+              
               {hasActiveSearch && (
                 <Button variant="ghost" size="sm" onClick={clearFilters}>
                   {t('clearFilters')}
