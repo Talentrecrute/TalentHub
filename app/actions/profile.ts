@@ -57,8 +57,40 @@ export async function updateProfile(data: {
     data: updateData
   })
 
+  // Sync Company table if employer updates company fields
+  const hasCompanyFieldsUpdated = data.companyName !== undefined || 
+    data.companyDescription !== undefined || 
+    data.companyWebsite !== undefined || 
+    data.companyIndustry !== undefined || 
+    data.companySize !== undefined ||
+    data.location !== undefined
+
+  if (hasCompanyFieldsUpdated) {
+    // Find existing company for this employer
+    const company = await prisma.company.findFirst({
+      where: { employerId: session.user.id }
+    })
+
+    if (company) {
+      // Build update data for Company table
+      const companyUpdateData: any = {}
+      if (data.companyName !== undefined) companyUpdateData.name = data.companyName
+      if (data.companyDescription !== undefined) companyUpdateData.description = data.companyDescription
+      if (data.companyWebsite !== undefined) companyUpdateData.website = data.companyWebsite
+      if (data.companyIndustry !== undefined) companyUpdateData.industry = data.companyIndustry
+      if (data.companySize !== undefined) companyUpdateData.size = data.companySize
+      if (data.location !== undefined) companyUpdateData.location = data.location
+
+      await prisma.company.update({
+        where: { id: company.id },
+        data: companyUpdateData
+      })
+    }
+  }
+
   revalidatePath('/profile')
   revalidatePath('/dashboard')
+  revalidatePath('/jobs')
   
   return user
 }

@@ -1,20 +1,28 @@
 'use client'
 
 import { Button } from "@/components/ui/button"
-import { Briefcase, Building2, LogOut, Menu, User, X } from 'lucide-react'
+import { Link, usePathname, useRouter } from "@/i18n/routing"
+import { Building2, Globe, LogOut, Menu, User, X } from 'lucide-react'
 import { signIn, signOut, useSession } from 'next-auth/react'
+import { useLocale, useTranslations } from 'next-intl'
 import NextImage from 'next/image'
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 
 export default function Navigation() {
-  const { data: session, status } = useSession()
+  const t = useTranslations('nav')
+  const locale = useLocale()
+  const router = useRouter()
   const pathname = usePathname()
+  const { data: session, status } = useSession()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const isEmployer = session?.user?.role === 'EMPLOYER'
 
   const isActive = (path: string) => pathname === path
+
+  const switchLanguage = () => {
+    const newLocale = locale === 'fr' ? 'en' : 'fr'
+    router.replace(pathname, {locale: newLocale})
+  }
 
   return (
     <nav className="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
@@ -22,10 +30,14 @@ export default function Navigation() {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 group">
-            <div className="bg-gradient-to-br from-blue-900 to-blue-700 p-2 rounded-lg group-hover:shadow-lg transition-shadow">
-              <Briefcase className="w-6 h-6 text-white" />
-            </div>
-            <span className="text-xl font-bold text-slate-900">TalentHub</span>
+            <img 
+              src="/icon.svg" 
+              alt="OceanicJob" 
+              className="w-10 h-10 group-hover:scale-105 transition-transform"
+            />
+            <span className="text-xl font-bold bg-gradient-to-r from-blue-900 to-blue-600 bg-clip-text text-transparent">
+              OceanicJob
+            </span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -38,7 +50,7 @@ export default function Navigation() {
                   : 'text-slate-600 hover:text-blue-900'
               }`}
             >
-              Home
+              {t('home')}
             </Link>
             <Link 
               href="/jobs" 
@@ -48,7 +60,7 @@ export default function Navigation() {
                   : 'text-slate-600 hover:text-blue-900'
               }`}
             >
-              Find Jobs
+              {t('findJobs')}
             </Link>
             
             {status === 'authenticated' && session ? (
@@ -63,7 +75,7 @@ export default function Navigation() {
                           : 'text-slate-600 hover:text-blue-900'
                       }`}
                     >
-                      Dashboard
+                      {t('dashboard')}
                     </Link>
                     <Link 
                       href="/employer/post-job" 
@@ -73,7 +85,7 @@ export default function Navigation() {
                           : 'text-slate-600 hover:text-blue-900'
                       }`}
                     >
-                      Post Job
+                      {t('postJob')}
                     </Link>
                   </>
                 ) : (
@@ -86,7 +98,7 @@ export default function Navigation() {
                           : 'text-slate-600 hover:text-blue-900'
                       }`}
                     >
-                      Dashboard
+                      {t('dashboard')}
                     </Link>
                     <Link 
                       href="/applications" 
@@ -96,7 +108,7 @@ export default function Navigation() {
                           : 'text-slate-600 hover:text-blue-900'
                       }`}
                     >
-                      My Applications
+                      {t('myApplications')}
                     </Link>
                   </>
                 )}
@@ -149,9 +161,19 @@ export default function Navigation() {
                 onClick={() => signIn()}
                 className="bg-blue-900 hover:bg-blue-800 text-white"
               >
-                Sign In
+                {t('signIn')}
               </Button>
             )}
+
+            {/* Language Toggle */}
+            <button
+              onClick={switchLanguage}
+              className="flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+              title={locale === 'fr' ? 'Switch to English' : 'Passer en français'}
+            >
+              <Globe className="w-4 h-4" />
+              <span className="uppercase">{locale}</span>
+            </button>
           </div>
 
           {/* Mobile menu button */}
@@ -180,7 +202,7 @@ export default function Navigation() {
                 }`}
                 onClick={() => setMobileMenuOpen(false)}
               >
-                Home
+                {t('home')}
               </Link>
               <Link 
                 href="/jobs" 
@@ -191,7 +213,7 @@ export default function Navigation() {
                 }`}
                 onClick={() => setMobileMenuOpen(false)}
               >
-                Find Jobs
+                {t('findJobs')}
               </Link>
               
               {status === 'authenticated' && session ? (
@@ -207,7 +229,7 @@ export default function Navigation() {
                         }`}
                         onClick={() => setMobileMenuOpen(false)}
                       >
-                        Dashboard
+                        {t('dashboard')}
                       </Link>
                       <Link 
                         href="/employer/post-job" 
@@ -218,7 +240,7 @@ export default function Navigation() {
                         }`}
                         onClick={() => setMobileMenuOpen(false)}
                       >
-                        Post Job
+                        {t('postJob')}
                       </Link>
                     </>
                   ) : (
@@ -232,7 +254,7 @@ export default function Navigation() {
                         }`}
                         onClick={() => setMobileMenuOpen(false)}
                       >
-                        Dashboard
+                        {t('dashboard')}
                       </Link>
                       <Link 
                         href="/applications" 
@@ -243,7 +265,7 @@ export default function Navigation() {
                         }`}
                         onClick={() => setMobileMenuOpen(false)}
                       >
-                        My Applications
+                        {t('myApplications')}
                       </Link>
                     </>
                   )}
@@ -257,7 +279,7 @@ export default function Navigation() {
                     }`}
                     onClick={() => setMobileMenuOpen(false)}
                   >
-                    Profile
+                    {t('profile')}
                   </Link>
                   
                   <button
@@ -267,7 +289,7 @@ export default function Navigation() {
                     }}
                     className="px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 rounded-lg text-left"
                   >
-                    Sign Out
+                    {t('signOut')}
                   </button>
                 </>
               ) : (
@@ -278,9 +300,21 @@ export default function Navigation() {
                   }}
                   className="mx-4 px-4 py-2 bg-blue-900 hover:bg-blue-800 text-white rounded-lg text-sm font-medium"
                 >
-                  Sign In
+                  {t('signIn')}
                 </button>
               )}
+
+              {/* Mobile Language Toggle */}
+              <button
+                onClick={() => {
+                  switchLanguage()
+                  setMobileMenuOpen(false)
+                }}
+                className="mx-4 px-4 py-2 flex items-center gap-2 text-slate-700 hover:bg-slate-100 rounded-lg text-sm font-medium"
+              >
+                <Globe className="w-4 h-4" />
+                {locale === 'fr' ? 'Switch to English' : 'Passer en français'}
+              </button>
             </div>
           </div>
         )}
