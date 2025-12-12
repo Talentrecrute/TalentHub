@@ -187,6 +187,25 @@ export default function JobsClient({ initialJobs, savedJobIds, userId }: JobsCli
       // For different currencies, we don't filter (show all to let user decide)
     }
     
+    // Date posted filter
+    if ((filters as any).datePosted && (filters as any).datePosted !== 'any') {
+      const now = new Date()
+      const jobDate = new Date(job.createdAt)
+      const diffDays = Math.floor((now.getTime() - jobDate.getTime()) / (1000 * 60 * 60 * 24))
+      
+      switch ((filters as any).datePosted) {
+        case 'today':
+          if (diffDays > 0) return false
+          break
+        case 'week':
+          if (diffDays > 7) return false
+          break
+        case 'month':
+          if (diffDays > 30) return false
+          break
+      }
+    }
+    
     return true
   })
 

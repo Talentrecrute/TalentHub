@@ -1,4 +1,5 @@
 import CompanyAvatar from '@/components/CompanyAvatar'
+import ExportPdfButton from '@/components/jobs/ExportPdfButton'
 import { Badge } from "@/components/ui/badge"
 import { Breadcrumbs } from "@/components/ui/breadcrumbs"
 import { Button } from "@/components/ui/button"
@@ -7,12 +8,12 @@ import { Link } from '@/i18n/routing'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import {
-    Briefcase,
-    Building2,
-    CheckCircle2,
-    DollarSign,
-    MapPin,
-    Users
+  Briefcase,
+  Building2,
+  CheckCircle2,
+  DollarSign,
+  MapPin,
+  Users
 } from 'lucide-react'
 import type { Metadata } from 'next'
 import { getServerSession } from 'next-auth'
@@ -618,6 +619,29 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
                       )}
                     </>
                   )}
+                  
+                  {/* PDF Export */}
+                  <div className="mt-4 pt-4 border-t border-slate-200">
+                    <ExportPdfButton 
+                      job={{
+                        title: job.title,
+                        company: job.company?.name || 'Company',
+                        location: job.location,
+                        locationType: job.locationType,
+                        employmentType: job.employmentType,
+                        category: job.category,
+                        experienceLevel: (job as any).experienceLevel,
+                        salaryMin: job.salaryMin,
+                        salaryMax: job.salaryMax,
+                        salaryCurrency: job.salaryCurrency,
+                        description: job.description,
+                        requirements: job.requirements,
+                        responsibilities: job.responsibilities,
+                        benefits: job.benefits,
+                        createdAt: job.createdAt
+                      }}
+                    />
+                  </div>
                 </CardContent>
               </Card>
 
