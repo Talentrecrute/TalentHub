@@ -1,8 +1,10 @@
 'use client'
 
 import { saveJob } from '@/app/actions/jobs'
+import FadeIn from '@/components/animations/FadeIn'
 import JobCard from '@/components/jobs/JobCard'
 import JobFilters from '@/components/jobs/JobFilters'
+import JobCardSkeleton from '@/components/skeletons/JobCardSkeleton'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import type { Company, Job } from '@prisma/client'
@@ -46,6 +48,16 @@ export default function JobsClient({ initialJobs, savedJobIds, userId }: JobsCli
   const [localSavedJobs, setLocalSavedJobs] = useState<Set<string>>(new Set(savedJobIds))
   const [showSuggestions, setShowSuggestions] = useState(false)
   const [recentSearches, setRecentSearches] = useState<string[]>([])
+  const [isLoading, setIsLoading] = useState(true) // Initial load state
+
+  // Simulate loading on mount and filter change
+  useEffect(() => {
+    setIsLoading(true)
+    const timer = setTimeout(() => {
+      setIsLoading(false)
+    }, 500) // 500ms delay for smooth UX
+    return () => clearTimeout(timer)
+  }, [searchTerm, locationSearch, filters])
   
   // Pagination
   const JOBS_PER_PAGE = 10
@@ -490,16 +502,24 @@ export default function JobsClient({ initialJobs, savedJobIds, userId }: JobsCli
             ) : (
               <>
                 <div className="space-y-4">
-                  {paginatedJobs.map(job => (
-                    <JobCard 
-                      key={job.id}
-                      job={job}
-                      company={job.company}
-                      isSaved={localSavedJobs.has(job.id)}
-                      onSave={() => handleSaveJob(job.id)}
-                      applicationCount={job._count?.applications}
-                    />
-                  ))}
+                  {isLoading ? (
+                    // Show 3 skeletons during loading
+                    Array.from({ length: 3 }).map((_, i) => (
+                      <JobCardSkeleton key={i} />
+                    ))
+                  ) : (
+                    paginatedJobs.map((job, index) => (
+                      <FadeIn key={job.id} delay={index * 0.05}>
+                        <JobCard 
+                          job={job}
+                          company={job.company}
+                          isSaved={localSavedJobs.has(job.id)}
+                          onSave={() => handleSaveJob(job.id)}
+                          applicationCount={job._count?.applications}
+                        />
+                      </FadeIn>
+                    ))
+                  )}
                 </div>
                 
                 {/* Pagination */}

@@ -1,12 +1,12 @@
 import CompanyAvatar from '@/components/CompanyAvatar'
 import { Badge } from "@/components/ui/badge"
+import { Breadcrumbs } from "@/components/ui/breadcrumbs"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Link } from '@/i18n/routing'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import {
-    ArrowLeft,
     Briefcase,
     Building2,
     CheckCircle2,
@@ -294,10 +294,14 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
       />
       <div className="min-h-screen bg-slate-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <Link href="/jobs" className="inline-flex items-center gap-2 text-slate-600 hover:text-slate-900 mb-6">
-            <ArrowLeft className="w-4 h-4" />
-            {t('backToJobs')}
-          </Link>
+          <div className="mb-6">
+            <Breadcrumbs 
+              items={[
+                { label: t('findJob'), href: '/jobs' },
+                { label: job.title }
+              ]} 
+            />
+          </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Main Content */}
