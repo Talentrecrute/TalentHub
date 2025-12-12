@@ -4,6 +4,7 @@ import { saveJob } from '@/app/actions/jobs'
 import FadeIn from '@/components/animations/FadeIn'
 import JobCard from '@/components/jobs/JobCard'
 import JobFilters from '@/components/jobs/JobFilters'
+import SwipeableJobCard from '@/components/jobs/SwipeableJobCard'
 import JobCardSkeleton from '@/components/skeletons/JobCardSkeleton'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -510,13 +511,31 @@ export default function JobsClient({ initialJobs, savedJobIds, userId }: JobsCli
                   ) : (
                     paginatedJobs.map((job, index) => (
                       <FadeIn key={job.id} delay={index * 0.05}>
-                        <JobCard 
-                          job={job}
-                          company={job.company}
-                          isSaved={localSavedJobs.has(job.id)}
-                          onSave={() => handleSaveJob(job.id)}
-                          applicationCount={job._count?.applications}
-                        />
+                        {/* Swipeable on mobile, regular on desktop */}
+                        <div className="lg:hidden">
+                          <SwipeableJobCard
+                            onSwipeRight={() => handleSaveJob(job.id)}
+                            onSwipeLeft={() => {/* Skip - could track dismissed jobs */}}
+                            isSaved={localSavedJobs.has(job.id)}
+                          >
+                            <JobCard 
+                              job={job}
+                              company={job.company}
+                              isSaved={localSavedJobs.has(job.id)}
+                              onSave={() => handleSaveJob(job.id)}
+                              applicationCount={job._count?.applications}
+                            />
+                          </SwipeableJobCard>
+                        </div>
+                        <div className="hidden lg:block">
+                          <JobCard 
+                            job={job}
+                            company={job.company}
+                            isSaved={localSavedJobs.has(job.id)}
+                            onSave={() => handleSaveJob(job.id)}
+                            applicationCount={job._count?.applications}
+                          />
+                        </div>
                       </FadeIn>
                     ))
                   )}

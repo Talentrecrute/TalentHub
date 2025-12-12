@@ -1,5 +1,6 @@
 import AnimatedBackground from "@/components/animations/AnimatedBackground";
 import Footer from "@/components/layout/Footer";
+import MobileBottomNav from "@/components/layout/MobileBottomNav";
 import Navigation from "@/components/layout/Navigation";
 import AuthProvider from "@/components/providers/AuthProvider";
 import type { Metadata, Viewport } from "next";
@@ -167,12 +168,13 @@ export default async function LocaleLayout({
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <AuthProvider>
           <NextIntlClientProvider messages={messages}>
-            <div className="min-h-screen bg-slate-50 flex flex-col relative">
+            <div className="min-h-screen bg-slate-50 flex flex-col relative pb-16 lg:pb-0">
               {/* Animated background */}
               <AnimatedBackground variant="gradient" />
               <Navigation />
               <main className="flex-1 relative z-10">{children}</main>
               <Footer />
+              <MobileBottomNav />
             </div>
             <Toaster position="top-right" />
           </NextIntlClientProvider>
