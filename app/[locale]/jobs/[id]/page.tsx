@@ -8,12 +8,12 @@ import { Link } from '@/i18n/routing'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import {
-  Briefcase,
-  Building2,
-  CheckCircle2,
-  DollarSign,
-  MapPin,
-  Users
+    Briefcase,
+    Building2,
+    CheckCircle2,
+    DollarSign,
+    MapPin,
+    Users
 } from 'lucide-react'
 import type { Metadata } from 'next'
 import { getServerSession } from 'next-auth'
@@ -604,9 +604,12 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
                     <>
                       <ApplyButton
                         jobId={job.id}
+                        jobTitle={job.title}
+                        companyName={job.company.name}
                         hasApplied={!!application}
                         applicationStatus={application?.status}
                         isAuthenticated={!!session}
+                        candidateName={session?.user?.name || undefined}
                       />
                       {!application && (
                         <div className="mt-4">

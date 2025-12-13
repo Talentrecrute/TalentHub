@@ -7,7 +7,8 @@ import { revalidatePath } from 'next/cache'
 
 export async function updateApplicationStatus(
   applicationId: string,
-  status: 'PENDING' | 'REVIEWED' | 'ACCEPTED' | 'REJECTED'
+  status: 'PENDING' | 'REVIEWED' | 'ACCEPTED' | 'REJECTED',
+  note?: string
 ) {
   const session = await getServerSession(authOptions)
   
@@ -36,14 +37,31 @@ export async function updateApplicationStatus(
     throw new Error('Unauthorized to update this application')
   }
 
-  const updatedApplication = await prisma.application.update({
-    where: { id: applicationId },
-    data: { status }
-  })
+  // Only create event if status actually changed
+  const statusChanged = application.status !== status
+
+  // Update application and create timeline event in a transaction
+  const [updatedApplication] = await prisma.$transaction([
+    prisma.application.update({
+      where: { id: applicationId },
+      data: { status }
+    }),
+    ...(statusChanged ? [
+      prisma.applicationEvent.create({
+        data: {
+          applicationId,
+          status,
+          note: note || null
+        }
+      })
+    ] : [])
+  ])
 
   revalidatePath('/employer/applications')
   revalidatePath(`/employer/applications/${applicationId}`)
   revalidatePath('/employer/dashboard')
+  revalidatePath('/candidate/dashboard')
+  revalidatePath('/candidate/applications')
   
   return updatedApplication
 }

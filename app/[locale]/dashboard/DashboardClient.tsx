@@ -1,5 +1,6 @@
 'use client'
 
+import RecommendedJobs from '@/components/candidate/RecommendedJobs'
 import JobCard from '@/components/jobs/JobCard'
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -123,6 +124,11 @@ export default function DashboardClient({
             </CardContent>
           </Card>
         )}
+
+        {/* Recommended Jobs Section */}
+        <div className="mb-8">
+          <RecommendedJobs />
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <div>

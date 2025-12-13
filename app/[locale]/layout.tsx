@@ -165,7 +165,7 @@ export default async function LocaleLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
         />
       </head>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`} suppressHydrationWarning>
         <AuthProvider>
           <NextIntlClientProvider messages={messages}>
             <div className="min-h-screen bg-slate-50 flex flex-col relative pb-16 lg:pb-0">

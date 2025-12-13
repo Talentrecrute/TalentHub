@@ -13,6 +13,9 @@ async function getDashboardData(userId: string) {
           include: {
             company: true
           }
+        },
+        events: {
+          orderBy: { createdAt: 'asc' }
         }
       },
       orderBy: {

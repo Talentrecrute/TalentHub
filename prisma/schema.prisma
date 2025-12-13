@@ -73,13 +73,14 @@ model User {
   role          UserRole  @default(CANDIDATE)
 
   // Candidate fields
-  phone      String?
-  location   String?
-  bio        String?
-  skills     String? // JSON array stored as string
-  experience String? // JSON array stored as string
-  education  String? // JSON array stored as string
-  resume     String? // URL to resume file
+  phone           String?
+  location        String?
+  bio             String?
+  skills          String? // JSON array stored as string
+  experience      String? // JSON array stored as string
+  education       String? // JSON array stored as string
+  resume          String? // URL to resume file
+  isPublicProfile Boolean @default(false) // Allow recruiters to view profile
 
   // Company/Employer fields
   companyName        String?
@@ -98,6 +99,26 @@ model User {
   companies    Company[] // Companies owned by this employer
   savedJobs    SavedJob[]
   jobTemplates JobTemplate[] // Job templates for quick job creation
+  jobAlerts    JobAlert[] // Job alerts for new job notifications
+}
+
+// Job Alert for candidates to receive notifications about new jobs
+model JobAlert {
+  id           String  @id @default(cuid())
+  name         String // Alert name (e.g., "Remote Dev Jobs")
+  keywords     String? // Search keywords
+  category     String? // Job category filter
+  location     String? // Location filter
+  locationType String? // onsite, remote, hybrid
+  isActive     Boolean @default(true)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
 }
 
 // Job Template for employers to save and reuse job offer templates
@@ -201,10 +222,28 @@ model Application {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  // Timeline events
+  events ApplicationEvent[]
+
   @@unique([jobId, candidateId]) // A user can only apply once per job
   @@index([candidateId])
   @@index([jobId])
   @@index([status])
+}
+
+// Application timeline events for tracking status changes
+model ApplicationEvent {
+  id String @id @default(cuid())
+
+  applicationId String
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  status ApplicationStatus
+  note   String? // Optional note from employer
+
+  createdAt DateTime @default(now())
+
+  @@index([applicationId])
 }
 
 model SavedJob {
