@@ -2,10 +2,10 @@
 
 import CompanyAvatar from '@/components/CompanyAvatar'
 import { Button } from '@/components/ui/button'
-import { Link } from '@/i18n/routing'
 import type { Company, Job } from '@prisma/client'
 import { Bookmark, Clock, DollarSign, MapPin, Users } from 'lucide-react'
 import { useLocale, useTranslations } from 'next-intl'
+import { useRouter } from 'next/navigation'
 
 interface JobCardProps {
   job: Job
@@ -20,6 +20,7 @@ export default function JobCard({ job, company, showActions = true, isSaved = fa
   const t = useTranslations('jobs')
   const tCommon = useTranslations('common')
   const locale = useLocale()
+  const router = useRouter()
 
   const formatSalary = (min?: number | null, max?: number | null, currency: string = 'EUR', period: string = 'monthly') => {
     if (!min && !max) return t('competitive')
@@ -63,14 +64,28 @@ export default function JobCard({ job, company, showActions = true, isSaved = fa
     return tCommon('monthsAgo', { count: Math.floor(days / 30) })
   }
 
+  const handleCardClick = () => {
+    router.push(`/${locale}/jobs/${job.id}`)
+  }
+
+  const handleCompanyClick = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    if (company) {
+      router.push(`/${locale}/companies/${company.id}`)
+    }
+  }
+
   return (
-    <div className="bg-white border border-slate-200 rounded-xl p-6 hover:shadow-lg hover:border-teal-300 transition-all duration-300 h-full relative group hover-lift card-hover">
+    <div 
+      onClick={handleCardClick}
+      className="bg-white border border-slate-200 rounded-xl p-6 hover:shadow-lg hover:border-teal-300 transition-all duration-300 h-full relative group hover-lift card-hover cursor-pointer"
+    >
       {onSave && (
         <Button
           variant="ghost"
           size="sm"
           onClick={(e) => {
-            e.preventDefault()
+            e.stopPropagation()
             onSave()
           }}
           className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity"
@@ -79,79 +94,84 @@ export default function JobCard({ job, company, showActions = true, isSaved = fa
         </Button>
       )}
       
-      <Link href={`/jobs/${job.id}`} className="block">
-        <div className="flex items-start gap-4 mb-4">
-          <CompanyAvatar 
-            companyName={company?.name || 'Company'}
-            logoUrl={company?.logo}
-            size="md"
-          />
-          <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-lg text-slate-900 mb-1 truncate">
-              {job.title}
-            </h3>
-            <p className="text-sm text-slate-600 truncate">
-              {company?.name || 'Company'}
-            </p>
-          </div>
-        </div>
-
-        <div className="space-y-2 mb-4">
-          <div className="flex items-center gap-2 text-sm text-slate-600">
-            <MapPin className="w-4 h-4 flex-shrink-0" />
-            <span className="truncate">{job.location}</span>
-            <span className="px-2 py-0.5 bg-slate-100 rounded text-xs flex-shrink-0">
-              {job.locationType === 'remote' ? t('remote') : 
-               job.locationType === 'hybrid' ? t('hybrid') : t('onsite')}
-            </span>
-          </div>
-          
-          <div className="flex items-center gap-2 text-sm text-slate-600">
-            <DollarSign className="w-4 h-4 flex-shrink-0" />
-            <span className="truncate">{formatSalary(job.salaryMin, job.salaryMax, job.salaryCurrency, (job as any).salaryPeriod)}</span>
-          </div>
-
-          <div className="flex items-center gap-2 text-sm text-slate-600">
-            <Clock className="w-4 h-4 flex-shrink-0" />
-            <span className="capitalize">{job.employmentType.replace('-', ' ')}</span>
-          </div>
-        </div>
-
-        <div className="flex flex-wrap gap-2 mb-4">
-          <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">
-            {job.category}
-          </span>
-          {(job as any).experienceLevel && (
-            <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-medium">
-              {(job as any).experienceLevel === 'entry' ? (locale === 'fr' ? 'Débutant' : 'Entry') :
-               (job as any).experienceLevel === 'mid' ? (locale === 'fr' ? 'Intermédiaire' : 'Mid-Level') :
-               (job as any).experienceLevel === 'senior' ? 'Senior' :
-               (job as any).experienceLevel === 'lead' ? 'Lead' :
-               (job as any).experienceLevel === 'executive' ? (locale === 'fr' ? 'Directeur' : 'Executive') :
-               (job as any).experienceLevel}
-            </span>
+      <div className="flex items-start gap-4 mb-4">
+        <CompanyAvatar 
+          companyName={company?.name || 'Company'}
+          logoUrl={company?.logo}
+          size="md"
+        />
+        <div className="flex-1 min-w-0">
+          <h3 className="font-semibold text-lg text-slate-900 mb-1 truncate">
+            {job.title}
+          </h3>
+          {company ? (
+            <button 
+              onClick={handleCompanyClick}
+              className="text-sm text-slate-600 hover:text-teal-600 truncate block text-left"
+            >
+              {company.name}
+            </button>
+          ) : (
+            <p className="text-sm text-slate-600 truncate">Company</p>
           )}
         </div>
+      </div>
 
-        {showActions && (
-          <div className="flex items-center justify-between pt-4 border-t border-slate-200">
-            <div className="flex items-center gap-3">
-              <span className="text-xs text-slate-500">
-                {getTimeAgo(job.createdAt)}
-              </span>
-              {applicationCount !== undefined && (
-                <span className="flex items-center gap-1 text-xs text-slate-500">
-                  <Users className="w-3 h-3" />
-                  {t('applications', { count: applicationCount })}
-                </span>
-              )}
-            </div>
-            <span className="text-sm font-medium text-teal-600 hover:text-teal-700">
-              {tCommon('viewDetails')} →
-            </span>
-          </div>
+      <div className="space-y-2 mb-4">
+        <div className="flex items-center gap-2 text-sm text-slate-600">
+          <MapPin className="w-4 h-4 flex-shrink-0" />
+          <span className="truncate">{job.location}</span>
+          <span className="px-2 py-0.5 bg-slate-100 rounded text-xs flex-shrink-0">
+            {job.locationType === 'remote' ? t('remote') : 
+             job.locationType === 'hybrid' ? t('hybrid') : t('onsite')}
+          </span>
+        </div>
+        
+        <div className="flex items-center gap-2 text-sm text-slate-600">
+          <DollarSign className="w-4 h-4 flex-shrink-0" />
+          <span className="truncate">{formatSalary(job.salaryMin, job.salaryMax, job.salaryCurrency, (job as any).salaryPeriod)}</span>
+        </div>
+
+        <div className="flex items-center gap-2 text-sm text-slate-600">
+          <Clock className="w-4 h-4 flex-shrink-0" />
+          <span className="capitalize">{job.employmentType.replace('-', ' ')}</span>
+        </div>
+      </div>
+
+      <div className="flex flex-wrap gap-2 mb-4">
+        <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">
+          {job.category}
+        </span>
+        {(job as any).experienceLevel && (
+          <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-medium">
+            {(job as any).experienceLevel === 'entry' ? (locale === 'fr' ? 'Débutant' : 'Entry') :
+             (job as any).experienceLevel === 'mid' ? (locale === 'fr' ? 'Intermédiaire' : 'Mid-Level') :
+             (job as any).experienceLevel === 'senior' ? 'Senior' :
+             (job as any).experienceLevel === 'lead' ? 'Lead' :
+             (job as any).experienceLevel === 'executive' ? (locale === 'fr' ? 'Directeur' : 'Executive') :
+             (job as any).experienceLevel}
+          </span>
         )}
-      </Link>
+      </div>
+
+      {showActions && (
+        <div className="flex items-center justify-between pt-4 border-t border-slate-200">
+          <div className="flex items-center gap-3">
+            <span className="text-xs text-slate-500">
+              {getTimeAgo(job.createdAt)}
+            </span>
+            {applicationCount !== undefined && (
+              <span className="flex items-center gap-1 text-xs text-slate-500">
+                <Users className="w-3 h-3" />
+                {t('applications', { count: applicationCount })}
+              </span>
+            )}
+          </div>
+          <span className="text-sm font-medium text-teal-600 hover:text-teal-700">
+            {tCommon('viewDetails')} →
+          </span>
+        </div>
+      )}
     </div>
   )
 }

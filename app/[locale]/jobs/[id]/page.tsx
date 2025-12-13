@@ -523,6 +523,16 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
                         </div>
                       )}
                     </div>
+
+                    {/* View Company Profile Button */}
+                    <div className="mt-6 pt-4 border-t border-slate-200">
+                      <Link href={`/companies/${job.company.id}`}>
+                        <Button variant="outline" className="w-full gap-2">
+                          <Building2 className="w-4 h-4" />
+                          {locale === 'fr' ? 'Voir le profil de l\'entreprise' : 'View company profile'}
+                        </Button>
+                      </Link>
+                    </div>
                   </CardContent>
                 </Card>
               )}
