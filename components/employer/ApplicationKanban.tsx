@@ -1,6 +1,7 @@
 'use client'
 
 import { updateApplicationStatus } from '@/app/actions/applications'
+import StartConversationButton from '@/components/messaging/StartConversationButton'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -155,6 +156,15 @@ export default function ApplicationKanban({ applications: initialApplications }:
                       </span>
 
                       <div className="flex gap-1">
+                        {/* Contact candidate */}
+                        <StartConversationButton
+                          receiverId={app.candidate.id}
+                          applicationId={app.id}
+                          jobId={app.job.id}
+                          variant="ghost"
+                          size="sm"
+                        />
+
                         {/* Move to next stage (only for PENDING and REVIEWED) */}
                         {(column.id === 'PENDING' || column.id === 'REVIEWED') && (
                           <Button
