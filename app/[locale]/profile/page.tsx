@@ -1,3 +1,4 @@
+import DangerZone from '@/components/account/DangerZone'
 import { Card, CardContent } from "@/components/ui/card"
 import { Link } from '@/i18n/routing'
 import { authOptions } from '@/lib/auth'
@@ -115,6 +116,11 @@ export default async function ProfilePage({ params }: { params: Promise<{ locale
             </div>
           </CardContent>
         </Card>
+
+        {/* Danger Zone - Account Deletion */}
+        <div className="mt-8">
+          <DangerZone userRole={user.role} />
+        </div>
       </div>
     </div>
   )

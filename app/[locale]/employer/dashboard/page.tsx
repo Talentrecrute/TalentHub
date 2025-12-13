@@ -1,3 +1,4 @@
+import DangerZone from '@/components/account/DangerZone'
 import ApplicationKanban from '@/components/employer/ApplicationKanban'
 import DashboardStats from '@/components/employer/DashboardStats'
 import { Badge } from "@/components/ui/badge"
@@ -331,6 +332,11 @@ export default async function EmployerDashboardPage() {
               </Card>
             </div>
           </div>
+        </div>
+
+        {/* Danger Zone - Account Deletion */}
+        <div className="mt-12">
+          <DangerZone userRole="EMPLOYER" />
         </div>
       </div>
       <Toaster position="top-right" />

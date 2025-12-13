@@ -37,7 +37,7 @@ export default function MobileBottomNav() {
             if (!session) {
               actualHref = '/auth/signin'
             } else {
-              actualHref = '/profile'
+              actualHref = '/settings'
             }
           }
 
