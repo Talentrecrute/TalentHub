@@ -97,6 +97,33 @@ model User {
   applications Application[]
   companies    Company[] // Companies owned by this employer
   savedJobs    SavedJob[]
+  jobTemplates JobTemplate[] // Job templates for quick job creation
+}
+
+// Job Template for employers to save and reuse job offer templates
+model JobTemplate {
+  id               String  @id @default(cuid())
+  name             String // Template name (e.g., "Senior Developer", "Marketing Manager")
+  title            String
+  description      String
+  category         String?
+  locationType     String  @default("onsite")
+  employmentType   String  @default("full-time")
+  experienceLevel  String  @default("mid")
+  requirements     String? // JSON array stored as string
+  responsibilities String? // JSON array stored as string
+  benefits         String? // JSON array stored as string
+  salaryMin        Int?
+  salaryMax        Int?
+  salaryCurrency   String  @default("EUR")
+
+  employerId String
+  employer   User   @relation(fields: [employerId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([employerId])
 }
 
 model Company {
