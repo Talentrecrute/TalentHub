@@ -1,21 +1,103 @@
 {
-  "name": "OceanicJob",
+  "name": "OceanicJob - Plateforme d'Emploi",
   "short_name": "OceanicJob",
-  "description": "Find your dream job - Leading recruitment platform",
+  "description": "Trouvez votre emploi de rêve ou recrutez les meilleurs talents",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#f8fafc",
-  "theme_color": "#0d9488",
+  "theme_color": "#0f172a",
+  "orientation": "portrait-primary",
+  "scope": "/",
   "icons": [
     {
-      "src": "/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png"
+      "src": "/icons/icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "maskable any"
     },
     {
-      "src": "/icon-512.png",
+      "src": "/icons/icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "maskable any"
     }
-  ]
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/desktop.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "OceanicJob Desktop"
+    },
+    {
+      "src": "/screenshots/mobile.png",
+      "sizes": "750x1334",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "OceanicJob Mobile"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Rechercher des offres",
+      "short_name": "Offres",
+      "description": "Parcourir les offres d'emploi",
+      "url": "/jobs",
+      "icons": [{ "src": "/icons/search.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Mes candidatures",
+      "short_name": "Candidatures",
+      "description": "Voir mes candidatures",
+      "url": "/applications",
+      "icons": [{ "src": "/icons/applications.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Messages",
+      "short_name": "Messages",
+      "description": "Consulter mes messages",
+      "url": "/messages",
+      "icons": [{ "src": "/icons/messages.png", "sizes": "96x96" }]
+    }
+  ],
+  "categories": ["business", "productivity"],
+  "lang": "fr",
+  "dir": "ltr"
 }

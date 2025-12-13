@@ -1,8 +1,11 @@
 import AnimatedBackground from "@/components/animations/AnimatedBackground";
+import KeyboardShortcuts from "@/components/keyboard/KeyboardShortcuts";
 import Footer from "@/components/layout/Footer";
 import MobileBottomNav from "@/components/layout/MobileBottomNav";
 import Navigation from "@/components/layout/Navigation";
+import OnboardingTour from "@/components/onboarding/OnboardingTour";
 import AuthProvider from "@/components/providers/AuthProvider";
+import PWAInstallPrompt from "@/components/pwa/PWAInstallPrompt";
 import type { Metadata, Viewport } from "next";
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, getTranslations } from 'next-intl/server';
@@ -177,6 +180,9 @@ export default async function LocaleLayout({
               <MobileBottomNav />
             </div>
             <Toaster position="top-right" />
+            <KeyboardShortcuts />
+            <PWAInstallPrompt />
+            <OnboardingTour />
           </NextIntlClientProvider>
         </AuthProvider>
       </body>
