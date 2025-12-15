@@ -1,3 +1,6 @@
+import DangerZone from '@/components/account/DangerZone'
+import JobAlertManager from '@/components/candidate/JobAlertManager'
+import PublicProfileToggle from '@/components/candidate/PublicProfileToggle'
 import { Card, CardContent } from "@/components/ui/card"
 import { Link } from '@/i18n/routing'
 import { authOptions } from '@/lib/auth'
@@ -74,6 +77,23 @@ export default async function ProfilePage({ params }: { params: Promise<{ locale
           </div>
         )}
 
+        {/* Public Profile Toggle - Only for Candidates */}
+        {!isEmployer && (
+          <div className="mb-6">
+            <PublicProfileToggle 
+              userId={user.id} 
+              initialValue={user.isPublicProfile ?? false} 
+            />
+          </div>
+        )}
+
+        {/* Job Alerts - Only for Candidates */}
+        {!isEmployer && (
+          <div className="mb-6">
+            <JobAlertManager />
+          </div>
+        )}
+
         {/* Profile Form */}
         <Card>
           <CardContent className="p-8">
@@ -115,6 +135,11 @@ export default async function ProfilePage({ params }: { params: Promise<{ locale
             </div>
           </CardContent>
         </Card>
+
+        {/* Danger Zone - Account Deletion */}
+        <div className="mt-8">
+          <DangerZone userRole={user.role} />
+        </div>
       </div>
     </div>
   )

@@ -16,6 +16,7 @@ interface JobFiltersProps {
     experienceLevels: string[]
     categories: string[]
     salaryMin: number
+    datePosted?: string  // 'today', 'week', 'month', 'any'
   }
   onChange: (filters: any) => void
   onClear: () => void
@@ -64,6 +65,14 @@ const salaryRanges = [
   { min: 100000, labelFr: '100 000€+', labelEn: '$100,000+' }
 ]
 
+// Date posted filter options
+const datePostedOptions = [
+  { value: 'any', labelFr: 'Toutes les dates', labelEn: 'Any time' },
+  { value: 'today', labelFr: "Aujourd'hui", labelEn: 'Today' },
+  { value: 'week', labelFr: 'Cette semaine', labelEn: 'This week' },
+  { value: 'month', labelFr: 'Ce mois-ci', labelEn: 'This month' },
+]
+
 export default function JobFilters({ filters, onChange, onClear }: JobFiltersProps) {
   const t = useTranslations('jobs')
   const tCommon = useTranslations('common')
@@ -74,7 +83,8 @@ export default function JobFilters({ filters, onChange, onClear }: JobFiltersPro
     type: true,
     experience: false,
     category: true,
-    salary: false
+    salary: false,
+    datePosted: true
   })
 
   const toggleSection = (section: keyof typeof expandedSections) => {
@@ -107,7 +117,8 @@ export default function JobFilters({ filters, onChange, onClear }: JobFiltersPro
     filters.types.length +
     filters.experienceLevels.length +
     filters.categories.length +
-    (filters.salaryMin > 0 ? 1 : 0)
+    (filters.salaryMin > 0 ? 1 : 0) +
+    (filters.datePosted && filters.datePosted !== 'any' ? 1 : 0)
 
   const hasActiveFilters = activeFiltersCount > 0
 
@@ -199,6 +210,49 @@ export default function JobFilters({ filters, onChange, onClear }: JobFiltersPro
               />
               <span className="text-sm text-slate-700 font-medium">{t('remote')}</span>
             </label>
+          </CardContent>
+        )}
+      </Card>
+
+      {/* Date Posted */}
+      <Card>
+        <CardHeader 
+          className="cursor-pointer py-3"
+          onClick={() => toggleSection('datePosted')}
+        >
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-sm font-semibold">
+              {locale === 'fr' ? 'Date de publication' : 'Date Posted'}
+              {filters.datePosted && filters.datePosted !== 'any' && (
+                <Badge className="ml-2 bg-teal-600">1</Badge>
+              )}
+            </CardTitle>
+            {expandedSections.datePosted ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+          </div>
+        </CardHeader>
+        {expandedSections.datePosted && (
+          <CardContent className="space-y-1 pt-0">
+            {datePostedOptions.map(option => (
+              <label 
+                key={option.value} 
+                className={`flex items-center gap-3 cursor-pointer p-2 rounded-lg transition-colors ${
+                  filters.datePosted === option.value || (!filters.datePosted && option.value === 'any') 
+                    ? 'bg-teal-50' 
+                    : 'hover:bg-slate-50'
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="datePosted"
+                  checked={filters.datePosted === option.value || (!filters.datePosted && option.value === 'any')}
+                  onChange={() => onChange({ ...filters, datePosted: option.value })}
+                  className="w-4 h-4 border-slate-300 text-teal-600 focus:ring-teal-500"
+                />
+                <span className={`text-sm ${filters.datePosted === option.value ? 'text-teal-700 font-medium' : 'text-slate-700'}`}>
+                  {getLabel(option)}
+                </span>
+              </label>
+            ))}
           </CardContent>
         )}
       </Card>

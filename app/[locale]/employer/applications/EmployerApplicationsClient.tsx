@@ -3,11 +3,13 @@
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
 import { Link } from '@/i18n/routing'
 import type { Application, Job, User } from '@prisma/client'
-import { FileText, Filter } from 'lucide-react'
+import { Calendar, Download, FileText, Filter, Search, X } from 'lucide-react'
 import { useLocale, useTranslations } from 'next-intl'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
+import { toast } from 'sonner'
 
 type ApplicationWithDetails = Application & {
   job: Job
@@ -35,7 +37,13 @@ export default function EmployerApplicationsClient({
   const tNav = useTranslations('nav')
   const tCommon = useTranslations('common')
   const locale = useLocale()
+  
+  // Filter states
   const [statusFilter, setStatusFilter] = useState<string>('ALL')
+  const [dateFilter, setDateFilter] = useState<string>('ALL')
+  const [jobFilter, setJobFilter] = useState<string>('ALL')
+  const [searchQuery, setSearchQuery] = useState<string>('')
+  const [isExporting, setIsExporting] = useState(false)
 
   const statusOptions = [
     { value: 'ALL', label: t('all'), color: 'bg-slate-100 text-slate-700' },
@@ -45,6 +53,13 @@ export default function EmployerApplicationsClient({
     { value: 'REJECTED', label: tStatus('rejected'), color: 'bg-red-100 text-red-700' },
   ]
 
+  const dateOptions = [
+    { value: 'ALL', label: locale === 'fr' ? 'Toutes les dates' : 'All dates' },
+    { value: '7', label: locale === 'fr' ? '7 derniers jours' : 'Last 7 days' },
+    { value: '30', label: locale === 'fr' ? '30 derniers jours' : 'Last 30 days' },
+    { value: '90', label: locale === 'fr' ? '3 derniers mois' : 'Last 3 months' },
+  ]
+
   const statusLabels: Record<string, string> = {
     PENDING: tStatus('pending'),
     REVIEWED: tStatus('reviewed'),
@@ -52,10 +67,45 @@ export default function EmployerApplicationsClient({
     REJECTED: tStatus('rejected')
   }
 
-  const filteredApplications = applications.filter(app => {
-    if (statusFilter === 'ALL') return true
-    return app.status === statusFilter
-  })
+  // Get unique jobs for filter
+  const uniqueJobs = useMemo(() => {
+    const jobMap = new Map<string, string>()
+    applications.forEach(app => {
+      if (!jobMap.has(app.job.id)) {
+        jobMap.set(app.job.id, app.job.title)
+      }
+    })
+    return Array.from(jobMap).map(([id, title]) => ({ id, title }))
+  }, [applications])
+
+  // Filter applications
+  const filteredApplications = useMemo(() => {
+    return applications.filter(app => {
+      // Status filter
+      if (statusFilter !== 'ALL' && app.status !== statusFilter) return false
+      
+      // Date filter
+      if (dateFilter !== 'ALL') {
+        const days = parseInt(dateFilter)
+        const cutoff = new Date()
+        cutoff.setDate(cutoff.getDate() - days)
+        if (new Date(app.createdAt) < cutoff) return false
+      }
+      
+      // Job filter
+      if (jobFilter !== 'ALL' && app.job.id !== jobFilter) return false
+      
+      // Search filter
+      if (searchQuery) {
+        const query = searchQuery.toLowerCase()
+        const candidateName = (app.candidate.name || '').toLowerCase()
+        const candidateEmail = app.candidate.email.toLowerCase()
+        if (!candidateName.includes(query) && !candidateEmail.includes(query)) return false
+      }
+      
+      return true
+    })
+  }, [applications, statusFilter, dateFilter, jobFilter, searchQuery])
 
   const statusCounts = {
     ALL: applications.length,
@@ -65,60 +115,222 @@ export default function EmployerApplicationsClient({
     REJECTED: applications.filter(a => a.status === 'REJECTED').length,
   }
 
+  const activeFiltersCount = [
+    statusFilter !== 'ALL',
+    dateFilter !== 'ALL',
+    jobFilter !== 'ALL',
+    searchQuery !== ''
+  ].filter(Boolean).length
+
+  const clearAllFilters = () => {
+    setStatusFilter('ALL')
+    setDateFilter('ALL')
+    setJobFilter('ALL')
+    setSearchQuery('')
+  }
+
+  // Export to CSV
+  const handleExportCsv = () => {
+    setIsExporting(true)
+    
+    try {
+      const headers = ['Nom', 'Email', 'Poste', 'Statut', 'Date de candidature', 'Lettre de motivation']
+      const rows = filteredApplications.map(app => [
+        app.candidate.name || 'N/A',
+        app.candidate.email,
+        app.job.title,
+        statusLabels[app.status],
+        new Date(app.createdAt).toLocaleDateString(locale === 'fr' ? 'fr-FR' : 'en-US'),
+        (app.coverLetter || '').replace(/"/g, '""').substring(0, 500)
+      ])
+
+      const csvContent = [
+        headers.join(','),
+        ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
+      ].join('\n')
+
+      const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' })
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `candidatures_${companyName.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.csv`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      URL.revokeObjectURL(url)
+
+      toast.success(locale === 'fr' ? 'Export CSV réussi !' : 'CSV export successful!')
+    } catch (error) {
+      toast.error(locale === 'fr' ? 'Erreur lors de l\'export' : 'Export failed')
+    } finally {
+      setIsExporting(false)
+    }
+  }
+
   return (
     <div>
-      <div className="mb-6">
-        <div className="flex items-center gap-2 mb-3">
-          <Filter className="w-4 h-4 text-slate-500" />
-          <span className="text-sm font-medium text-slate-700">{t('filterByStatus')}</span>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {statusOptions.map((option) => (
-            <button
-              key={option.value}
-              onClick={() => setStatusFilter(option.value)}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                statusFilter === option.value
-                  ? `${option.color} ring-2 ring-offset-2 ring-teal-500`
-                  : 'bg-white border border-slate-200 text-slate-600 hover:border-slate-300'
-              }`}
-            >
-              {option.label} ({statusCounts[option.value as keyof typeof statusCounts]})
-            </button>
-          ))}
-        </div>
-      </div>
+      {/* Filters Section */}
+      <Card className="mb-6">
+        <CardContent className="p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <Filter className="w-5 h-5 text-teal-600" />
+              <h3 className="font-semibold text-slate-900">
+                {locale === 'fr' ? 'Filtres' : 'Filters'}
+              </h3>
+              {activeFiltersCount > 0 && (
+                <Badge variant="secondary" className="bg-teal-100 text-teal-700">
+                  {activeFiltersCount}
+                </Badge>
+              )}
+            </div>
+            <div className="flex items-center gap-2">
+              {activeFiltersCount > 0 && (
+                <Button variant="ghost" size="sm" onClick={clearAllFilters}>
+                  <X className="w-4 h-4 mr-1" />
+                  {locale === 'fr' ? 'Effacer' : 'Clear'}
+                </Button>
+              )}
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handleExportCsv}
+                disabled={isExporting || filteredApplications.length === 0}
+              >
+                {isExporting ? (
+                  <div className="w-4 h-4 border-2 border-slate-400 border-t-transparent rounded-full animate-spin mr-2" />
+                ) : (
+                  <Download className="w-4 h-4 mr-2" />
+                )}
+                {locale === 'fr' ? 'Exporter CSV' : 'Export CSV'}
+              </Button>
+            </div>
+          </div>
 
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Search */}
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">
+                <Search className="w-4 h-4 inline mr-1" />
+                {locale === 'fr' ? 'Rechercher' : 'Search'}
+              </label>
+              <Input
+                type="text"
+                placeholder={locale === 'fr' ? 'Nom ou email...' : 'Name or email...'}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full"
+              />
+            </div>
+
+            {/* Date Filter */}
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">
+                <Calendar className="w-4 h-4 inline mr-1" />
+                {locale === 'fr' ? 'Période' : 'Period'}
+              </label>
+              <select
+                value={dateFilter}
+                onChange={(e) => setDateFilter(e.target.value)}
+                className="w-full h-10 px-3 rounded-md border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+              >
+                {dateOptions.map(option => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Job Filter */}
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">
+                <FileText className="w-4 h-4 inline mr-1" />
+                {locale === 'fr' ? 'Offre d\'emploi' : 'Job Posting'}
+              </label>
+              <select
+                value={jobFilter}
+                onChange={(e) => setJobFilter(e.target.value)}
+                className="w-full h-10 px-3 rounded-md border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+              >
+                <option value="ALL">{locale === 'fr' ? 'Toutes les offres' : 'All jobs'}</option>
+                {uniqueJobs.map(job => (
+                  <option key={job.id} value={job.id}>
+                    {job.title}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Status Filter (mini) */}
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">
+                {locale === 'fr' ? 'Statut' : 'Status'}
+              </label>
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="w-full h-10 px-3 rounded-md border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+              >
+                {statusOptions.map(option => (
+                  <option key={option.value} value={option.value}>
+                    {option.label} ({statusCounts[option.value as keyof typeof statusCounts]})
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {/* Status Pills (quick toggle) */}
+          <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-slate-100">
+            {statusOptions.map((option) => (
+              <button
+                key={option.value}
+                onClick={() => setStatusFilter(option.value)}
+                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+                  statusFilter === option.value
+                    ? `${option.color} ring-2 ring-offset-1 ring-teal-500`
+                    : 'bg-white border border-slate-200 text-slate-600 hover:border-slate-300'
+                }`}
+              >
+                {option.label} ({statusCounts[option.value as keyof typeof statusCounts]})
+              </button>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Results Count */}
       <p className="text-sm text-slate-600 mb-4">
-        {t('total', { count: filteredApplications.length })}
+        {filteredApplications.length === applications.length 
+          ? t('total', { count: filteredApplications.length })
+          : (locale === 'fr' 
+              ? `${filteredApplications.length} résultat(s) sur ${applications.length}` 
+              : `${filteredApplications.length} of ${applications.length} results`)
+        }
       </p>
 
+      {/* Applications List */}
       {filteredApplications.length === 0 ? (
         <Card>
           <CardContent className="p-12 text-center">
             <FileText className="w-16 h-16 text-slate-300 mx-auto mb-4" />
             <h3 className="text-xl font-semibold text-slate-900 mb-2">
-              {statusFilter === 'ALL' ? t('noApplications') : t('noMatchingFilter')}
+              {statusFilter === 'ALL' && !searchQuery ? t('noApplications') : t('noMatchingFilter')}
             </h3>
             <p className="text-slate-600 mb-6">
-              {statusFilter === 'ALL' 
+              {statusFilter === 'ALL' && !searchQuery
                 ? (locale === 'fr' 
                     ? "Les candidatures apparaîtront ici lorsque des candidats postuleront à vos offres" 
                     : "Applications will appear here when candidates apply to your jobs")
-                : t('noMatchingFilter')}
+                : (locale === 'fr'
+                    ? "Essayez de modifier vos critères de recherche"
+                    : "Try adjusting your search criteria")}
             </p>
-            {statusFilter === 'ALL' ? (
-              <Link href="/employer/post-job">
-                <Button className="bg-teal-600 hover:bg-teal-700">
-                  {tNav('postJob')}
-                </Button>
-              </Link>
-            ) : (
-              <Button 
-                variant="outline" 
-                onClick={() => setStatusFilter('ALL')}
-              >
-                {tCommon('viewAll')}
+            {activeFiltersCount > 0 && (
+              <Button variant="outline" onClick={clearAllFilters}>
+                <X className="w-4 h-4 mr-2" />
+                {locale === 'fr' ? 'Effacer les filtres' : 'Clear filters'}
               </Button>
             )}
           </CardContent>

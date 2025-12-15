@@ -1,8 +1,11 @@
 'use client'
 
 import { saveJob } from '@/app/actions/jobs'
+import FadeIn from '@/components/animations/FadeIn'
 import JobCard from '@/components/jobs/JobCard'
 import JobFilters from '@/components/jobs/JobFilters'
+import SwipeableJobCard from '@/components/jobs/SwipeableJobCard'
+import JobCardSkeleton from '@/components/skeletons/JobCardSkeleton'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import type { Company, Job } from '@prisma/client'
@@ -46,6 +49,16 @@ export default function JobsClient({ initialJobs, savedJobIds, userId }: JobsCli
   const [localSavedJobs, setLocalSavedJobs] = useState<Set<string>>(new Set(savedJobIds))
   const [showSuggestions, setShowSuggestions] = useState(false)
   const [recentSearches, setRecentSearches] = useState<string[]>([])
+  const [isLoading, setIsLoading] = useState(true) // Initial load state
+
+  // Simulate loading on mount and filter change
+  useEffect(() => {
+    setIsLoading(true)
+    const timer = setTimeout(() => {
+      setIsLoading(false)
+    }, 500) // 500ms delay for smooth UX
+    return () => clearTimeout(timer)
+  }, [searchTerm, locationSearch, filters])
   
   // Pagination
   const JOBS_PER_PAGE = 10
@@ -172,6 +185,25 @@ export default function JobsClient({ initialJobs, savedJobIds, userId }: JobsCli
         if (normalizedJobSalary < filters.salaryMin) return false
       }
       // For different currencies, we don't filter (show all to let user decide)
+    }
+    
+    // Date posted filter
+    if ((filters as any).datePosted && (filters as any).datePosted !== 'any') {
+      const now = new Date()
+      const jobDate = new Date(job.createdAt)
+      const diffDays = Math.floor((now.getTime() - jobDate.getTime()) / (1000 * 60 * 60 * 24))
+      
+      switch ((filters as any).datePosted) {
+        case 'today':
+          if (diffDays > 0) return false
+          break
+        case 'week':
+          if (diffDays > 7) return false
+          break
+        case 'month':
+          if (diffDays > 30) return false
+          break
+      }
     }
     
     return true
@@ -490,16 +522,42 @@ export default function JobsClient({ initialJobs, savedJobIds, userId }: JobsCli
             ) : (
               <>
                 <div className="space-y-4">
-                  {paginatedJobs.map(job => (
-                    <JobCard 
-                      key={job.id}
-                      job={job}
-                      company={job.company}
-                      isSaved={localSavedJobs.has(job.id)}
-                      onSave={() => handleSaveJob(job.id)}
-                      applicationCount={job._count?.applications}
-                    />
-                  ))}
+                  {isLoading ? (
+                    // Show 3 skeletons during loading
+                    Array.from({ length: 3 }).map((_, i) => (
+                      <JobCardSkeleton key={i} />
+                    ))
+                  ) : (
+                    paginatedJobs.map((job, index) => (
+                      <FadeIn key={job.id} delay={index * 0.05}>
+                        {/* Swipeable on mobile, regular on desktop */}
+                        <div className="lg:hidden">
+                          <SwipeableJobCard
+                            onSwipeRight={() => handleSaveJob(job.id)}
+                            onSwipeLeft={() => {/* Skip - could track dismissed jobs */}}
+                            isSaved={localSavedJobs.has(job.id)}
+                          >
+                            <JobCard 
+                              job={job}
+                              company={job.company}
+                              isSaved={localSavedJobs.has(job.id)}
+                              onSave={() => handleSaveJob(job.id)}
+                              applicationCount={job._count?.applications}
+                            />
+                          </SwipeableJobCard>
+                        </div>
+                        <div className="hidden lg:block">
+                          <JobCard 
+                            job={job}
+                            company={job.company}
+                            isSaved={localSavedJobs.has(job.id)}
+                            onSave={() => handleSaveJob(job.id)}
+                            applicationCount={job._count?.applications}
+                          />
+                        </div>
+                      </FadeIn>
+                    ))
+                  )}
                 </div>
                 
                 {/* Pagination */}

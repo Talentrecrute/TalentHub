@@ -1,10 +1,12 @@
 'use client'
 
 import { createJob, updateJob } from '@/app/actions/jobs'
+import JobTemplateManager from '@/components/employer/JobTemplateManager'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import type { JobTemplate } from '@prisma/client'
 import { Plus, X } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
@@ -126,6 +128,35 @@ export default function PostJobForm({ companyId, initialData, jobId }: PostJobFo
     setFormData({ ...formData, benefits: formData.benefits.filter((_: any, i: number) => i !== index) })
   }
 
+  // Apply template to form
+  const handleApplyTemplate = (template: JobTemplate) => {
+    const parseTemplateJSON = (data: string | null) => {
+      if (!data) return []
+      try {
+        return JSON.parse(data)
+      } catch {
+        return data.split(',').map((s: string) => s.trim()).filter(Boolean)
+      }
+    }
+
+    setFormData({
+      ...formData,
+      title: template.title,
+      description: template.description,
+      category: template.category || formData.category,
+      locationType: template.locationType || formData.locationType,
+      employmentType: template.employmentType || formData.employmentType,
+      experienceLevel: template.experienceLevel || formData.experienceLevel,
+      requirements: parseTemplateJSON(template.requirements),
+      responsibilities: parseTemplateJSON(template.responsibilities),
+      benefits: parseTemplateJSON(template.benefits),
+      salaryMin: template.salaryMin || formData.salaryMin,
+      salaryMax: template.salaryMax || formData.salaryMax,
+      salaryCurrency: template.salaryCurrency || formData.salaryCurrency,
+    })
+    toast.success('Template appliqué !')
+  }
+
   const handleSubmit = async (status: 'DRAFT' | 'OPEN') => {
     if (!formData.title || !formData.description || !formData.category || !formData.location) {
       toast.error(tErrors('requiredFields'))
@@ -162,6 +193,27 @@ export default function PostJobForm({ companyId, initialData, jobId }: PostJobFo
 
   return (
     <div className="space-y-6">
+      {/* Job Templates */}
+      {!jobId && (
+        <JobTemplateManager
+          onSelectTemplate={handleApplyTemplate}
+          currentJobData={{
+            title: formData.title,
+            description: formData.description,
+            category: formData.category,
+            locationType: formData.locationType,
+            employmentType: formData.employmentType,
+            experienceLevel: formData.experienceLevel,
+            requirements: JSON.stringify(formData.requirements),
+            responsibilities: JSON.stringify(formData.responsibilities),
+            benefits: JSON.stringify(formData.benefits),
+            salaryMin: formData.salaryMin ? parseInt(formData.salaryMin) : null,
+            salaryMax: formData.salaryMax ? parseInt(formData.salaryMax) : null,
+            salaryCurrency: formData.salaryCurrency,
+          }}
+        />
+      )}
+
       {/* Basic Info */}
       <div className="space-y-4">
         <div>

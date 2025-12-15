@@ -4,10 +4,9 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
 }
-
 // NextAuth Models
 model Account {
   id                String  @id @default(cuid())
@@ -73,13 +72,14 @@ model User {
   role          UserRole  @default(CANDIDATE)
 
   // Candidate fields
-  phone      String?
-  location   String?
-  bio        String?
-  skills     String? // JSON array stored as string
-  experience String? // JSON array stored as string
-  education  String? // JSON array stored as string
-  resume     String? // URL to resume file
+  phone           String?
+  location        String?
+  bio             String?
+  skills          String? // JSON array stored as string
+  experience      String? // JSON array stored as string
+  education       String? // JSON array stored as string
+  resume          String? // URL to resume file
+  isPublicProfile Boolean @default(false) // Allow recruiters to view profile
 
   // Company/Employer fields
   companyName        String?
@@ -92,11 +92,124 @@ model User {
   updatedAt DateTime @updatedAt
 
   // Relations
-  accounts     Account[]
-  sessions     Session[]
-  applications Application[]
-  companies    Company[] // Companies owned by this employer
-  savedJobs    SavedJob[]
+  accounts      Account[]
+  sessions      Session[]
+  applications  Application[]
+  companies     Company[] // Companies owned by this employer
+  savedJobs     SavedJob[]
+  jobTemplates  JobTemplate[] // Job templates for quick job creation
+  jobAlerts     JobAlert[] // Job alerts for new job notifications
+  notifications Notification[] // User notifications
+
+  // Messaging relations
+  conversationsInitiated Conversation[] @relation("ConversationInitiator")
+  conversationsReceived  Conversation[] @relation("ConversationReceiver")
+  messagesSent           Message[]
+}
+
+// Notification model for real-time alerts
+model Notification {
+  id      String  @id @default(cuid())
+  type    String // APPLICATION_RECEIVED, STATUS_CHANGE, NEW_MESSAGE, etc.
+  title   String
+  message String
+  link    String? // Optional link to navigate to
+  isRead  Boolean @default(false)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([isRead])
+}
+
+// Conversation between candidate and employer
+model Conversation {
+  id String @id @default(cuid())
+
+  initiatorId String
+  initiator   User   @relation("ConversationInitiator", fields: [initiatorId], references: [id], onDelete: Cascade)
+
+  receiverId String
+  receiver   User   @relation("ConversationReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+
+  // Optional: Link to related application or job
+  applicationId String?
+  jobId         String?
+
+  messages Message[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([initiatorId, receiverId])
+  @@index([initiatorId])
+  @@index([receiverId])
+}
+
+// Message in a conversation
+model Message {
+  id      String  @id @default(cuid())
+  content String
+  isRead  Boolean @default(false)
+
+  senderId String
+  sender   User   @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([conversationId])
+  @@index([senderId])
+}
+
+// Job Alert for candidates to receive notifications about new jobs
+model JobAlert {
+  id           String  @id @default(cuid())
+  name         String // Alert name (e.g., "Remote Dev Jobs")
+  keywords     String? // Search keywords
+  category     String? // Job category filter
+  location     String? // Location filter
+  locationType String? // onsite, remote, hybrid
+  isActive     Boolean @default(true)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+// Job Template for employers to save and reuse job offer templates
+model JobTemplate {
+  id               String  @id @default(cuid())
+  name             String // Template name (e.g., "Senior Developer", "Marketing Manager")
+  title            String
+  description      String
+  category         String?
+  locationType     String  @default("onsite")
+  employmentType   String  @default("full-time")
+  experienceLevel  String  @default("mid")
+  requirements     String? // JSON array stored as string
+  responsibilities String? // JSON array stored as string
+  benefits         String? // JSON array stored as string
+  salaryMin        Int?
+  salaryMax        Int?
+  salaryCurrency   String  @default("EUR")
+
+  employerId String
+  employer   User   @relation(fields: [employerId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([employerId])
 }
 
 model Company {
@@ -174,10 +287,28 @@ model Application {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  // Timeline events
+  events ApplicationEvent[]
+
   @@unique([jobId, candidateId]) // A user can only apply once per job
   @@index([candidateId])
   @@index([jobId])
   @@index([status])
+}
+
+// Application timeline events for tracking status changes
+model ApplicationEvent {
+  id String @id @default(cuid())
+
+  applicationId String
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  status ApplicationStatus
+  note   String? // Optional note from employer
+
+  createdAt DateTime @default(now())
+
+  @@index([applicationId])
 }
 
 model SavedJob {

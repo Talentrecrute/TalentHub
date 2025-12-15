@@ -1,16 +1,18 @@
 'use client'
 
+import ApplicationTimeline from '@/components/candidate/ApplicationTimeline'
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Link } from '@/i18n/routing'
-import type { Application, Company, Job } from '@prisma/client'
-import { Calendar, FileText, Filter } from 'lucide-react'
+import type { Application, ApplicationEvent, Company, Job } from '@prisma/client'
+import { Calendar, ChevronDown, ChevronUp, FileText, Filter, History } from 'lucide-react'
 import { useLocale, useTranslations } from 'next-intl'
 import { useState } from 'react'
 
 type ApplicationWithJob = Application & {
   job: Job & { company: Company }
+  events: ApplicationEvent[]
 }
 
 interface ApplicationsClientProps {
@@ -31,6 +33,7 @@ export default function ApplicationsClient({ applications }: ApplicationsClientP
   const tDashboard = useTranslations('candidateDashboard')
   const locale = useLocale()
   const [statusFilter, setStatusFilter] = useState<string>('ALL')
+  const [expandedTimeline, setExpandedTimeline] = useState<string | null>(null)
 
   const statusOptions = [
     { value: 'ALL', label: t('all'), color: 'bg-slate-100 text-slate-700' },
@@ -58,6 +61,10 @@ export default function ApplicationsClient({ applications }: ApplicationsClientP
     REVIEWED: applications.filter(a => a.status === 'REVIEWED').length,
     ACCEPTED: applications.filter(a => a.status === 'ACCEPTED').length,
     REJECTED: applications.filter(a => a.status === 'REJECTED').length,
+  }
+
+  const toggleTimeline = (appId: string) => {
+    setExpandedTimeline(expandedTimeline === appId ? null : appId)
   }
 
   return (
@@ -144,6 +151,30 @@ export default function ApplicationsClient({ applications }: ApplicationsClientP
                     <p className="text-sm text-slate-600 whitespace-pre-wrap line-clamp-3">
                       {app.coverLetter}
                     </p>
+                  </div>
+                )}
+
+                {/* Timeline Toggle Button */}
+                <button
+                  onClick={() => toggleTimeline(app.id)}
+                  className="w-full flex items-center justify-center gap-2 py-2 text-sm font-medium text-teal-600 hover:text-teal-700 bg-teal-50 hover:bg-teal-100 rounded-lg transition-colors mb-4"
+                >
+                  <History className="w-4 h-4" />
+                  {locale === 'fr' ? 'Historique du statut' : 'Status History'}
+                  {expandedTimeline === app.id ? (
+                    <ChevronUp className="w-4 h-4" />
+                  ) : (
+                    <ChevronDown className="w-4 h-4" />
+                  )}
+                </button>
+
+                {/* Timeline */}
+                {expandedTimeline === app.id && (
+                  <div className="p-4 bg-slate-50 rounded-lg border border-slate-200 mb-4">
+                    <ApplicationTimeline 
+                      events={app.events} 
+                      createdAt={app.createdAt} 
+                    />
                   </div>
                 )}
 

@@ -1,12 +1,13 @@
 import CompanyAvatar from '@/components/CompanyAvatar'
+import ExportPdfButton from '@/components/jobs/ExportPdfButton'
 import { Badge } from "@/components/ui/badge"
+import { Breadcrumbs } from "@/components/ui/breadcrumbs"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Link } from '@/i18n/routing'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import {
-    ArrowLeft,
     Briefcase,
     Building2,
     CheckCircle2,
@@ -294,10 +295,14 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
       />
       <div className="min-h-screen bg-slate-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <Link href="/jobs" className="inline-flex items-center gap-2 text-slate-600 hover:text-slate-900 mb-6">
-            <ArrowLeft className="w-4 h-4" />
-            {t('backToJobs')}
-          </Link>
+          <div className="mb-6">
+            <Breadcrumbs 
+              items={[
+                { label: t('findJob'), href: '/jobs' },
+                { label: job.title }
+              ]} 
+            />
+          </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Main Content */}
@@ -518,6 +523,16 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
                         </div>
                       )}
                     </div>
+
+                    {/* View Company Profile Button */}
+                    <div className="mt-6 pt-4 border-t border-slate-200">
+                      <Link href={`/companies/${job.company.id}`}>
+                        <Button variant="outline" className="w-full gap-2">
+                          <Building2 className="w-4 h-4" />
+                          {locale === 'fr' ? 'Voir le profil de l\'entreprise' : 'View company profile'}
+                        </Button>
+                      </Link>
+                    </div>
                   </CardContent>
                 </Card>
               )}
@@ -599,9 +614,12 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
                     <>
                       <ApplyButton
                         jobId={job.id}
+                        jobTitle={job.title}
+                        companyName={job.company.name}
                         hasApplied={!!application}
                         applicationStatus={application?.status}
                         isAuthenticated={!!session}
+                        candidateName={session?.user?.name || undefined}
                       />
                       {!application && (
                         <div className="mt-4">
@@ -614,6 +632,29 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
                       )}
                     </>
                   )}
+                  
+                  {/* PDF Export */}
+                  <div className="mt-4 pt-4 border-t border-slate-200">
+                    <ExportPdfButton 
+                      job={{
+                        title: job.title,
+                        company: job.company?.name || 'Company',
+                        location: job.location,
+                        locationType: job.locationType,
+                        employmentType: job.employmentType,
+                        category: job.category,
+                        experienceLevel: (job as any).experienceLevel,
+                        salaryMin: job.salaryMin,
+                        salaryMax: job.salaryMax,
+                        salaryCurrency: job.salaryCurrency,
+                        description: job.description,
+                        requirements: job.requirements,
+                        responsibilities: job.responsibilities,
+                        benefits: job.benefits,
+                        createdAt: job.createdAt
+                      }}
+                    />
+                  </div>
                 </CardContent>
               </Card>
 

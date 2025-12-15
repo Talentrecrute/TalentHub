@@ -3,10 +3,18 @@ import { PrismaAdapter } from "@next-auth/prisma-adapter"
 import bcrypt from "bcryptjs"
 import { NextAuthOptions } from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
+import GoogleProvider from "next-auth/providers/google"
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   providers: [
+    // Google OAuth
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID || "",
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
+      allowDangerousEmailAccountLinking: true,
+    }),
+    // Credentials (email/password)
     CredentialsProvider({
       name: "credentials",
       credentials: {
@@ -48,11 +56,63 @@ export const authOptions: NextAuthOptions = {
     })
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async signIn({ user, account }) {
+      console.log(`✅ Sign-in attempt: ${account?.provider} for ${user.email}`)
+      
+      if (account?.provider === "google") {
+        const existingUser = await prisma.user.findUnique({
+          where: { email: user.email! }
+        })
+        
+        if (existingUser) {
+          console.log(`✅ Existing user found: ${existingUser.id}`)
+        } else {
+          console.log(`🆕 New user will be created`)
+        }
+      }
+      
+      return true
+    },
+    async redirect({ url, baseUrl }) {
+      // If signing in, redirect to home
+      if (url.includes('/api/auth/callback')) {
+        return baseUrl
+      }
+      
+      // Allow relative URLs
+      if (url.startsWith('/')) {
+        return `${baseUrl}${url}`
+      }
+      
+      // Allow URLs on the same origin
+      if (url.startsWith(baseUrl)) {
+        return url
+      }
+      
+      return baseUrl
+    },
+    async jwt({ token, user, account }) {
+      // First time sign in
       if (user) {
         token.id = user.id
-        token.role = user.role
+        token.role = user.role || "CANDIDATE"
       }
+      
+      // For OAuth sign-ins, fetch fresh data from DB
+      if (account?.provider === "google") {
+        try {
+          const dbUser = await prisma.user.findUnique({
+            where: { email: token.email! }
+          })
+          if (dbUser) {
+            token.id = dbUser.id
+            token.role = dbUser.role
+          }
+        } catch (error) {
+          console.error("JWT callback error:", error)
+        }
+      }
+      
       return token
     },
     async session({ session, token }) {
@@ -68,6 +128,7 @@ export const authOptions: NextAuthOptions = {
   },
   session: {
     strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   secret: process.env.NEXTAUTH_SECRET,
 }

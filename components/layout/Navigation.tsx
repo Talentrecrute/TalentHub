@@ -1,8 +1,9 @@
 'use client'
 
+import NotificationBell from '@/components/notifications/NotificationBell'
 import { Button } from "@/components/ui/button"
 import { Link, usePathname, useRouter } from "@/i18n/routing"
-import { Building2, Globe, LogOut, Menu, User, X } from 'lucide-react'
+import { Building2, Globe, LogOut, Menu, MessageSquare, User, X } from 'lucide-react'
 import { signIn, signOut, useSession } from 'next-auth/react'
 import { useLocale, useTranslations } from 'next-intl'
 import NextImage from 'next/image'
@@ -146,6 +147,20 @@ export default function Navigation() {
                     isActive('/profile') ? 'text-white' : 'text-slate-700'
                   }`}>{session.user?.name}</span>
                 </Link>
+
+                {/* Messages Link */}
+                <Link
+                  href="/messages"
+                  className={`p-2 rounded-full hover:bg-slate-100 transition-colors ${
+                    isActive('/messages') ? 'bg-slate-100' : ''
+                  }`}
+                  title={locale === 'fr' ? 'Messages' : 'Messages'}
+                >
+                  <MessageSquare className="w-5 h-5 text-slate-600" />
+                </Link>
+
+                {/* Notifications */}
+                <NotificationBell />
                 
                 <Button
                   variant="ghost"

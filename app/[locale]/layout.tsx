@@ -1,7 +1,11 @@
 import AnimatedBackground from "@/components/animations/AnimatedBackground";
+import KeyboardShortcuts from "@/components/keyboard/KeyboardShortcuts";
 import Footer from "@/components/layout/Footer";
+import MobileBottomNav from "@/components/layout/MobileBottomNav";
 import Navigation from "@/components/layout/Navigation";
+import OnboardingTour from "@/components/onboarding/OnboardingTour";
 import AuthProvider from "@/components/providers/AuthProvider";
+import PWAInstallPrompt from "@/components/pwa/PWAInstallPrompt";
 import type { Metadata, Viewport } from "next";
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, getTranslations } from 'next-intl/server';
@@ -164,17 +168,21 @@ export default async function LocaleLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
         />
       </head>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`} suppressHydrationWarning>
         <AuthProvider>
           <NextIntlClientProvider messages={messages}>
-            <div className="min-h-screen bg-slate-50 flex flex-col relative">
+            <div className="min-h-screen bg-slate-50 flex flex-col relative pb-16 lg:pb-0">
               {/* Animated background */}
               <AnimatedBackground variant="gradient" />
               <Navigation />
               <main className="flex-1 relative z-10">{children}</main>
               <Footer />
+              <MobileBottomNav />
             </div>
             <Toaster position="top-right" />
+            <KeyboardShortcuts />
+            <PWAInstallPrompt />
+            <OnboardingTour />
           </NextIntlClientProvider>
         </AuthProvider>
       </body>

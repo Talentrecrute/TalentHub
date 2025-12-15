@@ -14,6 +14,9 @@ async function getApplications(userId: string) {
         include: {
           company: true
         }
+      },
+      events: {
+        orderBy: { createdAt: 'asc' }
       }
     },
     orderBy: {
