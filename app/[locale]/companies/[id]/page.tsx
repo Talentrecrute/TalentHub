@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Link } from '@/i18n/routing'
 import { prisma } from '@/lib/prisma'
-import { Briefcase, Building2, ExternalLink, Globe, Mail, MapPin, Users } from 'lucide-react'
+import { Briefcase, Building2, ExternalLink, Globe, MapPin, Users } from 'lucide-react'
 import { getLocale, getTranslations } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 
@@ -160,15 +160,7 @@ export default async function CompanyProfilePage({ params }: Props) {
                   </a>
                 )}
 
-                {company.email && (
-                  <a 
-                    href={`mailto:${company.email}`}
-                    className="flex items-center gap-3 text-slate-600 hover:text-teal-600 transition-colors"
-                  >
-                    <Mail className="w-5 h-5 text-slate-400" />
-                    <span className="truncate">{company.email}</span>
-                  </a>
-                )}
+
 
                 {company.location && (
                   <div className="flex items-center gap-3 text-slate-600">
