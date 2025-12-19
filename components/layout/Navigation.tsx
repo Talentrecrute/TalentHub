@@ -3,7 +3,7 @@
 import NotificationBell from '@/components/notifications/NotificationBell'
 import { Button } from "@/components/ui/button"
 import { Link, usePathname, useRouter } from "@/i18n/routing"
-import { Building2, Globe, LogOut, Menu, MessageSquare, User, X } from 'lucide-react'
+import { Building2, Globe, LogOut, MessageSquare, User } from 'lucide-react'
 import { signIn, signOut, useSession } from 'next-auth/react'
 import { useLocale, useTranslations } from 'next-intl'
 import NextImage from 'next/image'
@@ -191,43 +191,81 @@ export default function Navigation() {
             </button>
           </div>
 
-          {/* Mobile menu button */}
+          {/* Mobile menu button - Animated Hamburger */}
           <button
-            className="md:hidden p-2 rounded-lg hover:bg-slate-100"
+            className="md:hidden relative w-10 h-10 flex items-center justify-center rounded-lg hover:bg-slate-100 transition-colors"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label="Toggle menu"
           >
-            {mobileMenuOpen ? (
-              <X className="w-6 h-6 text-slate-700" />
-            ) : (
-              <Menu className="w-6 h-6 text-slate-700" />
-            )}
+            <div className="relative w-6 h-5 flex flex-col justify-center items-center">
+              <span 
+                className={`absolute h-0.5 w-6 bg-slate-700 rounded-full transition-all duration-300 ease-out ${
+                  mobileMenuOpen ? 'rotate-45 translate-y-0' : '-translate-y-2'
+                }`}
+              />
+              <span 
+                className={`absolute h-0.5 w-6 bg-slate-700 rounded-full transition-all duration-300 ease-out ${
+                  mobileMenuOpen ? 'opacity-0 scale-0' : 'opacity-100 scale-100'
+                }`}
+              />
+              <span 
+                className={`absolute h-0.5 w-6 bg-slate-700 rounded-full transition-all duration-300 ease-out ${
+                  mobileMenuOpen ? '-rotate-45 translate-y-0' : 'translate-y-2'
+                }`}
+              />
+            </div>
           </button>
         </div>
 
-        {/* Mobile Navigation */}
-        {mobileMenuOpen && (
-          <div className="md:hidden py-4 border-t border-slate-200">
-            <div className="flex flex-col gap-3">
+        {/* Mobile Navigation - Animated Slide Down */}
+        <div 
+          className={`md:hidden overflow-hidden transition-all duration-300 ease-out ${
+            mobileMenuOpen 
+              ? 'max-h-[500px] opacity-100' 
+              : 'max-h-0 opacity-0'
+          }`}
+        >
+          <div className="py-4 border-t border-slate-200">
+            <div className="flex flex-col gap-1">
+              {/* Home Link */}
               <Link 
                 href="/" 
-                className={`px-4 py-2 text-sm font-medium rounded-lg ${
+                className={`px-4 py-3 text-sm font-medium rounded-xl mx-2 flex items-center gap-3 transition-all duration-200 transform ${
+                  mobileMenuOpen ? 'translate-x-0 opacity-100' : '-translate-x-4 opacity-0'
+                } ${
                   isActive('/') 
-                    ? 'bg-blue-900 text-white' 
-                    : 'text-slate-700 hover:bg-slate-100'
+                    ? 'bg-gradient-to-r from-teal-600 to-cyan-600 text-white shadow-lg shadow-teal-500/20' 
+                    : 'text-slate-700 hover:bg-slate-100 active:scale-[0.98]'
                 }`}
+                style={{ transitionDelay: mobileMenuOpen ? '50ms' : '0ms' }}
                 onClick={() => setMobileMenuOpen(false)}
               >
+                <span className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+                  isActive('/') ? 'bg-white/20' : 'bg-slate-100'
+                }`}>
+                  🏠
+                </span>
                 {t('home')}
               </Link>
+
+              {/* Jobs Link */}
               <Link 
                 href="/jobs" 
-                className={`px-4 py-2 text-sm font-medium rounded-lg ${
+                className={`px-4 py-3 text-sm font-medium rounded-xl mx-2 flex items-center gap-3 transition-all duration-200 transform ${
+                  mobileMenuOpen ? 'translate-x-0 opacity-100' : '-translate-x-4 opacity-0'
+                } ${
                   isActive('/jobs') 
-                    ? 'bg-blue-900 text-white' 
-                    : 'text-slate-700 hover:bg-slate-100'
+                    ? 'bg-gradient-to-r from-teal-600 to-cyan-600 text-white shadow-lg shadow-teal-500/20' 
+                    : 'text-slate-700 hover:bg-slate-100 active:scale-[0.98]'
                 }`}
+                style={{ transitionDelay: mobileMenuOpen ? '100ms' : '0ms' }}
                 onClick={() => setMobileMenuOpen(false)}
               >
+                <span className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+                  isActive('/jobs') ? 'bg-white/20' : 'bg-slate-100'
+                }`}>
+                  🔍
+                </span>
                 {t('findJobs')}
               </Link>
               
@@ -237,24 +275,40 @@ export default function Navigation() {
                     <>
                       <Link 
                         href="/employer/dashboard" 
-                        className={`px-4 py-2 text-sm font-medium rounded-lg ${
+                        className={`px-4 py-3 text-sm font-medium rounded-xl mx-2 flex items-center gap-3 transition-all duration-200 transform ${
+                          mobileMenuOpen ? 'translate-x-0 opacity-100' : '-translate-x-4 opacity-0'
+                        } ${
                           isActive('/employer/dashboard') 
-                            ? 'bg-blue-900 text-white' 
-                            : 'text-slate-700 hover:bg-slate-100'
+                            ? 'bg-gradient-to-r from-teal-600 to-cyan-600 text-white shadow-lg shadow-teal-500/20' 
+                            : 'text-slate-700 hover:bg-slate-100 active:scale-[0.98]'
                         }`}
+                        style={{ transitionDelay: mobileMenuOpen ? '150ms' : '0ms' }}
                         onClick={() => setMobileMenuOpen(false)}
                       >
+                        <span className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+                          isActive('/employer/dashboard') ? 'bg-white/20' : 'bg-slate-100'
+                        }`}>
+                          📊
+                        </span>
                         {t('dashboard')}
                       </Link>
                       <Link 
                         href="/employer/post-job" 
-                        className={`px-4 py-2 text-sm font-medium rounded-lg ${
+                        className={`px-4 py-3 text-sm font-medium rounded-xl mx-2 flex items-center gap-3 transition-all duration-200 transform ${
+                          mobileMenuOpen ? 'translate-x-0 opacity-100' : '-translate-x-4 opacity-0'
+                        } ${
                           isActive('/employer/post-job') 
-                            ? 'bg-blue-900 text-white' 
-                            : 'text-slate-700 hover:bg-slate-100'
+                            ? 'bg-gradient-to-r from-teal-600 to-cyan-600 text-white shadow-lg shadow-teal-500/20' 
+                            : 'text-slate-700 hover:bg-slate-100 active:scale-[0.98]'
                         }`}
+                        style={{ transitionDelay: mobileMenuOpen ? '200ms' : '0ms' }}
                         onClick={() => setMobileMenuOpen(false)}
                       >
+                        <span className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+                          isActive('/employer/post-job') ? 'bg-white/20' : 'bg-slate-100'
+                        }`}>
+                          ➕
+                        </span>
                         {t('postJob')}
                       </Link>
                     </>
@@ -262,48 +316,83 @@ export default function Navigation() {
                     <>
                       <Link 
                         href="/dashboard" 
-                        className={`px-4 py-2 text-sm font-medium rounded-lg ${
+                        className={`px-4 py-3 text-sm font-medium rounded-xl mx-2 flex items-center gap-3 transition-all duration-200 transform ${
+                          mobileMenuOpen ? 'translate-x-0 opacity-100' : '-translate-x-4 opacity-0'
+                        } ${
                           isActive('/dashboard') 
-                            ? 'bg-blue-900 text-white' 
-                            : 'text-slate-700 hover:bg-slate-100'
+                            ? 'bg-gradient-to-r from-teal-600 to-cyan-600 text-white shadow-lg shadow-teal-500/20' 
+                            : 'text-slate-700 hover:bg-slate-100 active:scale-[0.98]'
                         }`}
+                        style={{ transitionDelay: mobileMenuOpen ? '150ms' : '0ms' }}
                         onClick={() => setMobileMenuOpen(false)}
                       >
+                        <span className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+                          isActive('/dashboard') ? 'bg-white/20' : 'bg-slate-100'
+                        }`}>
+                          📊
+                        </span>
                         {t('dashboard')}
                       </Link>
                       <Link 
                         href="/applications" 
-                        className={`px-4 py-2 text-sm font-medium rounded-lg ${
+                        className={`px-4 py-3 text-sm font-medium rounded-xl mx-2 flex items-center gap-3 transition-all duration-200 transform ${
+                          mobileMenuOpen ? 'translate-x-0 opacity-100' : '-translate-x-4 opacity-0'
+                        } ${
                           isActive('/applications') 
-                            ? 'bg-blue-900 text-white' 
-                            : 'text-slate-700 hover:bg-slate-100'
+                            ? 'bg-gradient-to-r from-teal-600 to-cyan-600 text-white shadow-lg shadow-teal-500/20' 
+                            : 'text-slate-700 hover:bg-slate-100 active:scale-[0.98]'
                         }`}
+                        style={{ transitionDelay: mobileMenuOpen ? '200ms' : '0ms' }}
                         onClick={() => setMobileMenuOpen(false)}
                       >
+                        <span className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+                          isActive('/applications') ? 'bg-white/20' : 'bg-slate-100'
+                        }`}>
+                          📝
+                        </span>
                         {t('myApplications')}
                       </Link>
                     </>
                   )}
                   
+                  {/* Profile Link */}
                   <Link 
                     href="/profile" 
-                    className={`px-4 py-2 text-sm font-medium rounded-lg ${
+                    className={`px-4 py-3 text-sm font-medium rounded-xl mx-2 flex items-center gap-3 transition-all duration-200 transform ${
+                      mobileMenuOpen ? 'translate-x-0 opacity-100' : '-translate-x-4 opacity-0'
+                    } ${
                       isActive('/profile') 
-                        ? 'bg-blue-900 text-white' 
-                        : 'text-slate-700 hover:bg-slate-100'
+                        ? 'bg-gradient-to-r from-teal-600 to-cyan-600 text-white shadow-lg shadow-teal-500/20' 
+                        : 'text-slate-700 hover:bg-slate-100 active:scale-[0.98]'
                     }`}
+                    style={{ transitionDelay: mobileMenuOpen ? '250ms' : '0ms' }}
                     onClick={() => setMobileMenuOpen(false)}
                   >
+                    <span className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+                      isActive('/profile') ? 'bg-white/20' : 'bg-slate-100'
+                    }`}>
+                      👤
+                    </span>
                     {t('profile')}
                   </Link>
+
+                  {/* Divider */}
+                  <div className="mx-6 my-2 border-t border-slate-200" />
                   
+                  {/* Sign Out */}
                   <button
                     onClick={() => {
                       signOut()
                       setMobileMenuOpen(false)
                     }}
-                    className="px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 rounded-lg text-left"
+                    className={`px-4 py-3 text-sm font-medium rounded-xl mx-2 flex items-center gap-3 text-red-600 hover:bg-red-50 transition-all duration-200 transform active:scale-[0.98] ${
+                      mobileMenuOpen ? 'translate-x-0 opacity-100' : '-translate-x-4 opacity-0'
+                    }`}
+                    style={{ transitionDelay: mobileMenuOpen ? '300ms' : '0ms' }}
                   >
+                    <span className="w-8 h-8 rounded-lg flex items-center justify-center bg-red-100">
+                      <LogOut className="w-4 h-4" />
+                    </span>
                     {t('signOut')}
                   </button>
                 </>
@@ -313,27 +402,36 @@ export default function Navigation() {
                     signIn()
                     setMobileMenuOpen(false)
                   }}
-                  className="mx-4 px-4 py-2 bg-blue-900 hover:bg-blue-800 text-white rounded-lg text-sm font-medium"
+                  className={`mx-4 mt-2 px-4 py-3 bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700 text-white rounded-xl text-sm font-semibold shadow-lg shadow-teal-500/25 transition-all duration-200 transform active:scale-[0.98] ${
+                    mobileMenuOpen ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
+                  }`}
+                  style={{ transitionDelay: mobileMenuOpen ? '150ms' : '0ms' }}
                 >
                   {t('signIn')}
                 </button>
               )}
 
-              {/* Mobile Language Toggle */}
+              {/* Language Toggle */}
               <button
                 onClick={() => {
                   switchLanguage()
                   setMobileMenuOpen(false)
                 }}
-                className="mx-4 px-4 py-2 flex items-center gap-2 text-slate-700 hover:bg-slate-100 rounded-lg text-sm font-medium"
+                className={`px-4 py-3 text-sm font-medium rounded-xl mx-2 mt-2 flex items-center gap-3 text-slate-700 hover:bg-slate-100 transition-all duration-200 transform active:scale-[0.98] ${
+                  mobileMenuOpen ? 'translate-x-0 opacity-100' : '-translate-x-4 opacity-0'
+                }`}
+                style={{ transitionDelay: mobileMenuOpen ? '350ms' : '0ms' }}
               >
-                <Globe className="w-4 h-4" />
+                <span className="w-8 h-8 rounded-lg flex items-center justify-center bg-slate-100">
+                  <Globe className="w-4 h-4" />
+                </span>
                 {locale === 'fr' ? 'Switch to English' : 'Passer en français'}
               </button>
             </div>
           </div>
-        )}
+        </div>
       </div>
     </nav>
   )
 }
+
