@@ -30,20 +30,22 @@ export default function MobileBottomNav() {
             } else if (session.user.role === 'EMPLOYER') {
               actualHref = '/employer/dashboard'
             } else {
-              actualHref = '/candidate/dashboard'
+              actualHref = '/dashboard'
             }
           }
           if (href === '/profile') {
             if (!session) {
               actualHref = '/auth/signin'
             } else {
-              actualHref = '/settings'
+              actualHref = '/profile'
             }
           }
 
-          const isActive = pathname === actualHref || 
+          const isActive = 
+            (href === '/' && pathname === '/') ||
             (href === '/jobs' && pathname.startsWith('/jobs')) ||
-            (href === '/dashboard' && (pathname.includes('/dashboard') || pathname.includes('/employer')))
+            (href === '/dashboard' && (pathname === '/dashboard' || pathname === '/employer/dashboard' || pathname.startsWith('/employer/'))) ||
+            (href === '/profile' && (pathname === '/profile' || pathname.startsWith('/profile')))
 
           return (
             <Link
