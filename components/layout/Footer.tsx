@@ -87,8 +87,8 @@ export default function Footer() {
           <div>
             <h3 className="font-semibold text-white mb-3">{t('company')}</h3>
             <ul className="space-y-2 text-sm">
-              <li><a href="#" className="hover:text-teal-400 transition-colors">{t('aboutUs')}</a></li>
-              <li><a href="#" className="hover:text-teal-400 transition-colors">{t('contact')}</a></li>
+              <li><Link href="/about" className="hover:text-teal-400 transition-colors">{t('aboutUs')}</Link></li>
+              <li><a href="mailto:contact@oceanic.job" className="hover:text-teal-400 transition-colors">{t('contact')}</a></li>
               <li><a href="#" className="hover:text-teal-400 transition-colors">{t('privacy')}</a></li>
               <li><a href="#" className="hover:text-teal-400 transition-colors">{t('terms')}</a></li>
             </ul>
@@ -96,7 +96,7 @@ export default function Footer() {
         </div>
         
         <div className="border-t border-slate-800 mt-8 pt-8 text-center text-sm text-slate-400">
-          <p>&copy; {new Date().getFullYear()} TalentHub. {t('copyright')}</p>
+          <p>&copy; {new Date().getFullYear()} OceanicJob. {t('copyright')}</p>
         </div>
       </div>
     </footer>

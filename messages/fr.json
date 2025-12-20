@@ -372,5 +372,71 @@
   },
   "language": {
     "switchTo": "Switch to English"
+  },
+  "about": {
+    "since": "Depuis 2014",
+    "heroTitle": "Notre Mission :",
+    "heroTitleHighlight": "Connecter l'Océan Indien",
+    "heroSubtitle": "OceanicJob est né d'un rêve : aider les jeunes diplômés de Madagascar, des Comores, de Maurice et de toutes les îles de l'Océan Indien à trouver un emploi dignement, sans corruption, sans favoritisme.",
+    "ourStory": "Notre Histoire",
+    "storyPart1": "OceanicJob est bien plus qu'une plateforme d'emploi. C'est une mission sociale née en 2014 grâce à la vision de Noureddine ABDALLAH, qui rêvait de connecter les talents de l'Océan Indien au monde du travail.",
+    "storyPart2": "Aujourd'hui, repris et amélioré par Sidi ABDILLAH SIDI et Ibrahim DJOUMOI, OceanicJob continue cette mission avec une technologie moderne et une ambition renouvelée.",
+    "storyQuote": "À Madagascar et dans les îles, beaucoup de jeunes diplômés brillants ne trouvent pas d'emploi. Pas parce qu'ils manquent de compétences, mais parce qu'ils ne connaissent pas 'l'oncle de tel ou tel'. Nous voulons changer ça.",
+    "theProblem": "Le Problème",
+    "problemList": {
+      "unemployment": "Chômage extrême touchant les jeunes diplômés",
+      "orientation": "Manque d'orientation professionnelle après les études",
+      "corruption": "Corruption et favoritisme dans le recrutement",
+      "disconnect": "Déconnexion avec le marché international"
+    },
+    "ourSolution": "Notre Solution",
+    "solutionList": {
+      "transparent": "Plateforme transparente et accessible à tous",
+      "connection": "Connexion avec les entreprises françaises, canadiennes et européennes",
+      "remote": "Opportunités de travail à distance depuis chez soi",
+      "solidarity": "S'entraider entre îles de l'Océan Indien"
+    },
+    "opportunityTitle": "L'Opportunité de l'Externalisation",
+    "opportunityText": "Aujourd'hui, de nombreuses entreprises françaises, canadiennes et européennes externalisent leurs services en Afrique. Elles recherchent une main-d'œuvre qualifiée et compétitive.",
+    "opportunityHighlight": "C'est une opportunité unique pour nous, les Africains !",
+    "opportunityDetails": "Développement web, service client, comptabilité, design, marketing digital... Des milliers d'emplois sont accessibles depuis Madagascar et les îles de l'Océan Indien. OceanicJob est le portail qui vous connecte à ces opportunités.",
+    "ourValues": "Nos Valeurs",
+    "values": {
+      "solidarity": "Solidarité",
+      "solidarityDesc": "S'entraider pour réduire le chômage dans nos îles",
+      "transparency": "Transparence",
+      "transparencyDesc": "Lutter contre la corruption et le favoritisme dans l'emploi",
+      "connection": "Connexion",
+      "connectionDesc": "Relier les îles de l'Océan Indien au marché mondial",
+      "opportunity": "Opportunité",
+      "opportunityDesc": "Connecter les talents africains aux entreprises internationales"
+    },
+    "islandsTitle": "Les Îles de l'Océan Indien",
+    "islandsSubtitle": "Nous connectons les talents de toutes les îles",
+    "teamTitle": "L'Équipe Fondatrice",
+    "teamSubtitle": "Les personnes derrière OceanicJob",
+    "founders": {
+      "sidi": {
+        "name": "Sidi ABDILLAH SIDI",
+        "role": "Co-fondateur & Lead Developer",
+        "description": "Passionné par la technologie et l'entrepreneuriat social"
+      },
+      "ibrahim": {
+        "name": "Ibrahim DJOUMOI",
+        "role": "Co-fondateur & Collaborateur",
+        "description": "Developpeur FullStack & Engagé pour l'emploi des jeunes dans l'Océan Indien"
+      },
+      "noureddine": {
+        "name": "Noureddine ABDALLAH",
+        "role": "Fondateur Original (2014)",
+        "description": "Visionnaire qui a posé les bases d'OceanicJob"
+      }
+    },
+    "thankYou": "Un grand merci à Noureddine ABDALLAH qui a créé OceanicJob en 2014 et nous a donné sa permission de reprendre et améliorer ce projet. Sa vision continue de vivre à travers nous.",
+    "ctaTitle": "Rejoignez le Mouvement",
+    "ctaSubtitle": "Ensemble, réduisons le chômage et créons des opportunités pour les jeunes de l'Océan Indien",
+    "findJob": "Trouver un emploi",
+    "recruitTalent": "Recruter des talents"
   }
 }
+

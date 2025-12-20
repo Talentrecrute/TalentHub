@@ -372,5 +372,71 @@
   },
   "language": {
     "switchTo": "Passer en français"
+  },
+  "about": {
+    "since": "Since 2014",
+    "heroTitle": "Our Mission:",
+    "heroTitleHighlight": "Connecting the Indian Ocean",
+    "heroSubtitle": "OceanicJob was born from a dream: to help young graduates from Madagascar, Comoros, Mauritius and all Indian Ocean islands find employment with dignity, without corruption, without favoritism.",
+    "ourStory": "Our Story",
+    "storyPart1": "OceanicJob is much more than a job platform. It's a social mission born in 2014 thanks to the vision of Noureddine ABDALLAH, who dreamed of connecting Indian Ocean talents to the world of work.",
+    "storyPart2": "Today, taken over and improved by Sidi ABDILLAH SIDI and Ibrahim DJOUMOI, OceanicJob continues this mission with modern technology and renewed ambition.",
+    "storyQuote": "In Madagascar and the islands, many brilliant young graduates cannot find work. Not because they lack skills, but because they don't know 'someone's uncle'. We want to change that.",
+    "theProblem": "The Problem",
+    "problemList": {
+      "unemployment": "Extreme unemployment affecting young graduates",
+      "orientation": "Lack of career guidance after studies",
+      "corruption": "Corruption and favoritism in hiring",
+      "disconnect": "Disconnection from the international market"
+    },
+    "ourSolution": "Our Solution",
+    "solutionList": {
+      "transparent": "Transparent and accessible platform for all",
+      "connection": "Connection with French, Canadian and European companies",
+      "remote": "Remote work opportunities from home",
+      "solidarity": "Mutual support between Indian Ocean islands"
+    },
+    "opportunityTitle": "The Outsourcing Opportunity",
+    "opportunityText": "Today, many French, Canadian and European companies outsource their services to Africa. They are looking for qualified and competitive workforce.",
+    "opportunityHighlight": "This is a unique opportunity for us, Africans!",
+    "opportunityDetails": "Web development, customer service, accounting, design, digital marketing... Thousands of jobs are accessible from Madagascar and the Indian Ocean islands. OceanicJob is the portal that connects you to these opportunities.",
+    "ourValues": "Our Values",
+    "values": {
+      "solidarity": "Solidarity",
+      "solidarityDesc": "Helping each other to reduce unemployment in our islands",
+      "transparency": "Transparency",
+      "transparencyDesc": "Fighting corruption and favoritism in employment",
+      "connection": "Connection",
+      "connectionDesc": "Linking Indian Ocean islands to the global market",
+      "opportunity": "Opportunity",
+      "opportunityDesc": "Connecting African talents to international companies"
+    },
+    "islandsTitle": "The Indian Ocean Islands",
+    "islandsSubtitle": "We connect talents from all islands",
+    "teamTitle": "The Founding Team",
+    "teamSubtitle": "The people behind OceanicJob",
+    "founders": {
+      "sidi": {
+        "name": "Sidi ABDILLAH SIDI",
+        "role": "Co-founder & Lead Developer",
+        "description": "Passionate about technology and social entrepreneurship"
+      },
+      "ibrahim": {
+        "name": "Ibrahim DJOUMOI",
+        "role": "Co-founder & Collaborator",
+        "description": "FullStack Developper & Committed to youth employment in the Indian Ocean"
+      },
+      "noureddine": {
+        "name": "Noureddine ABDALLAH",
+        "role": "Original Founder (2014)",
+        "description": "Visionary who laid the foundations of OceanicJob"
+      }
+    },
+    "thankYou": "A big thank you to Noureddine ABDALLAH who created OceanicJob in 2014 and gave us permission to take over and improve this project. His vision continues to live through us.",
+    "ctaTitle": "Join the Movement",
+    "ctaSubtitle": "Together, let's reduce unemployment and create opportunities for young people in the Indian Ocean",
+    "findJob": "Find a job",
+    "recruitTalent": "Recruit talents"
   }
 }
+
