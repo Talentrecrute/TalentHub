@@ -1,5 +1,6 @@
 'use client'
 
+import GlobalSearch from '@/components/GlobalSearch'
 import NotificationBell from '@/components/notifications/NotificationBell'
 import { Button } from "@/components/ui/button"
 import { Link, usePathname, useRouter } from "@/i18n/routing"
@@ -17,12 +18,18 @@ export default function Navigation() {
   const { data: session, status } = useSession()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const isEmployer = session?.user?.role === 'EMPLOYER'
+  const isAdmin = session?.user?.role === 'ADMIN'
 
   const isActive = (path: string) => pathname === path
 
   const switchLanguage = () => {
     const newLocale = locale === 'fr' ? 'en' : 'fr'
     router.replace(pathname, {locale: newLocale})
+  }
+
+  // Don't show regular navigation for admins - they have their own layout
+  if (isAdmin) {
+    return null
   }
 
   return (
@@ -63,7 +70,10 @@ export default function Navigation() {
             >
               {t('findJobs')}
             </Link>
-            
+
+            {/* Global Search */}
+            <GlobalSearch />
+
             {status === 'authenticated' && session ? (
               <>
                 {isEmployer ? (

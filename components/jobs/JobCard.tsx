@@ -1,6 +1,7 @@
 'use client'
 
 import CompanyAvatar from '@/components/CompanyAvatar'
+import ShareButton from '@/components/ShareButton'
 import { Button } from '@/components/ui/button'
 import type { Company, Job } from '@prisma/client'
 import { Bookmark, Clock, DollarSign, MapPin, Users } from 'lucide-react'
@@ -167,9 +168,18 @@ export default function JobCard({ job, company, showActions = true, isSaved = fa
               </span>
             )}
           </div>
-          <span className="text-sm font-medium text-teal-600 hover:text-teal-700">
-            {tCommon('viewDetails')} →
-          </span>
+          <div className="flex items-center gap-2">
+            <div onClick={(e) => e.stopPropagation()}>
+              <ShareButton 
+                url={`/jobs/${job.id}`}
+                title={`${job.title} - ${company?.name || 'OceanicJob'}`}
+                description={job.description?.slice(0, 150) || ''}
+              />
+            </div>
+            <span className="text-sm font-medium text-teal-600 hover:text-teal-700">
+              {tCommon('viewDetails')} →
+            </span>
+          </div>
         </div>
       )}
     </div>

@@ -67,6 +67,7 @@
     "resources": "Resources",
     "company": "Company",
     "browseJobs": "Browse Jobs",
+    "companies": "Companies",
     "createAccount": "Create Account",
     "careerTips": "Career Tips",
     "postJob": "Post a Job",
@@ -357,6 +358,7 @@
     "requiredFields": "Please fill in all required fields",
     "createJobFailed": "Failed to create job",
     "invalidEmail": "Invalid email",
+    "invalidCredentials": "Invalid email or password",
     "passwordMismatch": "Passwords do not match"
   },
   "messages": {
@@ -583,6 +585,65 @@
     "contactUs": "Contact us for any clarification regarding these terms.",
     "contactButton": "Contact us",
     "backToSite": "Back to site"
+  },
+  "companies": {
+    "metaTitle": "Hiring Companies | OceanicJob",
+    "metaDescription": "Discover companies hiring in the Indian Ocean. Browse their job offers and apply directly.",
+    "title": "Companies Hiring",
+    "subtitle": "Discover companies looking for talent in the Indian Ocean",
+    "companiesRecruiting": "companies hiring",
+    "searchPlaceholder": "Search for a company...",
+    "search": "Search",
+    "allIndustries": "All industries",
+    "companiesFound": "{count, plural, =0 {No companies} =1 {1 company found} other {# companies found}}",
+    "noCompaniesFound": "No companies found",
+    "tryAnotherSearch": "Try another search or modify your filters",
+    "openPositions": "{count, plural, =1 {open position} other {open positions}}",
+    "website": "Website",
+    "ctaTitle": "Are you a company?",
+    "ctaSubtitle": "Post your job offers and find the best talent in the Indian Ocean.",
+    "browseJobs": "Browse jobs",
+    "createProfile": "Create recruiter account"
+  },
+  "share": {
+    "share": "Share",
+    "shareVia": "Share via",
+    "copyLink": "Copy link",
+    "copied": "Copied!",
+    "shareJob": "Share this job"
+  },
+  "search": {
+    "search": "Search",
+    "placeholder": "Search for jobs, companies...",
+    "noResults": "No results found",
+    "quickLinks": "Quick links",
+    "browseJobs": "Browse jobs",
+    "browseCompanies": "Browse companies",
+    "navigate": "navigate",
+    "select": "select",
+    "close": "close"
+  },
+  "blog": {
+    "metaTitle": "Blog & Career Tips | OceanicJob",
+    "metaDescription": "Job tips, CV advice, interview preparation and job market trends in the Indian Ocean.",
+    "title": "Blog & Career Tips",
+    "subtitle": "Tips, guides and trends to boost your career in the Indian Ocean",
+    "articlesCount": "{count, plural, =0 {No articles} =1 {1 article} other {# articles}}",
+    "searchPlaceholder": "Search for an article...",
+    "allCategories": "All categories",
+    "noArticles": "No articles found",
+    "noArticlesDesc": "Check back soon for our career tips!",
+    "backToBlog": "Back to blog",
+    "shareArticle": "Share this article",
+    "relatedArticles": "Related articles",
+    "authorBio": "Writer at OceanicJob",
+    "newsletterTitle": "Stay informed",
+    "newsletterSubtitle": "Receive our career tips and the latest job offers.",
+    "emailPlaceholder": "Your email",
+    "subscribe": "Subscribe",
+    "ctaTitle": "Ready to find your next job?",
+    "ctaSubtitle": "Discover hundreds of offers in the Indian Ocean",
+    "browseJobs": "Browse jobs"
   }
 }
 
