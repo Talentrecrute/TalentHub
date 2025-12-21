@@ -437,6 +437,152 @@
     "ctaSubtitle": "Ensemble, réduisons le chômage et créons des opportunités pour les jeunes de l'Océan Indien",
     "findJob": "Trouver un emploi",
     "recruitTalent": "Recruter des talents"
+  },
+  "contact": {
+    "available": "Nous sommes disponibles",
+    "title": "Contactez-nous",
+    "subtitle": "Une question ? Un partenariat ? Nous sommes là pour vous aider.",
+    "formTitle": "Envoyez-nous un message",
+    "formSubtitle": "Nous vous répondrons dans les plus brefs délais",
+    "name": "Votre nom",
+    "namePlaceholder": "Jean Dupont",
+    "yourEmail": "Votre email",
+    "emailPlaceholder": "jean@email.com",
+    "subject": "Sujet",
+    "subjectPlaceholder": "Comment pouvons-nous vous aider ?",
+    "message": "Message",
+    "messagePlaceholder": "Décrivez votre demande en détail...",
+    "send": "Envoyer le message",
+    "sending": "Envoi en cours...",
+    "emailClientNote": "Cliquer sur envoyer ouvrira votre client email avec le message pré-rempli.",
+    "successTitle": "Message envoyé !",
+    "successMessage": "Merci pour votre message. Nous vous répondrons dans les plus brefs délais.",
+    "sendAnother": "Envoyer un autre message",
+    "otherWays": "Autres moyens de contact",
+    "email": "Email",
+    "location": "Localisation",
+    "locationValue": "Océan Indien (Madagascar, Comores, Maurice)",
+    "responseTime": "Temps de réponse",
+    "responseTimeValue": "Sous 24-48h en jours ouvrés",
+    "globalReach": "Portée Internationale",
+    "globalReachDesc": "Nous connectons les talents de l'Océan Indien avec des entreprises du monde entier.",
+    "faqTitle": "Besoin d'autre chose ?",
+    "faqSubtitle": "Explorez nos offres d'emploi ou découvrez notre mission.",
+    "browseJobs": "Voir les offres",
+    "learnMore": "À propos de nous"
+  },
+  "privacy": {
+    "title": "Politique de Confidentialité",
+    "backHome": "Retour à l'accueil",
+    "lastUpdated": "Dernière mise à jour",
+    "intro": "Chez OceanicJob, nous prenons la protection de vos données personnelles très au sérieux. Cette politique explique comment nous collectons, utilisons et protégeons vos informations.",
+    "rgpdCompliance": "Conforme au RGPD",
+    "rgpdText": "Cette politique est conforme au Règlement Général sur la Protection des Données (RGPD) de l'Union Européenne.",
+    "dataCollection": {
+      "title": "Données que nous collectons",
+      "item1": "Informations d'identification : nom, prénom, adresse email, numéro de téléphone",
+      "item2": "Informations professionnelles : CV, expériences, compétences, formations",
+      "item3": "Données de connexion : adresse IP, type de navigateur, pages visitées",
+      "item4": "Informations de candidature : lettres de motivation, préférences d'emploi"
+    },
+    "dataUse": {
+      "title": "Comment nous utilisons vos données",
+      "item1": "Pour créer et gérer votre compte utilisateur",
+      "item2": "Pour vous mettre en relation avec des employeurs potentiels",
+      "item3": "Pour améliorer nos services et votre expérience utilisateur",
+      "item4": "Pour vous envoyer des notifications sur les offres d'emploi pertinentes"
+    },
+    "dataSecurity": {
+      "title": "Sécurité de vos données",
+      "item1": "Chiffrement SSL/TLS pour toutes les communications",
+      "item2": "Stockage sécurisé avec accès restreint",
+      "item3": "Audits de sécurité réguliers de notre infrastructure"
+    },
+    "dataSharing": {
+      "title": "Partage des données",
+      "item1": "Vos données ne sont jamais vendues à des tiers",
+      "item2": "Partage avec les employeurs uniquement lorsque vous postulez",
+      "item3": "Prestataires techniques sous contrat de confidentialité"
+    },
+    "yourRights": {
+      "title": "Vos droits (RGPD)",
+      "item1": "Droit d'accès : consulter toutes vos données personnelles",
+      "item2": "Droit de rectification : corriger vos informations",
+      "item3": "Droit à l'effacement : supprimer votre compte et données",
+      "item4": "Droit à la portabilité : exporter vos données",
+      "item5": "Droit d'opposition : refuser certains traitements"
+    },
+    "cookies": {
+      "title": "Cookies",
+      "item1": "Cookies essentiels pour le fonctionnement du site",
+      "item2": "Cookies analytiques pour améliorer nos services",
+      "item3": "Vous pouvez gérer vos préférences dans votre navigateur"
+    },
+    "questions": "Des questions sur vos données ?",
+    "contactUs": "Notre équipe est disponible pour répondre à toutes vos questions concernant la protection de vos données.",
+    "contactButton": "Nous contacter"
+  },
+  "terms": {
+    "title": "Conditions Générales d'Utilisation",
+    "backHome": "Retour à l'accueil",
+    "lastUpdated": "Dernière mise à jour",
+    "intro": "Les présentes conditions générales régissent l'utilisation de la plateforme OceanicJob. En utilisant notre service, vous acceptez ces conditions.",
+    "importantNotice": "Note importante",
+    "importantNoticeText": "En créant un compte ou en utilisant OceanicJob, vous acceptez d'être lié par ces conditions. Veuillez les lire attentivement.",
+    "acceptance": {
+      "title": "Acceptation des conditions",
+      "item1": "L'accès et l'utilisation de OceanicJob implique l'acceptation des présentes CGU",
+      "item2": "Vous devez avoir au moins 16 ans pour utiliser nos services",
+      "item3": "Nous nous réservons le droit de modifier ces conditions à tout moment"
+    },
+    "services": {
+      "title": "Description des services",
+      "item1": "Plateforme de mise en relation entre candidats et employeurs",
+      "item2": "Publication et consultation d'offres d'emploi",
+      "item3": "Création de profils professionnels et envoi de candidatures",
+      "item4": "Services de messagerie entre utilisateurs"
+    },
+    "userObligations": {
+      "title": "Obligations des utilisateurs",
+      "item1": "Fournir des informations exactes et à jour",
+      "item2": "Maintenir la confidentialité de vos identifiants de connexion",
+      "item3": "Utiliser la plateforme de manière respectueuse et légale",
+      "item4": "Ne pas usurper l'identité d'une autre personne"
+    },
+    "prohibitedActions": {
+      "title": "Actions interdites",
+      "item1": "Publier du contenu faux, trompeur ou discriminatoire",
+      "item2": "Utiliser des systèmes automatisés pour collecter des données",
+      "item3": "Tenter de contourner les mesures de sécurité",
+      "item4": "Harceler ou menacer d'autres utilisateurs"
+    },
+    "payment": {
+      "title": "Services payants",
+      "item1": "Certains services premium peuvent être payants",
+      "item2": "Les tarifs sont indiqués avant tout achat",
+      "item3": "Les paiements sont sécurisés et conformes aux normes PCI-DSS"
+    },
+    "liability": {
+      "title": "Limitation de responsabilité",
+      "item1": "OceanicJob n'est pas responsable du contenu publié par les utilisateurs",
+      "item2": "Nous ne garantissons pas l'obtention d'un emploi",
+      "item3": "Nous déclinons toute responsabilité pour les interactions entre utilisateurs"
+    },
+    "termination": {
+      "title": "Résiliation",
+      "item1": "Vous pouvez supprimer votre compte à tout moment",
+      "item2": "Nous pouvons suspendre les comptes en cas de violation des CGU",
+      "item3": "La résiliation entraîne la suppression de vos données après 30 jours"
+    },
+    "jurisdiction": {
+      "title": "Droit applicable",
+      "item1": "Ces conditions sont régies par le droit français",
+      "item2": "Tout litige sera soumis aux tribunaux compétents de Paris, France"
+    },
+    "questions": "Des questions ?",
+    "contactUs": "Contactez-nous pour toute clarification concernant ces conditions.",
+    "contactButton": "Nous contacter",
+    "backToSite": "Retour au site"
   }
 }
 

@@ -437,6 +437,152 @@
     "ctaSubtitle": "Together, let's reduce unemployment and create opportunities for young people in the Indian Ocean",
     "findJob": "Find a job",
     "recruitTalent": "Recruit talents"
+  },
+  "contact": {
+    "available": "We are available",
+    "title": "Contact Us",
+    "subtitle": "A question? A partnership? We are here to help.",
+    "formTitle": "Send us a message",
+    "formSubtitle": "We will respond as soon as possible",
+    "name": "Your name",
+    "namePlaceholder": "John Doe",
+    "yourEmail": "Your email",
+    "emailPlaceholder": "john@email.com",
+    "subject": "Subject",
+    "subjectPlaceholder": "How can we help you?",
+    "message": "Message",
+    "messagePlaceholder": "Describe your request in detail...",
+    "send": "Send message",
+    "sending": "Sending...",
+    "emailClientNote": "Clicking send will open your email client with the pre-filled message.",
+    "successTitle": "Message sent!",
+    "successMessage": "Thank you for your message. We will respond as soon as possible.",
+    "sendAnother": "Send another message",
+    "otherWays": "Other ways to contact",
+    "email": "Email",
+    "location": "Location",
+    "locationValue": "Indian Ocean (Madagascar, Comoros, Mauritius)",
+    "responseTime": "Response time",
+    "responseTimeValue": "Within 24-48h on business days",
+    "globalReach": "International Reach",
+    "globalReachDesc": "We connect talents from the Indian Ocean with companies worldwide.",
+    "faqTitle": "Need something else?",
+    "faqSubtitle": "Browse our job listings or learn about our mission.",
+    "browseJobs": "Browse jobs",
+    "learnMore": "About us"
+  },
+  "privacy": {
+    "title": "Privacy Policy",
+    "backHome": "Back to home",
+    "lastUpdated": "Last updated",
+    "intro": "At OceanicJob, we take the protection of your personal data very seriously. This policy explains how we collect, use and protect your information.",
+    "rgpdCompliance": "GDPR Compliant",
+    "rgpdText": "This policy complies with the General Data Protection Regulation (GDPR) of the European Union.",
+    "dataCollection": {
+      "title": "Data we collect",
+      "item1": "Identification information: name, email address, phone number",
+      "item2": "Professional information: CV, experience, skills, education",
+      "item3": "Connection data: IP address, browser type, pages visited",
+      "item4": "Application information: cover letters, job preferences"
+    },
+    "dataUse": {
+      "title": "How we use your data",
+      "item1": "To create and manage your user account",
+      "item2": "To connect you with potential employers",
+      "item3": "To improve our services and your user experience",
+      "item4": "To send you notifications about relevant job offers"
+    },
+    "dataSecurity": {
+      "title": "Data security",
+      "item1": "SSL/TLS encryption for all communications",
+      "item2": "Secure storage with restricted access",
+      "item3": "Regular security audits of our infrastructure"
+    },
+    "dataSharing": {
+      "title": "Data sharing",
+      "item1": "Your data is never sold to third parties",
+      "item2": "Sharing with employers only when you apply",
+      "item3": "Technical providers under confidentiality agreement"
+    },
+    "yourRights": {
+      "title": "Your rights (GDPR)",
+      "item1": "Right of access: view all your personal data",
+      "item2": "Right to rectification: correct your information",
+      "item3": "Right to erasure: delete your account and data",
+      "item4": "Right to portability: export your data",
+      "item5": "Right to object: refuse certain processing"
+    },
+    "cookies": {
+      "title": "Cookies",
+      "item1": "Essential cookies for site operation",
+      "item2": "Analytics cookies to improve our services",
+      "item3": "You can manage your preferences in your browser"
+    },
+    "questions": "Questions about your data?",
+    "contactUs": "Our team is available to answer all your questions about data protection.",
+    "contactButton": "Contact us"
+  },
+  "terms": {
+    "title": "Terms of Service",
+    "backHome": "Back to home",
+    "lastUpdated": "Last updated",
+    "intro": "These terms of service govern the use of the OceanicJob platform. By using our service, you agree to these terms.",
+    "importantNotice": "Important notice",
+    "importantNoticeText": "By creating an account or using OceanicJob, you agree to be bound by these terms. Please read them carefully.",
+    "acceptance": {
+      "title": "Acceptance of terms",
+      "item1": "Access and use of OceanicJob implies acceptance of these ToS",
+      "item2": "You must be at least 16 years old to use our services",
+      "item3": "We reserve the right to modify these terms at any time"
+    },
+    "services": {
+      "title": "Description of services",
+      "item1": "Platform connecting candidates and employers",
+      "item2": "Publishing and viewing job offers",
+      "item3": "Creating professional profiles and sending applications",
+      "item4": "Messaging services between users"
+    },
+    "userObligations": {
+      "title": "User obligations",
+      "item1": "Provide accurate and up-to-date information",
+      "item2": "Maintain confidentiality of your login credentials",
+      "item3": "Use the platform respectfully and legally",
+      "item4": "Do not impersonate another person"
+    },
+    "prohibitedActions": {
+      "title": "Prohibited actions",
+      "item1": "Posting false, misleading or discriminatory content",
+      "item2": "Using automated systems to collect data",
+      "item3": "Attempting to bypass security measures",
+      "item4": "Harassing or threatening other users"
+    },
+    "payment": {
+      "title": "Paid services",
+      "item1": "Some premium services may be paid",
+      "item2": "Prices are indicated before any purchase",
+      "item3": "Payments are secure and PCI-DSS compliant"
+    },
+    "liability": {
+      "title": "Limitation of liability",
+      "item1": "OceanicJob is not responsible for user-posted content",
+      "item2": "We do not guarantee obtaining a job",
+      "item3": "We disclaim liability for interactions between users"
+    },
+    "termination": {
+      "title": "Termination",
+      "item1": "You can delete your account at any time",
+      "item2": "We may suspend accounts in case of ToS violation",
+      "item3": "Termination results in data deletion after 30 days"
+    },
+    "jurisdiction": {
+      "title": "Applicable law",
+      "item1": "These terms are governed by French law",
+      "item2": "Any dispute will be submitted to the competent courts of Paris, France"
+    },
+    "questions": "Questions?",
+    "contactUs": "Contact us for any clarification regarding these terms.",
+    "contactButton": "Contact us",
+    "backToSite": "Back to site"
   }
 }
 
