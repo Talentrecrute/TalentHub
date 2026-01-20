@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { Resend } from 'resend'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+// Initialize Resend inside the handler to avoid build-time errors if API key is missing
+// const resend = new Resend(process.env.RESEND_API_KEY)
 
 // Email for sending (verified domain on Resend - looks professional)
 const SENDER_EMAIL = 'contact@oceanic-job.com'
@@ -10,6 +11,8 @@ const SENDER_EMAIL = 'contact@oceanic-job.com'
 const RECIPIENT_EMAIL = 'raossidi@gmail.com'
 
 export async function POST(request: NextRequest) {
+  const resend = new Resend(process.env.RESEND_API_KEY)
+
   try {
     const body = await request.json()
     const { name, email, subject, message } = body
