@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Link } from '@/i18n/routing'
 import { prisma } from '@/lib/prisma'
-import { Briefcase, Building2, ExternalLink, Globe, MapPin, Users } from 'lucide-react'
+import { ArrowLeft, Briefcase, Building2, ExternalLink, Globe, MapPin, Users } from 'lucide-react'
 import { getLocale, getTranslations } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 
@@ -59,6 +59,15 @@ export default async function CompanyProfilePage({ params }: Props) {
       {/* Hero Header */}
       <div className="bg-gradient-to-r from-blue-900 via-blue-800 to-teal-700 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          {/* Back Button */}
+          <Link 
+            href="/companies" 
+            className="inline-flex items-center gap-2 text-blue-200 hover:text-white mb-6 transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            {locale === 'fr' ? 'Retour aux entreprises' : 'Back to companies'}
+          </Link>
+          
           <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
             {/* Company Logo */}
             <div className="w-24 h-24 bg-white rounded-2xl shadow-lg flex items-center justify-center">

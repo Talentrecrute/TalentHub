@@ -1,6 +1,6 @@
 import { MetadataRoute } from 'next'
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://talenthub.com'
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://oceanic-job.com'
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -11,16 +11,48 @@ export default function robots(): MetadataRoute.Robots {
         disallow: [
           '/api/',
           '/dashboard/',
-          '/employer/applications/',
+          '/employer/',
           '/applications/',
           '/profile/',
+          '/admin/',
           '/actions/',
+          '/_next/',
+          '/static/',
         ],
       },
       {
         userAgent: 'Googlebot',
-        allow: '/',
-        disallow: ['/api/', '/dashboard/', '/employer/applications/', '/applications/', '/profile/'],
+        allow: [
+          '/',
+          '/jobs/',
+          '/companies/',
+          '/blog/',
+        ],
+        disallow: [
+          '/api/',
+          '/dashboard/',
+          '/employer/',
+          '/applications/',
+          '/profile/',
+          '/admin/',
+        ],
+      },
+      {
+        userAgent: 'Bingbot',
+        allow: [
+          '/',
+          '/jobs/',
+          '/companies/',
+          '/blog/',
+        ],
+        disallow: [
+          '/api/',
+          '/dashboard/',
+          '/employer/',
+          '/applications/',
+          '/profile/',
+          '/admin/',
+        ],
       },
     ],
     sitemap: `${siteUrl}/sitemap.xml`,

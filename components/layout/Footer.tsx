@@ -42,7 +42,8 @@ export default function Footer() {
             <div>
               <h3 className="font-semibold text-white mb-3">{t('forJobSeekers')}</h3>
               <ul className="space-y-2 text-sm">
-                <li><Link href="/jobs" className="hover:text-teal-400 transition-colors">{t('browseJobs')}</Link></li>
+              <li><Link href="/jobs" className="hover:text-teal-400 transition-colors">{t('browseJobs')}</Link></li>
+                <li><Link href="/companies" className="hover:text-teal-400 transition-colors">{t('companies')}</Link></li>
                 {isCandidate && (
                   <>
                     <li><Link href="/dashboard" className="hover:text-teal-400 transition-colors">{tNav('dashboard')}</Link></li>
@@ -87,16 +88,17 @@ export default function Footer() {
           <div>
             <h3 className="font-semibold text-white mb-3">{t('company')}</h3>
             <ul className="space-y-2 text-sm">
-              <li><a href="#" className="hover:text-teal-400 transition-colors">{t('aboutUs')}</a></li>
-              <li><a href="#" className="hover:text-teal-400 transition-colors">{t('contact')}</a></li>
-              <li><a href="#" className="hover:text-teal-400 transition-colors">{t('privacy')}</a></li>
-              <li><a href="#" className="hover:text-teal-400 transition-colors">{t('terms')}</a></li>
+              <li><Link href="/about" className="hover:text-teal-400 transition-colors">{t('aboutUs')}</Link></li>
+              <li><Link href="/blog" className="hover:text-teal-400 transition-colors">{t('careerTips')}</Link></li>
+              <li><Link href="/contact" className="hover:text-teal-400 transition-colors">{t('contact')}</Link></li>
+              <li><Link href="/privacy" className="hover:text-teal-400 transition-colors">{t('privacy')}</Link></li>
+              <li><Link href="/terms" className="hover:text-teal-400 transition-colors">{t('terms')}</Link></li>
             </ul>
           </div>
         </div>
         
         <div className="border-t border-slate-800 mt-8 pt-8 text-center text-sm text-slate-400">
-          <p>&copy; {new Date().getFullYear()} TalentHub. {t('copyright')}</p>
+          <p>&copy; {new Date().getFullYear()} OceanicJob. {t('copyright')}</p>
         </div>
       </div>
     </footer>

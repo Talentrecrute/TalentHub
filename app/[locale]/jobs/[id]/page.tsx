@@ -24,7 +24,7 @@ import ApplyButton from './ApplyButton'
 import EmployerJobActions from './EmployerJobActions'
 import SaveButton from './SaveButton'
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://talenthub.com'
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://oceanic-job.com'
 
 // Generate dynamic SEO metadata for each job
 export async function generateMetadata({ 

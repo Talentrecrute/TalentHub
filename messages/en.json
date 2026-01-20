@@ -3,6 +3,8 @@
     "home": "Home",
     "jobs": "Jobs",
     "findJobs": "Find Jobs",
+    "findJob": "Find Jobs",
+    "companies": "Companies",
     "dashboard": "Dashboard",
     "postJob": "Post Job",
     "myApplications": "My Applications",
@@ -67,6 +69,7 @@
     "resources": "Resources",
     "company": "Company",
     "browseJobs": "Browse Jobs",
+    "companies": "Companies",
     "createAccount": "Create Account",
     "careerTips": "Career Tips",
     "postJob": "Post a Job",
@@ -357,6 +360,7 @@
     "requiredFields": "Please fill in all required fields",
     "createJobFailed": "Failed to create job",
     "invalidEmail": "Invalid email",
+    "invalidCredentials": "Invalid email or password",
     "passwordMismatch": "Passwords do not match"
   },
   "messages": {
@@ -372,5 +376,276 @@
   },
   "language": {
     "switchTo": "Passer en français"
+  },
+  "about": {
+    "since": "Since 2014",
+    "heroTitle": "Our Mission:",
+    "heroTitleHighlight": "Connecting the Indian Ocean",
+    "heroSubtitle": "OceanicJob was born from a dream: to help young graduates from Madagascar, Comoros, Mauritius and all Indian Ocean islands find employment with dignity, without corruption, without favoritism.",
+    "ourStory": "Our Story",
+    "storyPart1": "OceanicJob is much more than a job platform. It's a social mission born in 2014 thanks to the vision of Noureddine ABDALLAH, who dreamed of connecting Indian Ocean talents to the world of work.",
+    "storyPart2": "Today, taken over and improved by Sidi ABDILLAH SIDI and Ibrahim DJOUMOI, OceanicJob continues this mission with modern technology and renewed ambition.",
+    "storyQuote": "In Madagascar and the islands, many brilliant young graduates cannot find work. Not because they lack skills, but because they don't know 'someone's uncle'. We want to change that.",
+    "theProblem": "The Problem",
+    "problemList": {
+      "unemployment": "Extreme unemployment affecting young graduates",
+      "orientation": "Lack of career guidance after studies",
+      "corruption": "Corruption and favoritism in hiring",
+      "disconnect": "Disconnection from the international market"
+    },
+    "ourSolution": "Our Solution",
+    "solutionList": {
+      "transparent": "Transparent and accessible platform for all",
+      "connection": "Connection with French, Canadian and European companies",
+      "remote": "Remote work opportunities from home",
+      "solidarity": "Mutual support between Indian Ocean islands"
+    },
+    "opportunityTitle": "The Outsourcing Opportunity",
+    "opportunityText": "Today, many French, Canadian and European companies outsource their services to Africa. They are looking for qualified and competitive workforce.",
+    "opportunityHighlight": "This is a unique opportunity for us, Africans!",
+    "opportunityDetails": "Web development, customer service, accounting, design, digital marketing... Thousands of jobs are accessible from Madagascar and the Indian Ocean islands. OceanicJob is the portal that connects you to these opportunities.",
+    "ourValues": "Our Values",
+    "values": {
+      "solidarity": "Solidarity",
+      "solidarityDesc": "Helping each other to reduce unemployment in our islands",
+      "transparency": "Transparency",
+      "transparencyDesc": "Fighting corruption and favoritism in employment",
+      "connection": "Connection",
+      "connectionDesc": "Linking Indian Ocean islands to the global market",
+      "opportunity": "Opportunity",
+      "opportunityDesc": "Connecting African talents to international companies"
+    },
+    "islandsTitle": "The Indian Ocean Islands",
+    "islandsSubtitle": "We connect talents from all islands",
+    "teamTitle": "The Founding Team",
+    "teamSubtitle": "The people behind OceanicJob",
+    "founders": {
+      "sidi": {
+        "name": "Sidi ABDILLAH SIDI",
+        "role": "Co-founder & Lead Developer",
+        "description": "Passionate about technology and social entrepreneurship"
+      },
+      "ibrahim": {
+        "name": "Ibrahim DJOUMOI",
+        "role": "Co-founder & Collaborator",
+        "description": "FullStack Developper & Committed to youth employment in the Indian Ocean"
+      },
+      "noureddine": {
+        "name": "Noureddine ABDALLAH",
+        "role": "Original Founder (2014)",
+        "description": "Visionary who laid the foundations of OceanicJob"
+      }
+    },
+    "thankYou": "A big thank you to Noureddine ABDALLAH who created OceanicJob in 2014 and gave us permission to take over and improve this project. His vision continues to live through us.",
+    "ctaTitle": "Join the Movement",
+    "ctaSubtitle": "Together, let's reduce unemployment and create opportunities for young people in the Indian Ocean",
+    "findJob": "Find a job",
+    "recruitTalent": "Recruit talents"
+  },
+  "contact": {
+    "available": "We are available",
+    "title": "Contact Us",
+    "subtitle": "A question? A partnership? We are here to help.",
+    "formTitle": "Send us a message",
+    "formSubtitle": "We will respond as soon as possible",
+    "name": "Your name",
+    "namePlaceholder": "John Doe",
+    "yourEmail": "Your email",
+    "emailPlaceholder": "john@email.com",
+    "subject": "Subject",
+    "subjectPlaceholder": "How can we help you?",
+    "message": "Message",
+    "messagePlaceholder": "Describe your request in detail...",
+    "send": "Send message",
+    "sending": "Sending...",
+    "emailClientNote": "Clicking send will open your email client with the pre-filled message.",
+    "successTitle": "Message sent!",
+    "successMessage": "Thank you for your message. We will respond as soon as possible.",
+    "sendAnother": "Send another message",
+    "otherWays": "Other ways to contact",
+    "email": "Email",
+    "location": "Location",
+    "locationValue": "Indian Ocean (Madagascar, Comoros, Mauritius)",
+    "responseTime": "Response time",
+    "responseTimeValue": "Within 24-48h on business days",
+    "globalReach": "International Reach",
+    "globalReachDesc": "We connect talents from the Indian Ocean with companies worldwide.",
+    "faqTitle": "Need something else?",
+    "faqSubtitle": "Browse our job listings or learn about our mission.",
+    "browseJobs": "Browse jobs",
+    "learnMore": "About us"
+  },
+  "privacy": {
+    "title": "Privacy Policy",
+    "backHome": "Back to home",
+    "lastUpdated": "Last updated",
+    "intro": "At OceanicJob, we take the protection of your personal data very seriously. This policy explains how we collect, use and protect your information.",
+    "rgpdCompliance": "GDPR Compliant",
+    "rgpdText": "This policy complies with the General Data Protection Regulation (GDPR) of the European Union.",
+    "dataCollection": {
+      "title": "Data we collect",
+      "item1": "Identification information: name, email address, phone number",
+      "item2": "Professional information: CV, experience, skills, education",
+      "item3": "Connection data: IP address, browser type, pages visited",
+      "item4": "Application information: cover letters, job preferences"
+    },
+    "dataUse": {
+      "title": "How we use your data",
+      "item1": "To create and manage your user account",
+      "item2": "To connect you with potential employers",
+      "item3": "To improve our services and your user experience",
+      "item4": "To send you notifications about relevant job offers"
+    },
+    "dataSecurity": {
+      "title": "Data security",
+      "item1": "SSL/TLS encryption for all communications",
+      "item2": "Secure storage with restricted access",
+      "item3": "Regular security audits of our infrastructure"
+    },
+    "dataSharing": {
+      "title": "Data sharing",
+      "item1": "Your data is never sold to third parties",
+      "item2": "Sharing with employers only when you apply",
+      "item3": "Technical providers under confidentiality agreement"
+    },
+    "yourRights": {
+      "title": "Your rights (GDPR)",
+      "item1": "Right of access: view all your personal data",
+      "item2": "Right to rectification: correct your information",
+      "item3": "Right to erasure: delete your account and data",
+      "item4": "Right to portability: export your data",
+      "item5": "Right to object: refuse certain processing"
+    },
+    "cookies": {
+      "title": "Cookies",
+      "item1": "Essential cookies for site operation",
+      "item2": "Analytics cookies to improve our services",
+      "item3": "You can manage your preferences in your browser"
+    },
+    "questions": "Questions about your data?",
+    "contactUs": "Our team is available to answer all your questions about data protection.",
+    "contactButton": "Contact us"
+  },
+  "terms": {
+    "title": "Terms of Service",
+    "backHome": "Back to home",
+    "lastUpdated": "Last updated",
+    "intro": "These terms of service govern the use of the OceanicJob platform. By using our service, you agree to these terms.",
+    "importantNotice": "Important notice",
+    "importantNoticeText": "By creating an account or using OceanicJob, you agree to be bound by these terms. Please read them carefully.",
+    "acceptance": {
+      "title": "Acceptance of terms",
+      "item1": "Access and use of OceanicJob implies acceptance of these ToS",
+      "item2": "You must be at least 16 years old to use our services",
+      "item3": "We reserve the right to modify these terms at any time"
+    },
+    "services": {
+      "title": "Description of services",
+      "item1": "Platform connecting candidates and employers",
+      "item2": "Publishing and viewing job offers",
+      "item3": "Creating professional profiles and sending applications",
+      "item4": "Messaging services between users"
+    },
+    "userObligations": {
+      "title": "User obligations",
+      "item1": "Provide accurate and up-to-date information",
+      "item2": "Maintain confidentiality of your login credentials",
+      "item3": "Use the platform respectfully and legally",
+      "item4": "Do not impersonate another person"
+    },
+    "prohibitedActions": {
+      "title": "Prohibited actions",
+      "item1": "Posting false, misleading or discriminatory content",
+      "item2": "Using automated systems to collect data",
+      "item3": "Attempting to bypass security measures",
+      "item4": "Harassing or threatening other users"
+    },
+    "payment": {
+      "title": "Paid services",
+      "item1": "Some premium services may be paid",
+      "item2": "Prices are indicated before any purchase",
+      "item3": "Payments are secure and PCI-DSS compliant"
+    },
+    "liability": {
+      "title": "Limitation of liability",
+      "item1": "OceanicJob is not responsible for user-posted content",
+      "item2": "We do not guarantee obtaining a job",
+      "item3": "We disclaim liability for interactions between users"
+    },
+    "termination": {
+      "title": "Termination",
+      "item1": "You can delete your account at any time",
+      "item2": "We may suspend accounts in case of ToS violation",
+      "item3": "Termination results in data deletion after 30 days"
+    },
+    "jurisdiction": {
+      "title": "Applicable law",
+      "item1": "These terms are governed by French law",
+      "item2": "Any dispute will be submitted to the competent courts of Paris, France"
+    },
+    "questions": "Questions?",
+    "contactUs": "Contact us for any clarification regarding these terms.",
+    "contactButton": "Contact us",
+    "backToSite": "Back to site"
+  },
+  "companies": {
+    "metaTitle": "Hiring Companies | OceanicJob",
+    "metaDescription": "Discover companies hiring in the Indian Ocean. Browse their job offers and apply directly.",
+    "title": "Companies Hiring",
+    "subtitle": "Discover companies looking for talent in the Indian Ocean",
+    "companiesRecruiting": "companies hiring",
+    "searchPlaceholder": "Search for a company...",
+    "search": "Search",
+    "allIndustries": "All industries",
+    "companiesFound": "{count, plural, =0 {No companies} =1 {1 company found} other {# companies found}}",
+    "noCompaniesFound": "No companies found",
+    "tryAnotherSearch": "Try another search or modify your filters",
+    "openPositions": "{count, plural, =1 {open position} other {open positions}}",
+    "website": "Website",
+    "ctaTitle": "Are you a company?",
+    "ctaSubtitle": "Post your job offers and find the best talent in the Indian Ocean.",
+    "browseJobs": "Browse jobs",
+    "createProfile": "Create recruiter account"
+  },
+  "share": {
+    "share": "Share",
+    "shareVia": "Share via",
+    "copyLink": "Copy link",
+    "copied": "Copied!",
+    "shareJob": "Share this job"
+  },
+  "search": {
+    "search": "Search",
+    "placeholder": "Search for jobs, companies...",
+    "noResults": "No results found",
+    "quickLinks": "Quick links",
+    "browseJobs": "Browse jobs",
+    "browseCompanies": "Browse companies",
+    "navigate": "navigate",
+    "select": "select",
+    "close": "close"
+  },
+  "blog": {
+    "metaTitle": "Blog & Career Tips | OceanicJob",
+    "metaDescription": "Job tips, CV advice, interview preparation and job market trends in the Indian Ocean.",
+    "title": "Blog & Career Tips",
+    "subtitle": "Tips, guides and trends to boost your career in the Indian Ocean",
+    "articlesCount": "{count, plural, =0 {No articles} =1 {1 article} other {# articles}}",
+    "searchPlaceholder": "Search for an article...",
+    "allCategories": "All categories",
+    "noArticles": "No articles found",
+    "noArticlesDesc": "Check back soon for our career tips!",
+    "backToBlog": "Back to blog",
+    "shareArticle": "Share this article",
+    "relatedArticles": "Related articles",
+    "authorBio": "Writer at OceanicJob",
+    "newsletterTitle": "Stay informed",
+    "newsletterSubtitle": "Receive our career tips and the latest job offers.",
+    "emailPlaceholder": "Your email",
+    "subscribe": "Subscribe",
+    "ctaTitle": "Ready to find your next job?",
+    "ctaSubtitle": "Discover hundreds of offers in the Indian Ocean",
+    "browseJobs": "Browse jobs"
   }
 }
+

@@ -58,8 +58,14 @@ function SignInForm() {
   // Redirect if already authenticated
   useEffect(() => {
     if (status === 'authenticated' && session?.user) {
-      console.log('User already authenticated, redirecting to:', callbackUrl)
-      router.push(callbackUrl)
+      // Redirect admins to admin dashboard
+      if (session.user.role === 'ADMIN') {
+        console.log('Admin authenticated, redirecting to admin dashboard')
+        router.push('/admin')
+      } else {
+        console.log('User authenticated, redirecting to:', callbackUrl)
+        router.push(callbackUrl)
+      }
       router.refresh()
     }
   }, [status, session, router, callbackUrl])
@@ -77,14 +83,26 @@ function SignInForm() {
       })
 
       if (result?.error) {
-        setError(tErrors('invalidEmail'))
-        toast.error(tErrors('invalidEmail'))
-      } else {
+        console.log('Sign-in error:', result.error)
+        setError(tErrors('invalidCredentials'))
+        toast.error(tErrors('invalidCredentials'))
+      } else if (result?.ok) {
         toast.success(t('welcomeBack'))
-        router.push(callbackUrl)
+        
+        // Fetch user session to check role
+        const response = await fetch('/api/auth/session')
+        const session = await response.json()
+        
+        // Redirect admins to admin dashboard
+        if (session?.user?.role === 'ADMIN') {
+          router.push('/admin')
+        } else {
+          router.push(callbackUrl)
+        }
         router.refresh()
       }
     } catch (error) {
+      console.error('Sign-in exception:', error)
       setError(tErrors('somethingWrong'))
       toast.error(tErrors('somethingWrong'))
     } finally {
