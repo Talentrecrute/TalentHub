@@ -25,8 +25,8 @@ export default function AdminSettingsPage() {
   const [settings, setSettings] = useState({
     siteName: 'OceanicJob',
     siteDescription: 'Trouvez le job de vos rêves à Madagascar',
-    contactEmail: 'contact@oceanicjob.com',
-    supportEmail: 'support@oceanicjob.com',
+    contactEmail: 'contact@oceanic-job.com',
+    supportEmail: 'support@oceanic-job.com',
     maxApplicationsPerDay: 10,
     maxJobsPerEmployer: 50,
     enableEmailNotifications: true,

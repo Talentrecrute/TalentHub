@@ -258,7 +258,7 @@ export default function ExportPdfButton({ job }: ExportPdfButtonProps) {
       doc.setFontSize(9)
       doc.setTextColor(148, 163, 184)
       doc.setFont('helvetica', 'normal')
-      const footerText = `OceanicJob | ${locale === 'fr' ? 'Exporté le' : 'Exported on'} ${new Date().toLocaleDateString(locale === 'fr' ? 'fr-FR' : 'en-US')} | www.oceanicjob.com`
+      const footerText = `OceanicJob | ${locale === 'fr' ? 'Exporté le' : 'Exported on'} ${new Date().toLocaleDateString(locale === 'fr' ? 'fr-FR' : 'en-US')} | www.oceanic-job.com`
       doc.text(footerText, pageWidth / 2, y, { align: 'center' })
 
       // Generate filename and save

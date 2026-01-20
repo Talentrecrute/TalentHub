@@ -23,7 +23,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://oceanicjob.com';
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://oceanic-job.com';
 
 export async function generateMetadata({ params }: { params: Promise<{locale: string}> }): Promise<Metadata> {
   const { locale } = await params;
