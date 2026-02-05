@@ -1,5 +1,6 @@
 'use client'
 
+import { updateApplicationDetails } from '@/app/actions/applications'
 import ApplicationKanban from '@/components/employer/ApplicationKanban'
 import DashboardStats from '@/components/employer/DashboardStats'
 import { Badge } from "@/components/ui/badge"
@@ -7,9 +8,11 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Link } from '@/i18n/routing'
 import type { Application, Company, Job, User } from '@prisma/client'
-import { Briefcase, FileText, LayoutDashboard, PlusCircle, TrendingUp, Users } from 'lucide-react'
+import { Archive, Briefcase, FileText, LayoutDashboard, PlusCircle, TrendingUp, Users } from 'lucide-react'
 import { useLocale, useTranslations } from 'next-intl'
+import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+import { toast } from 'sonner'
 
 type JobWithCount = Job & {
   _count: { applications: number }
@@ -18,6 +21,7 @@ type JobWithCount = Job & {
 type ApplicationWithDetails = Application & {
   job: Job
   candidate: User
+  tags: string[]
 }
 
 interface EmployerDashboardClientProps {
@@ -35,12 +39,13 @@ interface EmployerDashboardClientProps {
     reviewed: number
     accepted: number
     rejected: number
+    archived?: number // Optional as it's new
   }
   applicationsByJob: { jobTitle: string; count: number }[]
   weeklyApplications: { day: string; count: number }[]
 }
 
-type TabType = 'overview' | 'jobs' | 'applications'
+type TabType = 'overview' | 'jobs' | 'applications' | 'talent-pool'
 
 export default function EmployerDashboardClient({
   company,
@@ -56,14 +61,28 @@ export default function EmployerDashboardClient({
   const tNav = useTranslations('nav')
   const tApps = useTranslations('applications')
   const locale = useLocale()
+  const router = useRouter()
   
   const [activeTab, setActiveTab] = useState<TabType>('overview')
+
+  const archivedApplications = allApplications.filter(app => app.status === 'ARCHIVED')
 
   const tabs = [
     { id: 'overview' as TabType, label: locale === 'fr' ? 'Vue d\'ensemble' : 'Overview', icon: LayoutDashboard },
     { id: 'jobs' as TabType, label: locale === 'fr' ? 'Mes offres' : 'My Jobs', icon: Briefcase, count: stats.totalJobs },
-    { id: 'applications' as TabType, label: locale === 'fr' ? 'Candidatures' : 'Applications', icon: Users, count: stats.totalApplications },
+    { id: 'applications' as TabType, label: locale === 'fr' ? 'Candidatures' : 'Applications', icon: Users, count: stats.totalApplications - (archivedApplications.length || 0) },
+    { id: 'talent-pool' as TabType, label: locale === 'fr' ? 'Vivier' : 'Talent Pool', icon: Archive, count: archivedApplications.length },
   ]
+
+  const handleRestore = async (appId: string) => {
+    try {
+      await updateApplicationDetails(appId, { status: 'PENDING' })
+      toast.success(locale === 'fr' ? 'Candidature restaurée' : 'Application restored')
+      router.refresh()
+    } catch (error) {
+      toast.error(locale === 'fr' ? 'Erreur' : 'Error')
+    }
+  }
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -183,6 +202,20 @@ export default function EmployerDashboardClient({
                 weeklyApplications={weeklyApplications}
                 totalJobs={stats.totalJobs}
                 openJobs={stats.openJobs}
+                avgTimeToHire={
+                  (() => {
+                    const hiredApps = allApplications.filter(a => a.status === 'ACCEPTED')
+                    if (hiredApps.length === 0) return 0
+                    
+                    const totalDays = hiredApps.reduce((acc, app) => {
+                      const start = new Date(app.createdAt).getTime()
+                      const end = new Date(app.updatedAt).getTime()
+                      return acc + (end - start)
+                    }, 0)
+                    
+                    return Math.round(totalDays / hiredApps.length / (1000 * 60 * 60 * 24))
+                  })()
+                }
               />
 
               {/* Quick Actions */}
@@ -301,9 +334,77 @@ export default function EmployerDashboardClient({
                   </CardContent>
                 </Card>
               ) : (
-                <ApplicationKanban applications={allApplications} />
+                <ApplicationKanban applications={allApplications.filter(a => a.status !== 'ARCHIVED')} />
               )}
             </div>
+          )}
+          
+          {/* Talent Pool Tab */}
+          {activeTab === 'talent-pool' && (
+             <div className="space-y-4">
+              <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-4 text-sm text-amber-800 flex items-start gap-3">
+                <Archive className="w-5 h-5 shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-semibold">{locale === 'fr' ? 'À propos du Vivier' : 'About Talent Pool'}</p>
+                  <p className="opacity-90">
+                    {locale === 'fr' 
+                      ? 'Conservez ici les profils intéressants qui ne correspondent pas immédiatement à vos besoins actuels. Vous pourrez les recontacter plus tard.'
+                      : 'Keep interesting profiles here that do not immediately fit your current needs. You can contact them later.'
+                    }
+                  </p>
+                </div>
+              </div>
+
+               {archivedApplications.length === 0 ? (
+                  <Card>
+                    <CardContent className="p-12 text-center text-slate-500">
+                      <Archive className="w-12 h-12 mx-auto mb-3 opacity-20" />
+                      <p>{locale === 'fr' ? 'Le vivier est vide' : 'Talent pool is empty'}</p>
+                    </CardContent>
+                  </Card>
+               ) : (
+                  archivedApplications.map(app => (
+                    <Card key={app.id}>
+                      <CardContent className="p-4 flex items-start justify-between">
+                        <div className="flex items-start gap-4">
+                           <div className="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center font-bold text-slate-600">
+                             {app.candidate.name?.[0]?.toUpperCase()}
+                           </div>
+                           <div>
+                             <h4 className="font-semibold text-slate-900">{app.candidate.name}</h4>
+                             <p className="text-sm text-slate-500">{app.candidate.email}</p>
+                             <div className="flex items-center gap-2 mt-1">
+                                <Badge variant="outline" className="text-xs">
+                                  {app.job.title}
+                                </Badge>
+                                {(app.score || 0) > 0 && (
+                                  <div className="flex text-amber-400 text-xs">
+                                    {Array.from({length: app.score || 0}).map((_, i) => <span key={i}>★</span>)}
+                                  </div>
+                                )}
+                             </div>
+                             {app.internalNotes && (
+                               <p className="text-xs text-slate-500 mt-2 bg-slate-50 p-2 rounded">
+                                 Note: {app.internalNotes}
+                               </p>
+                             )}
+                           </div>
+                        </div>
+                        <div className="flex flex-col gap-2">
+                           <Button variant="outline" size="sm" onClick={() => handleRestore(app.id)}>
+                             {locale === 'fr' ? 'Restaurer' : 'Restore'}
+                           </Button>
+                           <Button variant="ghost" size="sm" asChild>
+                              <a href={`mailto:${app.candidate.email}`}>
+                                {locale === 'fr' ? 'Contacter' : 'Contact'}
+                              </a>
+                           </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))
+               )}
+             </div>
           )}
         </div>
       </div>

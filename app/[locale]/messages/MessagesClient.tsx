@@ -55,13 +55,27 @@ export default function MessagesClient({ initialConversationId }: MessagesClient
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
 
-  // Poll for new messages when in conversation
-  useEffect(() => {
-    if (selectedConversation) {
-      const interval = setInterval(() => fetchMessages(selectedConversation), 5000)
-      return () => clearInterval(interval)
+  // Optimistic UI: Add message immediately to state
+  const addOptimisticMessage = (content: string) => {
+    if (!session?.user?.id) return
+
+    const optimisticMsg: MessageWithSender = {
+      id: `temp-${Date.now()}`,
+      content,
+      senderId: session.user.id,
+      conversationId: selectedConversation!,
+      createdAt: new Date(),
+      sender: {
+        id: session.user.id,
+        name: session.user.name || '',
+        image: session.user.image || null
+      },
+      isRead: false
     }
-  }, [selectedConversation])
+
+    setMessages(prev => [...prev, optimisticMsg])
+    return optimisticMsg.id
+  }
 
   const fetchConversations = async () => {
     try {
@@ -103,28 +117,55 @@ export default function MessagesClient({ initialConversationId }: MessagesClient
   const sendMessage = async () => {
     if (!newMessage.trim() || !selectedConversation) return
 
+    const content = newMessage
+    setNewMessage('') // Clear input immediately
+    const tempId = addOptimisticMessage(content)
+
     setIsSending(true)
     try {
       const res = await fetch(`/api/messages/conversations/${selectedConversation}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content: newMessage })
+        body: JSON.stringify({ content })
       })
 
       if (res.ok) {
         const message = await res.json()
-        setMessages(prev => [...prev, message])
-        setNewMessage('')
+        // Replace optimistic message with real one
+        setMessages(prev => prev.map(msg => 
+          msg.id === tempId ? message : msg
+        ))
         fetchConversations()
       } else {
         throw new Error('Failed to send')
       }
     } catch (error) {
       toast.error(locale === 'fr' ? 'Erreur d\'envoi' : 'Failed to send')
+      // Remove optimistic message on failure
+      setMessages(prev => prev.filter(msg => msg.id !== tempId))
+      setNewMessage(content) // Restore input
     } finally {
       setIsSending(false)
     }
   }
+
+  // Poll for new messages when in conversation
+  // Enhanced: Only poll if tab is visible to save resources
+  useEffect(() => {
+    if (!selectedConversation) return
+
+    const poll = () => {
+      if (document.visibilityState === 'visible') {
+        fetchMessages(selectedConversation)
+      }
+    }
+
+    // Initial fetch
+    poll()
+
+    const interval = setInterval(poll, 5000)
+    return () => clearInterval(interval)
+  }, [selectedConversation])
 
   const formatTime = (date: Date) => {
     return new Date(date).toLocaleTimeString(locale === 'fr' ? 'fr-FR' : 'en-US', {

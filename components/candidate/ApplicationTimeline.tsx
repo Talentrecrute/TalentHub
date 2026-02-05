@@ -1,8 +1,8 @@
 'use client'
 
 import type { ApplicationEvent, ApplicationStatus } from '@prisma/client'
-import { Check, Clock, Eye, Send, X } from 'lucide-react'
-import { useLocale } from 'next-intl'
+import { Archive, Check, Clock, Eye, Send, X } from 'lucide-react'
+import { useLocale, useTranslations } from 'next-intl'
 
 interface ApplicationTimelineProps {
   events: ApplicationEvent[]
@@ -13,36 +13,38 @@ const statusConfig: Record<ApplicationStatus, {
   icon: typeof Clock
   color: string
   bgColor: string
-  label: { fr: string; en: string }
 }> = {
   PENDING: {
     icon: Clock,
     color: 'text-yellow-600',
-    bgColor: 'bg-yellow-100',
-    label: { fr: 'En attente', en: 'Pending' }
+    bgColor: 'bg-yellow-100'
   },
   REVIEWED: {
     icon: Eye,
     color: 'text-blue-600',
-    bgColor: 'bg-blue-100',
-    label: { fr: 'Examinée', en: 'Reviewed' }
+    bgColor: 'bg-blue-100'
   },
   ACCEPTED: {
     icon: Check,
     color: 'text-green-600',
-    bgColor: 'bg-green-100',
-    label: { fr: 'Acceptée', en: 'Accepted' }
+    bgColor: 'bg-green-100'
   },
   REJECTED: {
     icon: X,
     color: 'text-red-600',
-    bgColor: 'bg-red-100',
-    label: { fr: 'Refusée', en: 'Rejected' }
+    bgColor: 'bg-red-100'
+  },
+  ARCHIVED: {
+    icon: Archive,
+    color: 'text-slate-600',
+    bgColor: 'bg-slate-100'
   }
 }
 
 export default function ApplicationTimeline({ events, createdAt }: ApplicationTimelineProps) {
   const locale = useLocale() as 'fr' | 'en'
+  const tStatus = useTranslations('status')
+  const tTimeline = useTranslations('timeline')
 
   // Create timeline items: first is always "Candidature envoyée", then events
   const timelineItems = [
@@ -74,11 +76,15 @@ export default function ApplicationTimeline({ events, createdAt }: ApplicationTi
         {timelineItems.map((item, index) => {
           const isCreated = item.status === 'CREATED'
           const config = isCreated 
-            ? { icon: Send, color: 'text-teal-600', bgColor: 'bg-teal-100', label: { fr: 'Candidature envoyée', en: 'Application sent' } }
+            ? { icon: Send, color: 'text-teal-600', bgColor: 'bg-teal-100' }
             : statusConfig[item.status as ApplicationStatus]
           
           const Icon = config.icon
           const isLast = index === timelineItems.length - 1
+          
+          const label = isCreated 
+            ? tTimeline('applicationSent')
+            : tStatus(item.status.toLowerCase())
 
           return (
             <div key={item.id} className="relative flex items-start gap-4 pl-0">
@@ -91,7 +97,7 @@ export default function ApplicationTimeline({ events, createdAt }: ApplicationTi
               <div className={`flex-1 pb-4 ${!isLast ? 'border-b border-slate-100' : ''}`}>
                 <div className="flex items-center justify-between">
                   <p className={`font-medium ${config.color}`}>
-                    {config.label[locale]}
+                    {label}
                   </p>
                   <span className="text-xs text-slate-500">
                     {formatDate(item.createdAt)}
@@ -111,9 +117,7 @@ export default function ApplicationTimeline({ events, createdAt }: ApplicationTi
       {/* Empty state */}
       {events.length === 0 && (
         <p className="mt-4 text-sm text-slate-500 pl-12">
-          {locale === 'fr' 
-            ? 'Aucune mise à jour pour le moment. Vous serez notifié des changements.'
-            : 'No updates yet. You will be notified of any changes.'}
+          {tTimeline('noUpdates')}
         </p>
       )}
     </div>

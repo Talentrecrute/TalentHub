@@ -45,6 +45,10 @@
     "open": "Ouverte",
     "closed": "Fermée"
   },
+  "timeline": {
+    "applicationSent": "Candidature envoyée",
+    "noUpdates": "Aucune mise à jour pour le moment. Vous serez notifié des changements."
+  },
   "homepage": {
     "heroTitle": "Trouvez le job de vos rêves",
     "heroSubtitle": "Des milliers d'opportunités vous attendent. Commencez votre carrière aujourd'hui.",

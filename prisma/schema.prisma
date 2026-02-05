@@ -212,17 +212,19 @@ model Job {
 }
 
 model Application {
-  id          String             @id @default(cuid())
-  jobId       String
-  candidateId String
-  status      ApplicationStatus  @default(PENDING)
-  coverLetter String?
-  resume      String?
-  createdAt   DateTime           @default(now())
-  updatedAt   DateTime           @updatedAt
-  candidate   User               @relation(fields: [candidateId], references: [id], onDelete: Cascade)
-  job         Job                @relation(fields: [jobId], references: [id], onDelete: Cascade)
-  events      ApplicationEvent[]
+  id            String             @id @default(cuid())
+  jobId         String
+  candidateId   String
+  status        ApplicationStatus  @default(PENDING)
+  score         Int? // 1-5 rating
+  internalNotes String? // Private notes for recruiters
+  coverLetter   String?
+  resume        String?
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+  candidate     User               @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  job           Job                @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  events        ApplicationEvent[]
 
   @@unique([jobId, candidateId])
   @@index([candidateId])
@@ -292,6 +294,7 @@ enum ApplicationStatus {
   REVIEWED
   ACCEPTED
   REJECTED
+  ARCHIVED
 }
 
 enum BlogPostStatus {

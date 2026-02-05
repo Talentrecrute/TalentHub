@@ -45,6 +45,10 @@
     "open": "Open",
     "closed": "Closed"
   },
+  "timeline": {
+    "applicationSent": "Application sent",
+    "noUpdates": "No updates yet. You will be notified of any changes."
+  },
   "homepage": {
     "heroTitle": "Find Your Dream Job",
     "heroSubtitle": "Thousands of opportunities await. Start your career today.",
