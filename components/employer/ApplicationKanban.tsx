@@ -7,23 +7,24 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Checkbox } from "@/components/ui/checkbox"
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
 } from "@/components/ui/dialog"
 import { Input } from '@/components/ui/input'
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
 } from "@/components/ui/table"
 import { Textarea } from '@/components/ui/textarea'
+import { DndContext, DragEndEvent, DragOverlay, DragStartEvent, PointerSensor, TouchSensor, closestCorners, useDraggable, useDroppable, useSensor, useSensors } from '@dnd-kit/core'
 import { ChevronRight, Eye, Filter, FolderDown, LayoutGrid, List, Plus, Search, Star, StickyNote, Trash2, X } from 'lucide-react'
 import { useLocale } from 'next-intl'
 import { useRouter } from 'next/navigation'
@@ -61,6 +62,7 @@ const COLUMNS = [
   { id: 'REJECTED', color: 'bg-red-500', lightColor: 'bg-red-50 border-red-200' },
 ]
 
+// -- Draggable Card Component --
 function KanbanCard({ 
   app, 
   column, 
@@ -69,7 +71,8 @@ function KanbanCard({
   onView,
   onArchive,
   onUpdate,
-  isMoving 
+  isMoving,
+  isOverlay = false
 }: { 
   app: Application
   column: typeof COLUMNS[0]
@@ -79,11 +82,22 @@ function KanbanCard({
   onArchive: (app: Application) => void
   onUpdate: (app: Application, data: Partial<Application>) => void
   isMoving: boolean
+  isOverlay?: boolean
 }) {
   const locale = useLocale()
   const [isNotesOpen, setIsNotesOpen] = useState(false)
   const [notes, setNotes] = useState(app.internalNotes || '')
   const [isSavingNotes, setIsSavingNotes] = useState(false)
+  
+  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+    id: app.id,
+    data: { app, column },
+    disabled: isMoving
+  })
+
+  const style = transform ? {
+    transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+  } : undefined
 
   const handleScore = async (newScore: number) => {
     onUpdate(app, { score: newScore })
@@ -110,211 +124,271 @@ function KanbanCard({
   }
 
   return (
-    <Card 
-      className={`bg-white shadow-sm hover:shadow-md transition-all ${
-        isMoving ? 'opacity-50 scale-95' : ''
-      }`}
-    >
-      <CardContent className="p-3">
-        <div className="flex items-start gap-2 mb-2">
-          <div className="w-8 h-8 bg-gradient-to-br from-teal-500 to-blue-600 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
-            {app.candidate.name?.[0]?.toUpperCase() || app.candidate.email[0].toUpperCase()}
-          </div>
-          <div className="min-w-0 flex-1">
-            <p className="font-medium text-sm text-slate-900 truncate">
-              {app.candidate.name || app.candidate.email}
-            </p>
-            <p className="text-xs text-slate-500 truncate">
-              {app.job.title}
-            </p>
-          </div>
-        </div>
-
-        <div className="flex items-center justify-between mb-3 bg-slate-50 p-1.5 rounded-lg border border-slate-100">
-          <div className="flex gap-0.5">
-            {[1, 2, 3, 4, 5].map((star) => (
-              <button
-                key={star}
-                onClick={(e) => {
-                  e.stopPropagation()
-                  handleScore(star)
-                }}
-                className={`focus:outline-none transition-transform hover:scale-110 ${
-                  (app.score || 0) >= star ? 'text-amber-400' : 'text-slate-300'
-                }`}
-              >
-                <Star className={`w-3.5 h-3.5 ${(app.score || 0) >= star ? 'fill-current' : ''}`} />
-              </button>
-            ))}
-          </div>
-
-          <button
-            onClick={(e) => {
-              e.stopPropagation()
-              setIsNotesOpen(!isNotesOpen)
-            }}
-            className={`p-1 rounded-md transition-colors ${
-              app.internalNotes 
-                ? 'text-blue-600 bg-blue-50' 
-                : 'text-slate-400 hover:text-slate-600 hover:bg-slate-200'
-            }`}
-          >
-            <StickyNote className="w-3.5 h-3.5" />
-          </button>
-        </div>
-
-        {isNotesOpen && (
-          <div className="mb-3 animate-in slide-in-from-top-2 duration-200">
-            <Textarea
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              placeholder={locale === 'fr' ? "Note interne..." : "Internal note..."}
-              className="text-xs min-h-[60px] mb-2"
-              onClick={(e) => e.stopPropagation()}
-            />
-            <div className="flex justify-end gap-2">
-              <Button 
-                size="sm" 
-                variant="ghost" 
-                className="h-6 text-xs"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  setIsNotesOpen(false)
-                }}
-              >
-                {locale === 'fr' ? 'Annuler' : 'Cancel'}
-              </Button>
-              <Button 
-                size="sm" 
-                className="h-6 text-xs bg-teal-600 hover:bg-teal-700"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  saveNotes()
-                }}
-                disabled={isSavingNotes}
-              >
-                {isSavingNotes ? '...' : (locale === 'fr' ? 'Sauver' : 'Save')}
-              </Button>
+    <div ref={setNodeRef} style={style} {...attributes} {...listeners} className="touch-none">
+      <Card 
+        className={`bg-white shadow-sm hover:shadow-md transition-shadow ${
+          isMoving || isDragging ? 'opacity-50' : ''
+        }`}
+      >
+        <CardContent className="p-3">
+          <div className="flex items-start gap-2 mb-2">
+            <div className="w-8 h-8 bg-gradient-to-br from-teal-500 to-blue-600 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+              {app.candidate.name?.[0]?.toUpperCase() || app.candidate.email[0].toUpperCase()}
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="font-medium text-sm text-slate-900 truncate">
+                {app.candidate.name || app.candidate.email}
+              </p>
+              <p className="text-xs text-slate-500 truncate">
+                {app.job.title}
+              </p>
             </div>
           </div>
-        )}
 
-        {/* Tags Section */}
-        <div className="flex flex-wrap gap-1 mb-3">
-          {app.tags?.map((tag, i) => (
-             <Badge key={i} variant="secondary" className="text-[10px] px-1.5 h-5 bg-slate-100 text-slate-600 hover:bg-red-50 hover:text-red-500 cursor-pointer transition-colors"
-                onClick={async (e) => {
-                  e.stopPropagation()
-                  const newTags = app.tags.filter(t => t !== tag)
-                  onUpdate(app, { tags: newTags })
-                  try {
-                    await updateApplicationDetails(app.id, { tags: newTags })
-                  } catch {
-                     toast.error('Failed to remove tag')
-                     onUpdate(app, { tags: app.tags })
-                  }
-                }}
-                title={locale === 'fr' ? "Cliquer pour supprimer" : "Click to remove"}
-             >
-                {tag}
-             </Badge>
-          ))}
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-5 w-5 p-0 rounded-full border border-dashed border-slate-300 text-slate-400 hover:text-teal-600 hover:border-teal-600"
-            onClick={(e) => {
-               e.stopPropagation()
-               const tag = prompt(locale === 'fr' ? "Nouveau tag :" : "New tag:")
-               if (tag && tag.trim()) {
-                 const newTags = [...(app.tags || []), tag.trim()]
-                 onUpdate(app, { tags: newTags })
-                 updateApplicationDetails(app.id, { tags: newTags }).catch(() => {
-                    toast.error('Failed to add tag')
-                    onUpdate(app, { tags: app.tags })
-                 })
-               }
-            }}
-          >
-            <Plus className="w-3 h-3" />
-          </Button>
-        </div>
+          <div className="flex items-center justify-between mb-3 bg-slate-50 p-1.5 rounded-lg border border-slate-100">
+            <div className="flex gap-0.5">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <button
+                  key={star}
+                  onPointerDown={(e) => e.stopPropagation()} 
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    handleScore(star)
+                  }}
+                  className={`focus:outline-none transition-transform hover:scale-110 ${
+                    (app.score || 0) >= star ? 'text-amber-400' : 'text-slate-300'
+                  }`}
+                  aria-label={locale === 'fr' ? `Noter ${star} étoiles` : `Rate ${star} stars`}
+                >
+                  <Star className={`w-3.5 h-3.5 ${(app.score || 0) >= star ? 'fill-current' : ''}`} />
+                </button>
+              ))}
+            </div>
 
-        <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-50">
-          <span className="text-[10px] text-slate-400">
-            {new Date(app.createdAt).toLocaleDateString(locale === 'fr' ? 'fr-FR' : 'en-US', {
-              month: 'short',
-              day: 'numeric'
-            })}
-          </span>
-
-          <div className="flex gap-1">
-             <Button
-              variant="ghost"
-              size="sm"
-              className="h-7 px-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50"
+            <button
+              onPointerDown={(e) => e.stopPropagation()}
               onClick={(e) => {
                 e.stopPropagation()
-                onView(app)
+                setIsNotesOpen(!isNotesOpen)
               }}
-              title={locale === 'fr' ? "Voir détails" : "View details"}
+              className={`p-1 rounded-md transition-colors ${
+                app.internalNotes 
+                  ? 'text-blue-600 bg-blue-50' 
+                  : 'text-slate-400 hover:text-slate-600 hover:bg-slate-200'
+              }`}
+              aria-label={locale === 'fr' ? "Ajouter une note" : "Add note"}
             >
-              <Eye className="w-4 h-4" />
-            </Button>
-            
+              <StickyNote className="w-3.5 h-3.5" />
+            </button>
+          </div>
+
+          {isNotesOpen && (
+            <div className="mb-3 animate-in slide-in-from-top-2 duration-200 cursor-auto" onPointerDown={(e) => e.stopPropagation()}>
+              <Textarea
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                placeholder={locale === 'fr' ? "Note interne..." : "Internal note..."}
+                className="text-xs min-h-[60px] mb-2"
+                onClick={(e) => e.stopPropagation()}
+              />
+              <div className="flex justify-end gap-2">
+                <Button 
+                  size="sm" 
+                  variant="ghost" 
+                  className="h-6 text-xs"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    setIsNotesOpen(false)
+                  }}
+                >
+                  {locale === 'fr' ? 'Annuler' : 'Cancel'}
+                </Button>
+                <Button 
+                  size="sm" 
+                  className="h-6 text-xs bg-teal-600 hover:bg-teal-700"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    saveNotes()
+                  }}
+                  disabled={isSavingNotes}
+                >
+                  {isSavingNotes ? '...' : (locale === 'fr' ? 'Sauver' : 'Save')}
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* Tags Section */}
+          <div className="flex flex-wrap gap-1 mb-3">
+            {app.tags?.map((tag, i) => (
+               <Badge key={i} variant="secondary" className="text-[10px] px-1.5 h-5 bg-slate-100 text-slate-600 hover:bg-red-50 hover:text-red-500 cursor-pointer transition-colors"
+                  onPointerDown={(e) => e.stopPropagation()}
+                  onClick={async (e) => {
+                    e.stopPropagation()
+                    const newTags = app.tags.filter(t => t !== tag)
+                    onUpdate(app, { tags: newTags })
+                    try {
+                      await updateApplicationDetails(app.id, { tags: newTags })
+                    } catch {
+                       toast.error('Failed to remove tag')
+                       onUpdate(app, { tags: app.tags })
+                    }
+                  }}
+                  title={locale === 'fr' ? "Cliquer pour supprimer" : "Click to remove"}
+               >
+                  {tag}
+               </Badge>
+            ))}
             <Button
               variant="ghost"
               size="sm"
-              className="h-7 px-2 text-slate-500 hover:text-amber-600 hover:bg-amber-50"
+              className="h-5 w-5 p-0 rounded-full border border-dashed border-slate-300 text-slate-400 hover:text-teal-600 hover:border-teal-600"
+              onPointerDown={(e) => e.stopPropagation()}
               onClick={(e) => {
-                e.stopPropagation()
-                onArchive(app)
+                 e.stopPropagation()
+                 const tag = prompt(locale === 'fr' ? "Nouveau tag :" : "New tag:")
+                 if (tag && tag.trim()) {
+                   const newTags = [...(app.tags || []), tag.trim()]
+                   onUpdate(app, { tags: newTags })
+                   updateApplicationDetails(app.id, { tags: newTags }).catch(() => {
+                      toast.error('Failed to add tag')
+                      onUpdate(app, { tags: app.tags })
+                   })
+                 }
               }}
-              title={locale === 'fr' ? "Archiver dans le vivier" : "Archive to Talent Pool"}
             >
-              <FolderDown className="w-4 h-4" />
+              <Plus className="w-3 h-3" />
             </Button>
-
-            <StartConversationButton
-              receiverId={app.candidate.id}
-              applicationId={app.id}
-              jobId={app.job.id}
-              variant="ghost"
-              size="sm"
-            />
-
-            {(column.id === 'PENDING' || column.id === 'REVIEWED') && (
-              <>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-7 px-2 text-teal-600 hover:text-teal-700 hover:bg-teal-50"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    onMove(app)
-                  }}
-                  disabled={isMoving}
-                >
-                  <ChevronRight className="w-4 h-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-7 px-2 text-red-500 hover:text-red-600 hover:bg-red-50"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    onReject(app)
-                  }}
-                  disabled={isMoving}
-                >
-                  <X className="w-4 h-4" />
-                </Button>
-              </>
-            )}
           </div>
+
+          <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-50">
+            <span className="text-[10px] text-slate-400">
+              {new Date(app.createdAt).toLocaleDateString(locale === 'fr' ? 'fr-FR' : 'en-US', {
+                month: 'short',
+                day: 'numeric'
+              })}
+            </span>
+
+            <div className="flex gap-1">
+               <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 px-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50"
+                onPointerDown={(e) => e.stopPropagation()}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onView(app)
+                }}
+                title={locale === 'fr' ? "Voir détails" : "View details"}
+                aria-label={locale === 'fr' ? "Voir les détails de la candidature" : "View application details"}
+              >
+                <Eye className="w-4 h-4" />
+              </Button>
+              
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 px-2 text-slate-500 hover:text-amber-600 hover:bg-amber-50"
+                onPointerDown={(e) => e.stopPropagation()}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onArchive(app)
+                }}
+                title={locale === 'fr' ? "Archiver dans le vivier" : "Archive to Talent Pool"}
+                aria-label={locale === 'fr' ? "Archiver le candidat" : "Archive candidate"}
+              >
+                <FolderDown className="w-4 h-4" />
+              </Button>
+
+              <div onPointerDown={(e) => e.stopPropagation()}>
+                <StartConversationButton
+                  receiverId={app.candidate.id}
+                  applicationId={app.id}
+                  jobId={app.job.id}
+                  variant="ghost"
+                  size="sm"
+                />
+              </div>
+
+              {(column.id === 'PENDING' || column.id === 'REVIEWED') && !isOverlay && (
+                <>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 px-2 text-teal-600 hover:text-teal-700 hover:bg-teal-50"
+                    onPointerDown={(e) => e.stopPropagation()}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onMove(app)
+                    }}
+                    disabled={isMoving}
+                    aria-label={locale === 'fr' ? "Passer à l'étape suivante" : "Move to next stage"}
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 px-2 text-red-500 hover:text-red-600 hover:bg-red-50"
+                    onPointerDown={(e) => e.stopPropagation()}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onReject(app)
+                    }}
+                    disabled={isMoving}
+                    aria-label={locale === 'fr' ? "Rejeter la candidature" : "Reject application"}
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                </>
+              )}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  )
+}
+
+// -- Droppable Column Component --
+function KanbanColumn({ 
+  id, 
+  column, 
+  children,
+  count,
+  locale,
+  columnLabels
+}: { 
+  id: string, 
+  column: any, 
+  children: React.ReactNode,
+  count: number,
+  locale: string,
+  columnLabels: any
+}) {
+  const { setNodeRef, isOver } = useDroppable({
+    id: id,
+  })
+
+  return (
+    <div key={id} className="flex flex-col h-full rounded-lg bg-slate-50 border border-slate-200">
+       <div className={`flex items-center gap-2 p-3 rounded-t-lg ${column.lightColor} border-b`}>
+          <div className={`w-3 h-3 rounded-full ${column.color}`} />
+          <span className="font-semibold text-slate-700">
+            {columnLabels[locale as 'fr'|'en'][id as keyof typeof columnLabels['fr']]}
+          </span>
+          <Badge variant="secondary" className="ml-auto">
+            {count}
+          </Badge>
         </div>
-      </CardContent>
-    </Card>
+
+        <div 
+          ref={setNodeRef} 
+          className={`flex-1 p-2 space-y-2 min-h-[500px] transition-colors ${isOver ? 'bg-slate-100 ring-2 ring-inset ring-slate-200' : ''}`}
+        >
+          {children}
+        </div>
+    </div>
   )
 }
 
@@ -324,6 +398,7 @@ export default function ApplicationKanban({ applications: initialApplications }:
   
   const [applications, setApplications] = useState(initialApplications)
   const [movingId, setMovingId] = useState<string | null>(null)
+  const [activeId, setActiveId] = useState<string | null>(null) // For DragOverlay
   const [rejectionApp, setRejectionApp] = useState<Application | null>(null)
   const [viewApp, setViewApp] = useState<Application | null>(null)
   const [schedulingApp, setSchedulingApp] = useState<Application | null>(null)
@@ -339,6 +414,20 @@ export default function ApplicationKanban({ applications: initialApplications }:
   // View & Selection State
   const [viewMode, setViewMode] = useState<'board' | 'list'>('board')
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 250,
+        tolerance: 5,
+      },
+    })
+  )
 
   const columnLabels = {
     fr: { PENDING: 'En attente', REVIEWED: 'Entretien', ACCEPTED: 'Accepté', REJECTED: 'Refusé', ARCHIVED: 'Archivé' },
@@ -367,13 +456,57 @@ export default function ApplicationKanban({ applications: initialApplications }:
     return matchesSearch && matchesScore && matchesTag
   })
 
+  // Sort by date (newest first)
+  const sortedApplications = filteredApplications.sort((a, b) => 
+    new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  )
+
   const getColumnApplications = (status: string) => 
-    filteredApplications.filter(app => app.status === status)
+    sortedApplications.filter(app => app.status === status)
 
   const handleUpdateApplication = (app: Application, data: Partial<Application>) => {
     setApplications(prev => 
       prev.map(a => a.id === app.id ? { ...a, ...data } : a)
     )
+  }
+
+  const handleDragStart = (event: DragStartEvent) => {
+    setActiveId(event.active.id as string)
+  }
+
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event
+    setActiveId(null)
+
+    if (!over) return
+
+    const appId = active.id as string
+    const newStatus = over.id as string
+    const app = applications.find(a => a.id === appId)
+
+    if (!app || app.status === newStatus) return
+
+    setMovingId(appId)
+
+    // Optimistic Update
+    const oldStatus = app.status
+    setApplications(prev => 
+      prev.map(a => a.id === appId ? { ...a, status: newStatus } : a)
+    )
+
+    try {
+      await updateApplicationDetails(appId, { status: newStatus as any })
+      toast.success(locale === 'fr' ? 'Statut mis à jour' : 'Status updated')
+      router.refresh()
+    } catch (error) {
+       // Rollback
+       setApplications(prev => 
+        prev.map(a => a.id === appId ? { ...a, status: oldStatus } : a)
+      )
+      toast.error(locale === 'fr' ? 'Erreur de mise à jour' : 'Update failed')
+    } finally {
+      setMovingId(null)
+    }
   }
 
   const handleMoveToNext = async (app: Application) => {
@@ -383,7 +516,6 @@ export default function ApplicationKanban({ applications: initialApplications }:
 
     const newStatus = statusOrder[currentIndex + 1]
 
-    // Intercept if moving to REVIEWED (Interview)
     if (newStatus === 'REVIEWED') {
       setSchedulingApp(app)
       return
@@ -416,7 +548,6 @@ export default function ApplicationKanban({ applications: initialApplications }:
   const handleArchive = async (app: Application) => {
     setMovingId(app.id)
     try {
-      // Optimistic update - app will disappear from filtered list because status becomes ARCHIVED
       setApplications(prev => 
         prev.map(a => a.id === app.id ? { ...a, status: 'ARCHIVED' } : a)
       )
@@ -425,7 +556,6 @@ export default function ApplicationKanban({ applications: initialApplications }:
       toast.success(locale === 'fr' ? 'Candidat archivé dans le vivier' : 'Candidate archived to talent pool')
       router.refresh()
     } catch (error) {
-      // Rollback
       setApplications(prev => 
         prev.map(a => a.id === app.id ? { ...a, status: app.status } : a)
       )
@@ -519,11 +649,8 @@ export default function ApplicationKanban({ applications: initialApplications }:
     
     const ids = Array.from(selectedIds)
     try {
-      // Optimistic update
       setApplications(prev => prev.map(app => ids.includes(app.id) ? { ...app, status: 'ARCHIVED' } : app))
       setSelectedIds(new Set())
-      
-      // Execute sequentially to avoid payload limits/race conditions (or use a bulk action)
       await Promise.all(ids.map(id => updateApplicationDetails(id, { status: 'ARCHIVED' })))
       
       toast.success(locale === 'fr' ? `${ids.length} archivés` : `${ids.length} archived`)
@@ -541,7 +668,6 @@ export default function ApplicationKanban({ applications: initialApplications }:
     try {
       setApplications(prev => prev.map(app => ids.includes(app.id) ? { ...app, status: 'REJECTED' } : app))
       setSelectedIds(new Set())
-      
       await Promise.all(ids.map(id => updateApplicationDetails(id, { status: 'REJECTED' })))
       
       toast.success(locale === 'fr' ? `${ids.length} refusés` : `${ids.length} rejected`)
@@ -552,8 +678,11 @@ export default function ApplicationKanban({ applications: initialApplications }:
     }
   }
 
+  const activeApp = activeId ? applications.find(a => a.id === activeId) : null
+  const activeColumn = activeApp ? (COLUMNS.find(c => c.id === activeApp.status) || COLUMNS[0]) : COLUMNS[0]
+
   return (
-    <div className="mb-8">
+    <div className="mb-8 ">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
         <h2 className="text-2xl font-bold text-slate-900">
           {locale === 'fr' ? 'Pipeline de recrutement' : 'Recruitment Pipeline'}
@@ -561,6 +690,7 @@ export default function ApplicationKanban({ applications: initialApplications }:
         
         {/* Filtering Toolbar */}
         <div className="flex flex-col sm:flex-row gap-2">
+          {/* ... Searching ... */}
           <div className="relative">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-500" />
             <Input
@@ -571,6 +701,7 @@ export default function ApplicationKanban({ applications: initialApplications }:
             />
           </div>
           
+          {/* ... Filtering ... */}
           <div className="flex items-center gap-2 bg-white px-3 border border-slate-200 rounded-md h-10">
             <Filter className="w-4 h-4 text-slate-500" />
             <select
@@ -611,16 +742,6 @@ export default function ApplicationKanban({ applications: initialApplications }:
               {locale === 'fr' ? 'Réinitialiser' : 'Reset'}
             </Button>
           )}
-          
-          {(searchQuery || minScore > 0 || selectedTag) && (
-            <Button 
-              variant="ghost" 
-              onClick={() => { setSearchQuery(''); setMinScore(0); setSelectedTag('') }}
-              className="text-slate-500"
-            >
-              {locale === 'fr' ? 'Réinitialiser' : 'Reset'}
-            </Button>
-          )}
 
           <div className="h-6 w-px bg-slate-200 mx-2" />
 
@@ -647,6 +768,7 @@ export default function ApplicationKanban({ applications: initialApplications }:
       {/* Bulk Action Toolbar */}
       {selectedIds.size > 0 && (
         <div className="mb-4 p-3 bg-slate-900 text-white rounded-lg flex items-center justify-between animate-in slide-in-from-top-2">
+          {/* ... bulk actions content ... */}
           <div className="flex items-center gap-3">
             <span className="font-semibold px-2 border-r border-slate-700">
               {selectedIds.size} {locale === 'fr' ? 'sélectionné(s)' : 'selected'}
@@ -682,48 +804,66 @@ export default function ApplicationKanban({ applications: initialApplications }:
       )}
       
       {viewMode === 'board' ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {COLUMNS.map(column => (
-            <div key={column.id} className="flex flex-col">
-              <div className={`flex items-center gap-2 p-3 rounded-t-lg ${column.lightColor} border-b-2`}>
-                <div className={`w-3 h-3 rounded-full ${column.color}`} />
-                <span className="font-semibold text-slate-700">
-                  {columnLabels[locale as 'fr' | 'en'][column.id as keyof typeof columnLabels['fr']]}
-                </span>
-                <Badge variant="secondary" className="ml-auto">
-                  {getColumnApplications(column.id).length}
-                </Badge>
-              </div>
+        <DndContext 
+          sensors={sensors}
+          collisionDetection={closestCorners}
+          onDragStart={handleDragStart} 
+          onDragEnd={handleDragEnd}
+        >
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {COLUMNS.map(column => (
+              <KanbanColumn
+                 key={column.id}
+                 id={column.id}
+                 column={column}
+                 count={getColumnApplications(column.id).length}
+                 locale={locale}
+                 columnLabels={columnLabels}
+              >
+                  {getColumnApplications(column.id).map(app => (
+                    <KanbanCard
+                      key={app.id}
+                      app={app}
+                      column={column}
+                      onMove={handleMoveToNext}
+                      onReject={handleRejectClick}
+                      onView={(app) => setViewApp(app)}
+                      onArchive={handleArchive}
+                      onUpdate={handleUpdateApplication}
+                      isMoving={movingId === app.id}
+                    />
+                  ))}
 
-              <div className={`flex-1 min-h-[300px] p-2 ${column.lightColor} rounded-b-lg border border-t-0 space-y-2`}>
-                {getColumnApplications(column.id).map(app => (
-                  <KanbanCard
-                    key={app.id}
-                    app={app}
-                    column={column}
-                    onMove={handleMoveToNext}
-                    onReject={handleRejectClick}
-                    onView={(app) => setViewApp(app)}
-                    onArchive={handleArchive}
-                    onUpdate={handleUpdateApplication}
-                    isMoving={movingId === app.id}
-                  />
-                ))}
+                  {getColumnApplications(column.id).length === 0 && (
+                    <div className="flex flex-col items-center justify-center h-32 text-slate-400 text-center px-4">
+                      <p className="text-sm">
+                        {filteredApplications.length === 0 && (searchQuery || minScore > 0)
+                          ? (locale === 'fr' ? 'Aucun résultat pour ce filtre' : 'No matches for filters')
+                          : (locale === 'fr' ? 'Aucune candidature' : 'No applications')
+                        }
+                      </p>
+                    </div>
+                  )}
+              </KanbanColumn>
+            ))}
+          </div>
 
-                {getColumnApplications(column.id).length === 0 && (
-                  <div className="flex flex-col items-center justify-center h-32 text-slate-400 text-center px-4">
-                    <p className="text-sm">
-                      {filteredApplications.length === 0 && (searchQuery || minScore > 0)
-                        ? (locale === 'fr' ? 'Aucun résultat pour ce filtre' : 'No matches for filters')
-                        : (locale === 'fr' ? 'Aucune candidature' : 'No applications')
-                      }
-                    </p>
-                  </div>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
+          <DragOverlay>
+            {activeApp ? (
+              <KanbanCard
+                app={activeApp}
+                column={activeColumn}
+                onMove={() => {}}
+                onReject={() => {}}
+                onView={() => {}}
+                onArchive={() => {}}
+                onUpdate={() => {}}
+                isMoving={false}
+                isOverlay
+              />
+            ) : null}
+          </DragOverlay>
+        </DndContext>
       ) : (
         <div className="bg-white border border-slate-200 rounded-lg overflow-hidden shadow-sm">
           <Table>
@@ -795,155 +935,93 @@ export default function ApplicationKanban({ applications: initialApplications }:
                     </div>
                   </TableCell>
                   <TableCell className="text-right">
-                    <div className="flex justify-end gap-1">
-                       <Button size="sm" variant="ghost" onClick={(e) => { e.stopPropagation(); setViewApp(app); }}>
-                         <Eye className="w-4 h-4" />
-                       </Button>
-                       <StartConversationButton
-                          receiverId={app.candidate.id}
-                          applicationId={app.id}
-                          jobId={app.job.id}
-                          variant="ghost"
-                          size="sm"
-                       />
-                    </div>
+                    <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); setViewApp(app); }}>
+                      <Eye className="w-4 h-4" />
+                    </Button>
                   </TableCell>
                 </TableRow>
               ))}
-              {filteredApplications.length === 0 && (
-                 <TableRow>
-                   <TableCell colSpan={7} className="h-32 text-center text-slate-500">
-                      {locale === 'fr' ? 'Aucune candidature trouvée' : 'No applications found'}
-                   </TableCell>
-                 </TableRow>
-              )}
             </TableBody>
           </Table>
         </div>
       )}
 
-      {/* Quick View Dialog */}
-      <Dialog open={!!viewApp} onOpenChange={(open) => !open && setViewApp(null)}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <span className="bg-gradient-to-br from-teal-500 to-blue-600 w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold">
-                {viewApp?.candidate.name?.[0]?.toUpperCase() || 'C'}
-              </span>
-              <span>{viewApp?.candidate.name || viewApp?.candidate.email}</span>
-            </DialogTitle>
-            <DialogDescription>
-              {locale === 'fr' ? 'Postule pour ' : 'Applied for '} 
-              <span className="font-medium text-slate-900">{viewApp?.job.title}</span>
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="grid grid-cols-1 gap-6 my-4">
-            {/* Information Section */}
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div className="bg-slate-50 p-3 rounded-lg">
-                <p className="text-slate-500 text-xs mb-1">Email</p>
-                <p className="font-medium">{viewApp?.candidate.email}</p>
-              </div>
-              <div className="bg-slate-50 p-3 rounded-lg">
-                <p className="text-slate-500 text-xs mb-1">Date</p>
-                <p className="font-medium">
-                  {viewApp && new Date(viewApp.createdAt).toLocaleDateString(locale === 'fr' ? 'fr-FR' : 'en-US', {
-                    dateStyle: 'long'
-                  })}
-                </p>
-              </div>
-            </div>
-
-            {/* Resume Section */}
-            {viewApp?.resume ? (
-               <div className="border border-slate-200 rounded-lg p-4 flex items-center justify-between">
-                <div>
-                  <h4 className="font-medium text-slate-900">CV / Resume</h4>
-                  <p className="text-xs text-slate-500">
-                    {locale === 'fr' ? 'Document téléchargé' : 'Uploaded document'}
-                  </p>
-                </div>
-                <Button variant="outline" size="sm" asChild>
-                  <a href={viewApp.resume} target="_blank" rel="noopener noreferrer">
-                    <Eye className="w-4 h-4 mr-2" />
-                    {locale === 'fr' ? 'Voir le CV' : 'View Resume'}
-                  </a>
-                </Button>
-               </div>
-            ) : (
-              <div className="border border-slate-200 border-dashed rounded-lg p-6 text-center text-slate-500 text-sm">
-                {locale === 'fr' ? 'Aucun CV fourni' : 'No resume provided'}
-              </div>
-            )}
-
-            {/* Cover Letter Section */}
-            <div>
-              <h4 className="font-medium text-slate-900 mb-2">
-                {locale === 'fr' ? 'Lettre de motivation' : 'Cover Letter'}
-              </h4>
-              <div className="bg-slate-50 p-4 rounded-lg text-sm text-slate-600 max-h-[200px] overflow-y-auto whitespace-pre-wrap leading-relaxed">
-                {viewApp?.coverLetter || (
-                  <span className="italic text-slate-400">
-                    {locale === 'fr' ? 'Aucune lettre de motivation' : 'No cover letter'}
-                  </span>
-                )}
-              </div>
-            </div>
-          </div>
-
-          <DialogFooter>
-             <Button variant="outline" onClick={() => setViewApp(null)}>
-               {locale === 'fr' ? 'Fermer' : 'Close'}
-             </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Rejection Modal */}
+      {/* Rejection Dialog */}
       <Dialog open={!!rejectionApp} onOpenChange={(open) => !open && setRejectionApp(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>
-              {locale === 'fr' ? 'Refuser la candidature' : 'Reject Application'}
-            </DialogTitle>
+            <DialogTitle>{locale === 'fr' ? 'Refuser la candidature ?' : 'Reject Application?'}</DialogTitle>
             <DialogDescription>
               {locale === 'fr' 
-                ? `Voulez-vous envoyer un email de refus automatique à ${rejectionApp?.candidate.name || 'ce candidat'} ?`
-                : `Do you want to send an automatic rejection email to ${rejectionApp?.candidate.name || 'this candidate'}?`
+                ? 'Cette action est irréversible. Voulez-vous envoyer un email de refus au candidat ?'
+                : 'This action cannot be undone. Do you want to send a rejection email to the candidate?'
               }
             </DialogDescription>
           </DialogHeader>
-          
-          <div className="bg-slate-50 p-4 rounded-lg text-sm text-slate-600 border border-slate-200 my-4">
-            <p className="font-medium mb-2 text-slate-900">
-              {locale === 'fr' ? 'Aperçu du message :' : 'Email preview:'}
-            </p>
-            <p className="italic">
-              {locale === 'fr' 
-                ? `"Bonjour ${rejectionApp?.candidate.name || '...'}, merci d'avoir postulé pour le poste de ${rejectionApp?.job.title}... Bien que votre profil soit intéressant, nous avons décidé de ne pas donner suite..."`
-                : `"Hello ${rejectionApp?.candidate.name || '...'}, thank you for applying for the ${rejectionApp?.job.title} position... Although your profile is impressive, we have decided not to proceed..."`
-              }
-            </p>
-          </div>
-
           <DialogFooter className="gap-2 sm:gap-0">
-            <Button
-              variant="outline"
+            <Button variant="outline" onClick={() => setRejectionApp(null)}>
+              {locale === 'fr' ? 'Annuler' : 'Cancel'}
+            </Button>
+            <Button 
+              variant="destructive" 
               onClick={() => confirmReject(false)}
               disabled={isProcessingRejection}
             >
-              {locale === 'fr' ? 'Refuser sans email' : 'Reject without email'}
+              {locale === 'fr' ? 'Refuser (Sans Email)' : 'Reject (No Email)'}
             </Button>
-            <Button
-              variant="destructive"
+            <Button 
+              variant="default" // "danger" isn't a variant, ususally destructive or default. I'll use default styled as red if needed, or just destructive. But "Refuser et Envoyer" is usually the primary action.
+              className="bg-red-600 hover:bg-red-700 text-white"
               onClick={() => confirmReject(true)}
               disabled={isProcessingRejection}
             >
-              {isProcessingRejection 
-                ? (locale === 'fr' ? 'Envoi...' : 'Sending...') 
-                : (locale === 'fr' ? 'Refuser et envoyer email' : 'Reject & Send Email')
-              }
+               {locale === 'fr' ? 'Refuser et Envoyer Email' : 'Reject & Send Email'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Schedule Interview Dialog */}
+       <Dialog open={!!schedulingApp} onOpenChange={(open) => !open && setSchedulingApp(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{locale === 'fr' ? 'Planifier un entretien' : 'Schedule Interview'}</DialogTitle>
+            <DialogDescription>
+               {locale === 'fr' 
+                 ? "Envoyez un lien de réservation (Calendly, Google Meet) au candidat."
+                 : "Send a booking link (Calendly, Google Meet) to the candidate."
+               }
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+             <div className="space-y-2">
+                <label className="text-sm font-medium">
+                  {locale === 'fr' ? 'Lien de réservation (Optionnel)' : 'Booking Link (Optional)'}
+                </label>
+                <Input 
+                   value={bookingLink}
+                   onChange={(e) => setBookingLink(e.target.value)}
+                   placeholder="https://calendly.com/..."
+                />
+             </div>
+          </div>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button variant="outline" onClick={() => setSchedulingApp(null)}>
+              {locale === 'fr' ? 'Annuler' : 'Cancel'}
+            </Button>
+            <Button 
+              variant="secondary" 
+              onClick={() => confirmSchedule(false)}
+              disabled={isProcessingSchedule}
+            >
+               {locale === 'fr' ? 'Déplacer sans email' : 'Move without email'}
+            </Button>
+            <Button 
+              onClick={() => confirmSchedule(true)} 
+              disabled={isProcessingSchedule || !bookingLink}
+              className="bg-teal-600 hover:bg-teal-700"
+            >
+               {locale === 'fr' ? 'Envoyer invitation' : 'Send Invitation'}
             </Button>
           </DialogFooter>
         </DialogContent>

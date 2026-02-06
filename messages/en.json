@@ -10,7 +10,8 @@
     "myApplications": "My Applications",
     "profile": "Profile",
     "signIn": "Sign In",
-    "signOut": "Sign Out"
+    "signOut": "Sign Out",
+    "messages": "Messages"
   },
   "common": {
     "viewAll": "View All",

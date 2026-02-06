@@ -153,7 +153,7 @@ export default function NotificationBell() {
                   {locale === 'fr' ? 'Tout lire' : 'Mark all read'}
                 </Button>
               )}
-              <button onClick={() => setIsOpen(false)}>
+              <button onClick={() => setIsOpen(false)} aria-label={locale === 'fr' ? "Fermer les notifications" : "Close notifications"}>
                 <X className="w-4 h-4 text-slate-400 hover:text-slate-600" />
               </button>
             </div>
@@ -187,7 +187,7 @@ export default function NotificationBell() {
                       <div className="flex items-center gap-1">
                         {notif.link && (
                           <Link href={notif.link} onClick={() => markAsRead(notif.id)}>
-                            <button className="p-1 text-slate-400 hover:text-teal-600">
+                            <button className="p-1 text-slate-400 hover:text-teal-600" aria-label={locale === 'fr' ? "Ouvrir le lien" : "Open link"}>
                               <ExternalLink className="w-4 h-4" />
                             </button>
                           </Link>
@@ -196,6 +196,7 @@ export default function NotificationBell() {
                           <button
                             onClick={() => markAsRead(notif.id)}
                             className="p-1 text-slate-400 hover:text-teal-600"
+                            aria-label={locale === 'fr' ? "Marquer comme lu" : "Mark as read"}
                           >
                             <Check className="w-4 h-4" />
                           </button>
@@ -203,6 +204,7 @@ export default function NotificationBell() {
                         <button
                           onClick={() => deleteNotification(notif.id)}
                           className="p-1 text-slate-400 hover:text-red-500"
+                          aria-label={locale === 'fr' ? "Supprimer la notification" : "Delete notification"}
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>

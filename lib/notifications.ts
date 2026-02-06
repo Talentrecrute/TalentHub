@@ -61,7 +61,8 @@ export async function notifyStatusChange(
     PENDING: 'En attente',
     REVIEWED: 'Vue par l\'employeur',
     ACCEPTED: 'Acceptée',
-    REJECTED: 'Refusée'
+    REJECTED: 'Refusée',
+    ARCHIVED: 'Archivée' // Should rarely happen for candidates, but good for completeness
   }
 
   return await createNotification({

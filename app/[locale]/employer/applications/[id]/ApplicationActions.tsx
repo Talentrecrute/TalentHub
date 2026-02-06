@@ -9,7 +9,7 @@ import { toast } from 'sonner'
 
 interface ApplicationActionsProps {
   applicationId: string
-  currentStatus: 'PENDING' | 'REVIEWED' | 'ACCEPTED' | 'REJECTED'
+  currentStatus: 'PENDING' | 'REVIEWED' | 'ACCEPTED' | 'REJECTED' | 'ARCHIVED'
   candidateEmail: string
   jobTitle: string
 }
@@ -23,7 +23,7 @@ export default function ApplicationActions({
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
 
-  const handleStatusChange = (status: 'PENDING' | 'REVIEWED' | 'ACCEPTED' | 'REJECTED') => {
+  const handleStatusChange = (status: 'PENDING' | 'REVIEWED' | 'ACCEPTED' | 'REJECTED' | 'ARCHIVED') => {
     startTransition(async () => {
       try {
         await updateApplicationStatus(applicationId, status)
@@ -31,7 +31,8 @@ export default function ApplicationActions({
           PENDING: 'Candidature remise en attente',
           REVIEWED: 'Candidature marquée comme examinée',
           ACCEPTED: 'Candidature acceptée !',
-          REJECTED: 'Candidature rejetée'
+          REJECTED: 'Candidature rejetée',
+          ARCHIVED: 'Candidature archivée'
         }
         toast.success(messages[status])
         router.refresh()

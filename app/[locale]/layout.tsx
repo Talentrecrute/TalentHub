@@ -4,6 +4,7 @@ import Footer from "@/components/layout/Footer";
 import MobileBottomNav from "@/components/layout/MobileBottomNav";
 import Navigation from "@/components/layout/Navigation";
 import OnboardingTour from "@/components/onboarding/OnboardingTour";
+import CookieConsent from "@/components/privacy/CookieConsent";
 import AuthProvider from "@/components/providers/AuthProvider";
 import PWAInstallPrompt from "@/components/pwa/PWAInstallPrompt";
 import type { Metadata, Viewport } from "next";
@@ -185,6 +186,7 @@ export default async function LocaleLayout({
             <Toaster position="top-right" />
             <KeyboardShortcuts />
             <PWAInstallPrompt />
+            <CookieConsent />
             <OnboardingTour />
           </NextIntlClientProvider>
         </AuthProvider>

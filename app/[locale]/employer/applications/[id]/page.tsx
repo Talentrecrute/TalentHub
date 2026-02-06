@@ -73,8 +73,9 @@ export default async function ApplicationDetailPage({
     PENDING: 'bg-yellow-100 text-yellow-700 border-yellow-200',
     REVIEWED: 'bg-blue-100 text-blue-700 border-blue-200',
     ACCEPTED: 'bg-green-100 text-green-700 border-green-200',
-    REJECTED: 'bg-red-100 text-red-700 border-red-200'
-  }
+    REJECTED: 'bg-red-100 text-red-700 border-red-200',
+    ARCHIVED: 'bg-slate-100 text-slate-700 border-slate-200'
+  } as const
 
   return (
     <div className="min-h-screen bg-slate-50">

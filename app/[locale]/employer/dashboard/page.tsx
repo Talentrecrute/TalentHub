@@ -139,7 +139,7 @@ export default async function EmployerDashboardPage() {
       <EmployerDashboardClient
         company={data.company}
         jobs={data.jobs}
-        allApplications={data.allApplications}
+        allApplications={data.allApplications.map(app => ({ ...app, tags: [] }))}
         stats={data.stats}
         applicationsByStatus={data.applicationsByStatus}
         applicationsByJob={data.applicationsByJob}

@@ -73,6 +73,14 @@ export default function Navigation() {
             >
               Blog
             </Link>
+            <Link 
+              href="/messages" 
+              className={`text-sm font-medium transition-colors ${
+                isActive('/messages') ? 'text-teal-600' : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              {t('messages')}
+            </Link>
           </div>
 
           {/* Create default navigation items if they don't exist */}
@@ -301,6 +309,25 @@ export default function Navigation() {
                 📰
               </span>
               Blog
+            </Link>
+            <Link 
+              href="/messages" 
+              className={`px-4 py-3 text-sm font-medium rounded-xl flex items-center gap-3 transition-all duration-200 transform ${
+                mobileMenuOpen ? 'translate-x-0 opacity-100' : '-translate-x-4 opacity-0'
+              } ${
+                isActive('/messages') 
+                  ? 'bg-gradient-to-r from-teal-600 to-cyan-600 text-white shadow-lg shadow-teal-500/20' 
+                  : 'text-slate-700 hover:bg-slate-100 active:scale-[0.98]'
+              }`}
+              style={{ transitionDelay: mobileMenuOpen ? '125ms' : '0ms' }}
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              <span className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+                isActive('/messages') ? 'bg-white/20' : 'bg-slate-100'
+              }`}>
+                💬
+              </span>
+              {t('messages')}
             </Link>
 
             <div className="mx-2 my-4 border-t border-slate-100" />
