@@ -2,7 +2,7 @@
 
 import { updateApplicationStatus } from '@/app/actions/applications'
 import { Button } from "@/components/ui/button"
-import { Check, Eye, Mail, X } from 'lucide-react'
+import { Briefcase, Check, Eye, Mail, X } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useTransition } from 'react'
 import { toast } from 'sonner'
@@ -92,6 +92,30 @@ export default function ApplicationActions({
           Rejeter
         </Button>
       )}
+
+      {/* Hire Action */}
+      <Button
+          variant="default"
+          size="sm"
+          disabled={isPending || currentStatus === 'ACCEPTED'}
+          onClick={async () => {
+              startTransition(async () => {
+                  try {
+                      // We dynamically import here or use a separate handler if we want to confirm
+                      const { hireCandidate } = await import('@/app/actions/employee')
+                      await hireCandidate(applicationId)
+                      toast.success('Candidat recruté avec succès ! Profil employé créé.')
+                      router.push('/employer/employees')
+                  } catch (error: any) {
+                      toast.error(error.message || "Erreur lors du recrutement")
+                  }
+              })
+          }}
+          className="bg-indigo-600 hover:bg-indigo-700 text-white ml-auto"
+        >
+          <Briefcase className="w-4 h-4 mr-2" />
+          Recruter & Créer Profil
+      </Button>
     </div>
   )
 }

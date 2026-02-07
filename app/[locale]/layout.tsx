@@ -3,6 +3,7 @@ import KeyboardShortcuts from "@/components/keyboard/KeyboardShortcuts";
 import Footer from "@/components/layout/Footer";
 import MobileBottomNav from "@/components/layout/MobileBottomNav";
 import Navigation from "@/components/layout/Navigation";
+import { NotificationProvider } from "@/components/notifications/NotificationProvider";
 import OnboardingTour from "@/components/onboarding/OnboardingTour";
 import CookieConsent from "@/components/privacy/CookieConsent";
 import AuthProvider from "@/components/providers/AuthProvider";
@@ -175,19 +176,21 @@ export default async function LocaleLayout({
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`} suppressHydrationWarning>
         <AuthProvider>
           <NextIntlClientProvider messages={messages}>
-            <div className="min-h-screen bg-slate-50 flex flex-col relative pb-16 lg:pb-0">
-              {/* Animated background */}
-              <AnimatedBackground variant="gradient" />
-              <Navigation />
-              <main className="flex-1 relative z-10">{children}</main>
-              <Footer />
-              <MobileBottomNav />
-            </div>
-            <Toaster position="top-right" />
-            <KeyboardShortcuts />
-            <PWAInstallPrompt />
-            <CookieConsent />
-            <OnboardingTour />
+            <NotificationProvider>
+              <div className="min-h-screen bg-slate-50 flex flex-col relative pb-16 lg:pb-0">
+                {/* Animated background */}
+                <AnimatedBackground variant="gradient" />
+                <Navigation />
+                <main className="flex-1 relative z-10">{children}</main>
+                <Footer />
+                <MobileBottomNav />
+              </div>
+              <Toaster position="top-right" />
+              <KeyboardShortcuts />
+              <PWAInstallPrompt />
+              <CookieConsent />
+              <OnboardingTour />
+            </NotificationProvider>
           </NextIntlClientProvider>
         </AuthProvider>
       </body>

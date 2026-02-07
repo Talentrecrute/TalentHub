@@ -11,7 +11,8 @@
     "profile": "Profile",
     "signIn": "Sign In",
     "signOut": "Sign Out",
-    "messages": "Messages"
+    "messages": "Messages",
+    "employees": "Employees"
   },
   "common": {
     "viewAll": "View All",
@@ -651,6 +652,49 @@
     "ctaTitle": "Ready to find your next job?",
     "ctaSubtitle": "Discover hundreds of offers in the Indian Ocean",
     "browseJobs": "Browse jobs"
+  },
+  "documents": {
+    "title": "Documents",
+    "myDocuments": "My Documents",
+    "upload": "Upload Document",
+    "uploadTitle": "Upload Document",
+    "uploadDescription": "Add a new document to your profile (PDF, Max 5MB).",
+    "name": "Name",
+    "type": "Type",
+    "file": "File",
+    "selectType": "Select type",
+    "uploading": "Uploading...",
+    "success": "Document uploaded successfully",
+    "error": "Upload failed",
+    "noDocuments": "No documents found",
+    "download": "Download",
+    "types": {
+      "ID": "Identity Card",
+      "CONTRACT": "Contract",
+      "DIPLOMA": "Diploma",
+      "PAYSLIP": "Payslip",
+      "OTHER": "Other"
+    }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "empty": "No notifications",
+    "markAllRead": "Mark all as read",
+    "newLeaveRequest": "New Leave Request",
+    "leaveStatusUpdated": "Leave Status Updated",
+    "welcome": "Welcome"
+  },
+  "analytics": {
+    "totalEmployees": "Total Employees",
+    "totalEmployeesDesc": "Active workforce",
+    "activePayroll": "Active Payroll",
+    "activePayrollDesc": "Est. Monthly",
+    "pendingLeaves": "Pending Leaves",
+    "pendingLeavesDesc": "Pending requests",
+    "openJobs": "Open Jobs",
+    "openJobsDesc": "Active recruiting",
+    "salaryDistribution": "Salary Distribution",
+    "headcountGrowth": "Headcount Growth"
   }
 }
 

@@ -76,21 +76,23 @@ model User {
   notifications          Notification[]
   savedJobs              SavedJob[]
   sessions               Session[]
+  employee               Employee?
 }
 
 model Notification {
-  id        String   @id @default(cuid())
-  type      String
+  id        String           @id @default(cuid())
+  userId    String
   title     String
   message   String
+  type      NotificationType @default(INFO)
+  read      Boolean          @default(false)
   link      String?
-  isRead    Boolean  @default(false)
-  userId    String
-  createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime         @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
-  @@index([isRead])
+  @@index([read])
 }
 
 model Conversation {
@@ -164,19 +166,23 @@ model JobTemplate {
 }
 
 model Company {
-  id          String   @id @default(cuid())
-  name        String
-  description String?
-  website     String?
-  logo        String?
-  industry    String?
-  size        String?
-  location    String?
-  employerId  String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  employer    User     @relation(fields: [employerId], references: [id], onDelete: Cascade)
-  jobs        Job[]
+  id            String         @id @default(cuid())
+  name          String
+  description   String?
+  website       String?
+  logo          String?
+  industry      String?
+  size          String?
+  location      String?
+  employerId    String
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  employer      User           @relation(fields: [employerId], references: [id], onDelete: Cascade)
+  jobs          Job[]
+  departments   Department[]
+  employees     Employee[]
+  documents     Document[]
+  leaveRequests LeaveRequest[]
 
   @@index([employerId])
 }
@@ -281,6 +287,7 @@ enum UserRole {
   CANDIDATE
   EMPLOYER
   ADMIN
+  EMPLOYEE
 }
 
 enum JobStatus {
@@ -300,4 +307,124 @@ enum ApplicationStatus {
 enum BlogPostStatus {
   DRAFT
   PUBLISHED
+}
+
+enum EmploymentStatus {
+  ACTIVE
+  TERMINATED
+  ON_LEAVE
+  PENDING_ONBOARDING
+}
+
+enum ContractType {
+  FULL_TIME
+  PART_TIME
+  FREELANCE
+  INTERNSHIP
+}
+
+model Department {
+  id        String     @id @default(cuid())
+  name      String
+  managerId String?
+  companyId String
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  company   Company    @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  employees Employee[]
+
+  @@index([companyId])
+}
+
+model Employee {
+  id               String           @id @default(cuid())
+  userId           String?          @unique
+  companyId        String
+  managerId        String?
+  departmentId     String?
+  jobTitle         String
+  status           EmploymentStatus @default(PENDING_ONBOARDING)
+  startDate        DateTime
+  endDate          DateTime?
+  contractType     ContractType     @default(FULL_TIME)
+  salary           Float?
+  currency         String           @default("EUR")
+  frequency        String           @default("MONTHLY")
+  firstName        String
+  lastName         String
+  dateOfBirth      DateTime?
+  address          String?
+  emergencyContact String?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  company          Company          @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  department       Department?      @relation(fields: [departmentId], references: [id])
+  documents        Document[]
+  manager          Employee?        @relation("ManagerToDirectReport", fields: [managerId], references: [id])
+  directReports    Employee[]       @relation("ManagerToDirectReport")
+  user             User?            @relation(fields: [userId], references: [id])
+  leaves           LeaveRequest[]
+
+  @@index([companyId])
+  @@index([departmentId])
+  @@index([managerId])
+}
+
+model Document {
+  id         String   @id @default(cuid())
+  name       String
+  type       String
+  url        String
+  employeeId String
+  companyId  String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  company    Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@index([employeeId])
+  @@index([companyId])
+}
+
+model LeaveRequest {
+  id         String      @id @default(cuid())
+  type       LeaveType   @default(PAID_LEAVE)
+  status     LeaveStatus @default(PENDING)
+  startDate  DateTime
+  endDate    DateTime
+  reason     String?
+  employeeId String
+  companyId  String
+  approverId String?
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  company  Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([employeeId])
+  @@index([companyId])
+  @@index([status])
+}
+
+enum NotificationType {
+  INFO
+  SUCCESS
+  WARNING
+  ERROR
+}
+
+enum LeaveType {
+  PAID_LEAVE
+  SICK_LEAVE
+  UNPAID
+  REMOTE_WORK
+  OTHER
+}
+
+enum LeaveStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
 }

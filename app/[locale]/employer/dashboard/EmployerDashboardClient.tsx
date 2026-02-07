@@ -1,29 +1,27 @@
 'use client'
 
-import { updateApplicationDetails } from '@/app/actions/applications'
-import ApplicationKanban from '@/components/employer/ApplicationKanban'
-import DashboardStats from '@/components/employer/DashboardStats'
+import { updateApplicationDetails } from "@/app/actions/applications"
+import ApplicationKanban from "@/components/employer/ApplicationKanban"
+import DashboardStats from "@/components/employer/DashboardStats"
+import { HeadcountTrend } from "@/components/employer/HeadcountTrend"
+import { HRStatsOverview } from "@/components/employer/HRStatsOverview"
+import { SalaryDistributionChart } from "@/components/employer/SalaryDistributionChart"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Link } from '@/i18n/routing'
-import type { Application, Company, Job, User } from '@prisma/client'
-import { Archive, Briefcase, FileText, LayoutDashboard, PlusCircle, TrendingUp, Users } from 'lucide-react'
+import { Card, CardContent } from "@/components/ui/card"
+import { Link, useRouter } from "@/i18n/routing"
+import { Application, Company, Job, User } from '@prisma/client'
+import { Archive, Briefcase, LayoutDashboard, PlusCircle, Users } from 'lucide-react'
 import { useLocale, useTranslations } from 'next-intl'
-import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
-type JobWithCount = Job & {
-  _count: { applications: number }
-}
-
+type JobWithCount = Job & { _count: { applications: number } }
 type ApplicationWithDetails = Application & {
   job: Job
   candidate: User
   tags: string[]
 }
-
 interface EmployerDashboardClientProps {
   company: Company
   jobs: JobWithCount[]
@@ -39,10 +37,20 @@ interface EmployerDashboardClientProps {
     reviewed: number
     accepted: number
     rejected: number
-    archived?: number // Optional as it's new
+    archived?: number
   }
   applicationsByJob: { jobTitle: string; count: number }[]
   weeklyApplications: { day: string; count: number }[]
+  // HR Analytics
+  hrStats: {
+      totalEmployees: number
+      totalPayroll: number
+      currency: string
+      pendingLeaves: number
+      openJobs: number
+  }
+  salaryDistribution: { department: string; totalAmount: number }[]
+  headcountTrend: { month: string; count: number }[]
 }
 
 type TabType = 'overview' | 'jobs' | 'applications' | 'talent-pool'
@@ -54,7 +62,10 @@ export default function EmployerDashboardClient({
   stats,
   applicationsByStatus,
   applicationsByJob,
-  weeklyApplications
+  weeklyApplications,
+  hrStats,
+  salaryDistribution,
+  headcountTrend
 }: EmployerDashboardClientProps) {
   const t = useTranslations('employerDashboard')
   const tStatus = useTranslations('status')
@@ -62,6 +73,7 @@ export default function EmployerDashboardClient({
   const tApps = useTranslations('applications')
   const locale = useLocale()
   const router = useRouter()
+
   
   const [activeTab, setActiveTab] = useState<TabType>('overview')
 
@@ -138,61 +150,12 @@ export default function EmployerDashboardClient({
           {/* Overview Tab */}
           {activeTab === 'overview' && (
             <div className="space-y-6">
-              {/* Stats Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <Card className="bg-gradient-to-br from-slate-50 to-slate-100 border-slate-200">
-                  <CardHeader className="flex flex-row items-center justify-between pb-2">
-                    <CardTitle className="text-sm font-medium text-slate-600">{t('activeJobs')}</CardTitle>
-                    <div className="w-10 h-10 bg-slate-200 rounded-full flex items-center justify-center">
-                      <Briefcase className="w-5 h-5 text-slate-600" />
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-3xl font-bold text-slate-900">{stats.totalJobs}</div>
-                    <p className="text-xs text-slate-500 mt-1">{stats.openJobs} {tStatus('open').toLowerCase()}</p>
-                  </CardContent>
-                </Card>
+              {/* HR Stats Overview */}
+              <HRStatsOverview stats={hrStats} />
 
-                <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
-                  <CardHeader className="flex flex-row items-center justify-between pb-2">
-                    <CardTitle className="text-sm font-medium text-green-700">{tStatus('open')}</CardTitle>
-                    <div className="w-10 h-10 bg-green-200 rounded-full flex items-center justify-center">
-                      <TrendingUp className="w-5 h-5 text-green-600" />
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-3xl font-bold text-green-700">{stats.openJobs}</div>
-                    <p className="text-xs text-green-600 mt-1">
-                      {stats.totalJobs > 0 ? Math.round((stats.openJobs / stats.totalJobs) * 100) : 0}% actifs
-                    </p>
-                  </CardContent>
-                </Card>
-
-                <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
-                  <CardHeader className="flex flex-row items-center justify-between pb-2">
-                    <CardTitle className="text-sm font-medium text-blue-700">{t('totalApplications')}</CardTitle>
-                    <div className="w-10 h-10 bg-blue-200 rounded-full flex items-center justify-center">
-                      <FileText className="w-5 h-5 text-blue-600" />
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-3xl font-bold text-blue-700">{stats.totalApplications}</div>
-                    <p className="text-xs text-blue-600 mt-1">{applicationsByStatus.accepted} acceptées</p>
-                  </CardContent>
-                </Card>
-
-                <Card className="bg-gradient-to-br from-amber-50 to-amber-100 border-amber-200">
-                  <CardHeader className="flex flex-row items-center justify-between pb-2">
-                    <CardTitle className="text-sm font-medium text-amber-700">{t('newApplications')}</CardTitle>
-                    <div className="w-10 h-10 bg-amber-200 rounded-full flex items-center justify-center">
-                      <Users className="w-5 h-5 text-amber-600" />
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-3xl font-bold text-amber-700">{stats.pendingApplications}</div>
-                    <p className="text-xs text-amber-600 mt-1">À traiter</p>
-                  </CardContent>
-                </Card>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <SalaryDistributionChart data={salaryDistribution} />
+                  <HeadcountTrend data={headcountTrend} />
               </div>
 
               {/* Statistics Charts */}

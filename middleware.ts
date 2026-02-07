@@ -28,6 +28,7 @@ const protectedPaths = [
   '/profile',
   '/employer',
   '/admin',
+  '/employee',
 ];
 
 // Paths that admins should NOT access (they should stay in admin area)
@@ -36,10 +37,14 @@ const nonAdminPaths = [
   '/applications',
   '/profile',
   '/employer',
+  '/employee',
 ];
 
 // Paths only for admins
 const adminOnlyPaths = ['/admin'];
+
+// Paths only for employees
+const employeeOnlyPaths = ['/employee'];
 
 function isProtectedPath(pathname: string) {
   return protectedPaths.some(path => 
@@ -51,6 +56,14 @@ function isProtectedPath(pathname: string) {
 
 function isAdminPath(pathname: string) {
   return adminOnlyPaths.some(path => 
+    pathname.startsWith(path) || 
+    pathname.startsWith(`/fr${path}`) || 
+    pathname.startsWith(`/en${path}`)
+  );
+}
+
+function isEmployeePath(pathname: string) {
+  return employeeOnlyPaths.some(path => 
     pathname.startsWith(path) || 
     pathname.startsWith(`/fr${path}`) || 
     pathname.startsWith(`/en${path}`)
@@ -90,6 +103,13 @@ export default async function middleware(req: NextRequest) {
   if (token && token.role !== 'ADMIN' && isAdminPath(pathname)) {
     const locale = pathname.startsWith('/fr') ? 'fr' : pathname.startsWith('/en') ? 'en' : 'fr';
     return NextResponse.redirect(new URL(`/${locale}`, req.url));
+  }
+
+  // If non-employee user tries to access employee routes
+  if (token && token.role !== 'EMPLOYEE' && isEmployeePath(pathname)) {
+     const locale = pathname.startsWith('/fr') ? 'fr' : pathname.startsWith('/en') ? 'en' : 'fr';
+     // Redirect to default dashboard or home
+     return NextResponse.redirect(new URL(`/${locale}`, req.url));
   }
   
   // Use auth middleware for protected paths

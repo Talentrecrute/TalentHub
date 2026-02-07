@@ -92,6 +92,61 @@ async function getEmployerData(userId: string) {
     })
   }
 
+
+  // HR Analytics Data
+  
+  // 1. Total Employees & Payroll
+  const employees = await prisma.employee.findMany({
+    where: { companyId: company.id },
+    select: {
+      salary: true,
+      currency: true,
+      department: { select: { name: true } },
+      createdAt: true
+    }
+  })
+
+  // 2. Pending Leaves
+  const pendingLeavesCount = await prisma.leaveRequest.count({
+    where: { 
+      companyId: company.id,
+      status: 'PENDING'
+    }
+  })
+
+  // 3. Salary Distribution by Department
+  const salaryByDeptMap = new Map<string, number>()
+  let totalPayroll = 0
+
+  employees.forEach(emp => {
+    const amount = emp.salary || 0
+    totalPayroll += amount
+    const deptName = emp.department?.name || "Sans département"
+    salaryByDeptMap.set(deptName, (salaryByDeptMap.get(deptName) || 0) + amount)
+  })
+
+  const salaryDistribution = Array.from(salaryByDeptMap.entries())
+    .map(([department, totalAmount]) => ({ department, totalAmount }))
+    .sort((a, b) => b.totalAmount - a.totalAmount)
+
+  // 4. Headcount Trend (Last 6 Months)
+  const today = new Date()
+  const headcountTrend = []
+  
+  for (let i = 5; i >= 0; i--) {
+      const d = new Date(today.getFullYear(), today.getMonth() - i, 1)
+      const monthName = d.toLocaleDateString('fr-FR', { month: 'short' })
+      // Count employees created BEFORE end of this month
+      const endOfMonth = new Date(today.getFullYear(), today.getMonth() - i + 1, 0)
+      
+      const count = employees.filter(e => new Date(e.createdAt) <= endOfMonth).length
+      
+      headcountTrend.push({
+          month: monthName,
+          count
+      })
+  }
+
   return { 
     company, 
     jobs, 
@@ -99,7 +154,17 @@ async function getEmployerData(userId: string) {
     stats,
     applicationsByStatus,
     applicationsByJob: jobApplicationCounts,
-    weeklyApplications
+    weeklyApplications,
+    // New HR Data
+    hrStats: {
+        totalEmployees: employees.length,
+        totalPayroll,
+        currency: employees[0]?.currency || 'EUR', // Simplified assumption
+        pendingLeaves: pendingLeavesCount,
+        openJobs: stats.openJobs
+    },
+    salaryDistribution,
+    headcountTrend
   }
 }
 
@@ -144,6 +209,9 @@ export default async function EmployerDashboardPage() {
         applicationsByStatus={data.applicationsByStatus}
         applicationsByJob={data.applicationsByJob}
         weeklyApplications={data.weeklyApplications}
+        hrStats={data.hrStats}
+        salaryDistribution={data.salaryDistribution}
+        headcountTrend={data.headcountTrend}
       />
       
       {/* Danger Zone - Account Deletion */}

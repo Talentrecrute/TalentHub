@@ -1,12 +1,14 @@
 import { prisma } from '@/lib/prisma'
 
+import { NotificationType as PrismaNotificationType } from '@prisma/client'
+
 export type NotificationType = 
-  | 'APPLICATION_RECEIVED'    // Employer: new application
-  | 'APPLICATION_STATUS'      // Candidate: status changed
-  | 'NEW_MESSAGE'             // Both: new message
-  | 'JOB_ALERT'               // Candidate: matching job
-  | 'PROFILE_VIEWED'          // Candidate: employer viewed profile
-  | 'APPLICATION_REMINDER'    // Employer: pending applications
+  | 'APPLICATION_RECEIVED'
+  | 'APPLICATION_STATUS'
+  | 'NEW_MESSAGE'
+  | 'JOB_ALERT'
+  | 'PROFILE_VIEWED'
+  | 'APPLICATION_REMINDER'
 
 interface CreateNotificationParams {
   userId: string
@@ -23,10 +25,28 @@ export async function createNotification({
   message,
   link
 }: CreateNotificationParams) {
+  let prismaType: PrismaNotificationType = 'INFO'
+
+  switch (type) {
+    case 'APPLICATION_RECEIVED':
+      prismaType = 'SUCCESS'
+      break
+    case 'APPLICATION_REMINDER':
+      prismaType = 'WARNING'
+      break
+    case 'APPLICATION_STATUS':
+    case 'NEW_MESSAGE':
+    case 'JOB_ALERT':
+    case 'PROFILE_VIEWED':
+    default:
+      prismaType = 'INFO'
+      break
+  }
+
   return await prisma.notification.create({
     data: {
       userId,
-      type,
+      type: prismaType,
       title,
       message,
       link

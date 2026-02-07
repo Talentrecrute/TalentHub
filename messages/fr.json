@@ -11,7 +11,8 @@
     "profile": "Profil",
     "signIn": "Se connecter",
     "signOut": "Se déconnecter",
-    "messages": "Messages"
+    "messages": "Messages",
+    "employees": "Employés"
   },
   "common": {
     "viewAll": "Voir tout",
@@ -651,6 +652,49 @@
     "ctaTitle": "Prêt à trouver votre prochain emploi ?",
     "ctaSubtitle": "Découvrez des centaines d'offres dans l'Océan Indien",
     "browseJobs": "Voir les offres"
+  },
+  "documents": {
+    "title": "Documents",
+    "myDocuments": "Mes Documents",
+    "upload": "Télécharger un document",
+    "uploadTitle": "Ajouter un document",
+    "uploadDescription": "Ajoutez un nouveau document à votre profil (PDF, Max 5MB).",
+    "name": "Nom",
+    "type": "Type",
+    "file": "Fichier",
+    "selectType": "Sélectionner le type",
+    "uploading": "Téléchargement...",
+    "success": "Document téléchargé avec succès",
+    "error": "Échec du téléchargement",
+    "noDocuments": "Aucun document trouvé",
+    "download": "Télécharger",
+    "types": {
+      "ID": "Carte d'identité",
+      "CONTRACT": "Contrat",
+      "DIPLOMA": "Diplôme",
+      "PAYSLIP": "Bulletin de paie",
+      "OTHER": "Autre"
+    }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "empty": "Aucune notification",
+    "markAllRead": "Tout marquer comme lu",
+    "newLeaveRequest": "Nouvelle demande de congé",
+    "leaveStatusUpdated": "Statut de congé mis à jour",
+    "welcome": "Bienvenue"
+  },
+  "analytics": {
+    "totalEmployees": "Total Employés",
+    "totalEmployeesDesc": "Effectif actif",
+    "activePayroll": "Masse Salariale",
+    "activePayrollDesc": "Mensuel estimé",
+    "pendingLeaves": "Congés en attente",
+    "pendingLeavesDesc": "Demandes en attente",
+    "openJobs": "Postes ouverts",
+    "openJobsDesc": "Recrutements actifs",
+    "salaryDistribution": "Répartition des salaires",
+    "headcountGrowth": "Croissance des effectifs"
   }
 }
 

@@ -1,29 +1,13 @@
 import { prisma } from '@/lib/prisma'
 import { MetadataRoute } from 'next'
 
+export const dynamic = 'force-dynamic'
+
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://oceanic-job.com'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const locales = ['fr', 'en']
   const sitemapEntries: MetadataRoute.Sitemap = []
-
-  // Get all open jobs
-  const jobs = await prisma.job.findMany({
-    where: { status: 'OPEN' },
-    select: { id: true, updatedAt: true },
-    orderBy: { createdAt: 'desc' },
-  })
-
-  // Get all companies
-  const companies = await prisma.company.findMany({
-    select: { id: true, updatedAt: true },
-  })
-
-  // Get all published blog posts
-  const blogPosts = await prisma.blogPost.findMany({
-    where: { status: 'PUBLISHED' },
-    select: { slug: true, updatedAt: true },
-  })
 
   // Static pages with priorities
   const staticPages = [
@@ -57,58 +41,80 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   }
 
-  // Add job pages (high priority - main content)
-  for (const job of jobs) {
-    for (const locale of locales) {
-      sitemapEntries.push({
-        url: `${siteUrl}/${locale}/jobs/${job.id}`,
-        lastModified: job.updatedAt,
-        changeFrequency: 'daily',
-        priority: 0.8,
-        alternates: {
-          languages: {
-            fr: `${siteUrl}/fr/jobs/${job.id}`,
-            en: `${siteUrl}/en/jobs/${job.id}`,
-          },
-        },
-      })
-    }
-  }
+  try {
+    // Get all open jobs
+    const jobs = await prisma.job.findMany({
+      where: { status: 'OPEN' },
+      select: { id: true, updatedAt: true },
+      orderBy: { createdAt: 'desc' },
+    })
 
-  // Add company pages
-  for (const company of companies) {
-    for (const locale of locales) {
-      sitemapEntries.push({
-        url: `${siteUrl}/${locale}/companies/${company.id}`,
-        lastModified: company.updatedAt,
-        changeFrequency: 'weekly',
-        priority: 0.7,
-        alternates: {
-          languages: {
-            fr: `${siteUrl}/fr/companies/${company.id}`,
-            en: `${siteUrl}/en/companies/${company.id}`,
-          },
-        },
-      })
-    }
-  }
+    // Get all companies
+    const companies = await prisma.company.findMany({
+      select: { id: true, updatedAt: true },
+    })
 
-  // Add blog post pages
-  for (const post of blogPosts) {
-    for (const locale of locales) {
-      sitemapEntries.push({
-        url: `${siteUrl}/${locale}/blog/${post.slug}`,
-        lastModified: post.updatedAt,
-        changeFrequency: 'weekly',
-        priority: 0.7,
-        alternates: {
-          languages: {
-            fr: `${siteUrl}/fr/blog/${post.slug}`,
-            en: `${siteUrl}/en/blog/${post.slug}`,
+    // Get all published blog posts
+    const blogPosts = await prisma.blogPost.findMany({
+      where: { status: 'PUBLISHED' },
+      select: { slug: true, updatedAt: true },
+    })
+
+    // Add job pages (high priority - main content)
+    for (const job of jobs) {
+      for (const locale of locales) {
+        sitemapEntries.push({
+          url: `${siteUrl}/${locale}/jobs/${job.id}`,
+          lastModified: job.updatedAt,
+          changeFrequency: 'daily',
+          priority: 0.8,
+          alternates: {
+            languages: {
+              fr: `${siteUrl}/fr/jobs/${job.id}`,
+              en: `${siteUrl}/en/jobs/${job.id}`,
+            },
           },
-        },
-      })
+        })
+      }
     }
+
+    // Add company pages
+    for (const company of companies) {
+      for (const locale of locales) {
+        sitemapEntries.push({
+          url: `${siteUrl}/${locale}/companies/${company.id}`,
+          lastModified: company.updatedAt,
+          changeFrequency: 'weekly',
+          priority: 0.7,
+          alternates: {
+            languages: {
+              fr: `${siteUrl}/fr/companies/${company.id}`,
+              en: `${siteUrl}/en/companies/${company.id}`,
+            },
+          },
+        })
+      }
+    }
+
+    // Add blog post pages
+    for (const post of blogPosts) {
+      for (const locale of locales) {
+        sitemapEntries.push({
+          url: `${siteUrl}/${locale}/blog/${post.slug}`,
+          lastModified: post.updatedAt,
+          changeFrequency: 'weekly',
+          priority: 0.7,
+          alternates: {
+            languages: {
+              fr: `${siteUrl}/fr/blog/${post.slug}`,
+              en: `${siteUrl}/en/blog/${post.slug}`,
+            },
+          },
+        })
+      }
+    }
+  } catch (error) {
+    console.warn('Could not fetch dynamic sitemap data:', error)
   }
 
   return sitemapEntries
