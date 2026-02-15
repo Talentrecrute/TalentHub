@@ -99,7 +99,7 @@ export async function createEmployee(data: CreateEmployeeData) {
       startDate: data.startDate,
       contractType: data.contractType,
       status: data.status || 'PENDING_ONBOARDING',
-      departmentId: data.departmentId,
+      departmentId: data.departmentId || null,
       companyId: company.id,
       salary: data.salary,
       currency: data.currency,
@@ -179,11 +179,15 @@ export async function updateEmployee(id: string, data: Partial<CreateEmployeeDat
 
     if (!existing) throw new Error('Employee not found')
 
+    const updateData = { ...data }
+    if (updateData.departmentId === '') {
+        // @ts-ignore - Prisma allows null but our type might not
+        updateData.departmentId = null
+    }
+
     const employee = await prisma.employee.update({
         where: { id },
-        data: {
-            ...data
-        }
+        data: updateData
     })
 
     revalidatePath(`/dashboard/employees/${id}`)
